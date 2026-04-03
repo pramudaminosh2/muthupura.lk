@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Muthupura.lk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root{--bg:#f5f8ff;--surface:#fff;--text:#1d2f51;--muted:#6a7f9d;--accent1:#3a6ff8;--accent2:#8e52f8;--shadow:0 16px 34px rgba(31,57,103,0.09);} 
+        *{box-sizing:border-box;}
+        body{margin:0;font-family:'Inter','Poppins',system-ui,sans-serif;background:linear-gradient(145deg,#f2f6fc,#ecf3fb);color:var(--text);}
+        .wrapper{max-width:1160px;margin:0 auto;padding:14px 16px 24px;}
+        .navbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,0.78);border:1px solid rgba(80,103,149,0.19);box-shadow:0 12px 26px rgba(24,50,95,0.12);}
+        .brand{display:flex;align-items:center;gap:10px;}.brand img{height:34px;}.brand span{font-size:1.2rem;font-weight:800;}.nav-links{display:flex;gap:8px;}
+        .btn{border:0;border-radius:999px;padding:8px 14px;font-size:.92rem;font-weight:600;cursor:pointer;transition:.2s ease;}.btn.primary{background:linear-gradient(110deg,var(--accent1),var(--accent2));color:#fff;}.btn.secondary{background:#f1f5ff;color:#2f4f82;border:1px solid rgba(58,111,248,0.2);}.btn.danger{background:#e26985;color:#fff;}.btn:hover{transform:translateY(-1px);}
+        .stats{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0;}
+        .stat{flex:1;min-width:168px;background:var(--surface);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow);border:1px solid rgba(84,110,154,0.16);} .stat h3{margin:0;font-size:.83rem;color:var(--muted);} .stat p{margin:.45rem 0 0;font-size:1.4rem;font-weight:700;}
+        .panel{background:var(--surface);border-radius:16px;border:1px solid rgba(83,110,146,0.16);box-shadow:var(--shadow);padding:14px;}
+        .panel h2{margin-top:0;font-size:1.18rem;}
+        .table-wrap{overflow-x:auto;}
+        table{width:100%;border-collapse:collapse;font-size:.9rem;} th,td{padding:10px 8px;text-align:left;border-bottom:1px solid #e5ecf8;} th{background:#eff4ff;color:#4d6292;font-weight:700;} tbody tr:hover{background:#f8fbff;}
+        img.thumb{width:60px;height:40px;object-fit:cover;border-radius:5px;}
+        .note{margin-top:14px;padding:10px;border-radius:12px;background:#fff6e7;border:1px solid #f1d8a4;color:#7a5c37;}
+        @media(max-width:860px){.navbar{flex-direction:column;align-items:flex-start;}.stats{display:block;}.btn{width:100%;text-align:center;}}
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <nav class="navbar">
+            <a class="brand" href="index.html"><img src="logo.PNG" alt="logo"><span>Muthupura.lk Admin</span></a>
+            <div class="nav-links">
+                <a href="index.html" class="btn secondary">Home</a>
+                <a href="post.html" class="btn secondary">Post Ad</a>
+                <button class="btn secondary" id="logout-btn">Logout</button>
+            </div>
+        </nav>
+
+        <div class="stats">
+            <div class="stat"><h3>Total Ads</h3><p id="total-ads">-</p></div>
+            <div class="stat"><h3>Featured</h3><p id="featured-ads">-</p></div>
+            <div class="stat"><h3>Total Views</h3><p id="total-views">-</p></div>
+        </div>
+
+        <div class="panel">
+            <h2>Vehicles List</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>Title</th><th>Brand</th><th>Price</th><th>Year</th><th>Phone</th><th>Fuel</th><th>Owner</th><th>Image</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="vehicles-table"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <p class="note">Use features to highlight top vehicles; delete outdated listings quickly.</p>
+    </div>
+
+    <script>
+        function getPayload(){ const t=localStorage.getItem('token'); if(!t) return null; try{return JSON.parse(atob(t.split('.')[1]));}catch{return null;} }
+        function requireAdmin(){ const p=getPayload(); if(!p||p.role!=='admin'){ alert('Admin login required'); window.location.href='login.html'; return false; } return true; }
+        if(!requireAdmin()) throw new Error('Unauthorized');
+
+        document.getElementById('logout-btn').onclick = () => { localStorage.removeItem('token'); window.location.href='login.html'; };
+
+        async function loadVehicles(){
+            const token = localStorage.getItem('token');
+            try {
+                const response = await fetch('http://localhost:3000/admin/vehicles', { headers: { Authorization: `Bearer ${token}` } });
+                if(!response.ok) throw new Error('Failed to load');
+                const vehicles = await response.json();
+
+                const tbody = document.getElementById('vehicles-table'); tbody.innerHTML='';
+                let totalViews=0, featuredCount=0;
+
+                if(!vehicles.length){ tbody.innerHTML='<tr><td colspan="8" style="text-align:center; padding:18px;">No vehicles found.</td></tr>'; }
+
+                vehicles.forEach(v => {
+                    totalViews += Number(v.views||0);
+                    if(v.isFeatured) featuredCount++;
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${v.id}</td>
+                        <td>${v.title||''}</td>
+                        <td>${v.brand||''}</td>
+                        <td>${v.price||''}</td>
+                        <td>${v.year||''}</td>
+                        <td>${v.phone||''}</td>
+                        <td>${v.fuelType||''}</td>
+                        <td>${v.ownerId||''}</td>
+                        <td><img class="thumb" src="http://localhost:3000${v.image||''}" onerror="this.src='https://via.placeholder.com/60x40?text=No'" /></td>
+                        <td>
+                            <button class="btn ${v.isFeatured?'secondary':'primary'}" onclick="toggleFeature(${v.id},${v.isFeatured})">${v.isFeatured?'Unfeature':'Feature'}</button>
+                            <button class="btn danger" onclick="deleteAd(${v.id})">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                document.getElementById('total-ads').textContent = vehicles.length;
+                document.getElementById('featured-ads').textContent = featuredCount;
+                document.getElementById('total-views').textContent = totalViews;
+            } catch(err){ console.error(err); alert('Could not load dashboard data.'); }
+        }
+
+        async function toggleFeature(id, current){
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch(`http://localhost:3000/toggle-feature/${id}`, { method:'PUT', headers:{'Content-Type':'application/json', Authorization:`Bearer ${token}`}});
+                if(!res.ok) throw new Error();
+                await loadVehicles();
+            } catch(err){ console.error(err); alert('Feature toggle failed.'); }
+        }
+
+        async function deleteAd(id){ if(!confirm('Delete this vehicle?')) return; const token = localStorage.getItem('token'); try { const res = await fetch(`http://localhost:3000/delete-vehicle/${id}`, { method:'DELETE', headers:{Authorization:`Bearer ${token}`}}); if(!res.ok) throw new Error(); await loadVehicles(); } catch(err){ console.error(err); alert('Delete failed.'); }}
+
+        loadVehicles();
+    </script>
+</body>
+</html>

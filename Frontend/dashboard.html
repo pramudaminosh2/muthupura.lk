@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Seller Dashboard - Muthupura.lk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-1: #f7fbff; --bg-2:#eef7ff; --surface:#ffffff; --text:#1f2f4d; --muted:#607190; --accent1:#3a6ff8; --accent2:#8e52f8; --shadow:0 12px 30px rgba(33,58,100,0.12); --radius:16px; }
+        *{box-sizing:border-box;}
+        body{margin:0;min-height:100vh;font-family:'Inter','Poppins',system-ui,sans-serif;background:linear-gradient(160deg,var(--bg-1),var(--bg-2));color:var(--text);position:relative;}
+        .container{max-width:1180px;margin:0 auto;padding:18px 14px 36px;}
+        .navbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,0.75);border:1px solid rgba(100,122,161,0.2);box-shadow:var(--shadow);margin-bottom:20px;}
+        .brand{display:flex;align-items:center;gap:10px;}.brand img{height:34px;}.brand span{font-size:1.15rem;font-weight:800;color:#2b3e61;}
+        .nav-links{display:flex;gap:8px;flex-wrap:wrap;}
+        .btn{border:0;border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer;transition:transform .2s ease,box-shadow .2s ease;}
+        .btn.primary{background:linear-gradient(110deg,var(--accent1),var(--accent2));color:#fff;}
+        .btn.secondary{background:#f1f5ff;color:#2f4f82;border:1px solid rgba(58,111,248,0.2);}
+        .btn:hover{transform:translateY(-1px);box-shadow:0 10px 20px rgba(58,111,248,0.25);}
+        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px;}
+        .stat{background:var(--surface);border-radius:var(--radius);padding:14px;border:1px solid rgba(95,120,159,0.14);box-shadow:var(--shadow);} .stat h3{margin:0 0 6px;font-size:0.94rem;color:var(--muted);} .stat p{margin:0;font-size:1.7rem;font-weight:800;}
+        .section-head{display:flex;justify-content:space-between;align-items:center;margin:22px 0 14px;}.section-head h2{margin:0;font-size:1.35rem;}.section-head small{color:#65769f;}
+        .vehicle-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;}
+        .card{background:var(--surface);border:1px solid rgba(96,116,156,0.16);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);transition:transform 0.25s ease,box-shadow 0.25s ease;}
+        .card:hover{transform:translateY(-5px);box-shadow:0 16px 30px rgba(31,55,95,0.2);}
+        .card-top{position:relative;height:170px;overflow:hidden;}
+        .card-top img{width:100%;height:100%;object-fit:cover;transition:transform 0.3s ease;}
+        .card:hover .card-top img{transform:scale(1.05);}
+        .card-top::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0.08),rgba(0,0,0,0.55));}
+        .card-badge{position:absolute;top:10px;left:10px;background:rgba(28,36,68,.82);color:#fff;border-radius:999px;padding:4px 10px;font-size:0.75rem;font-weight:700;z-index:2;}
+        .card-badge.ev{left:auto;right:10px;background:linear-gradient(110deg,#3cd06a,#14b4f7);color:#fff;}
+        .card-body{padding:12px 14px;}
+        .card-title{margin:0 0 8px;font-size:1.03rem;font-weight:700;color:#1b2765;}
+        .card-meta{display:flex;flex-wrap:wrap;gap:8px;font-size:0.82rem;color:#485d88;}
+        .card-meta span{background:#f2f5ff;border-radius:8px;padding:5px 8px;}
+        .card-actions{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;}
+        .card-actions .btn{font-size:0.8rem;padding:6px 10px;}
+        .empty{border:1px solid #d2d9eb;background:#f9fbff;color:#324a7e;border-radius:14px;padding:16px;text-align:center;}
+        @media(max-width:680px){.navbar{flex-direction:column;align-items:flex-start;}.card-meta{justify-content:start;}}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <a class="brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk"><span>Muthupura.lk</span></a>
+            <div class="nav-links">
+                <a href="index.html" class="btn secondary">Home</a>
+                <a href="post.html" class="btn secondary">Post Ad</a>
+                <a href="dashboard.html" class="btn secondary">My Listings</a>
+                <button id="logoutBtn" class="btn secondary">Logout</button>
+            </div>
+        </nav>
+
+        <section class="section-head">
+            <div>
+                <h2>Seller Dashboard</h2>
+                <small>Manage your listings and update your vehicle inventory quickly.</small>
+            </div>
+            <div>
+                <button id="refreshBtn" class="btn primary">Refresh</button>
+            </div>
+        </section>
+
+        <div class="stats">
+            <div class="stat"><h3>Total Listings</h3><p id="total-listings">0</p></div>
+            <div class="stat"><h3>Total Views</h3><p id="total-views">0</p></div>
+            <div class="stat"><h3>Featured</h3><p id="total-featured">0</p></div>
+        </div>
+
+        <section class="section-head"><h2>Your Vehicles</h2></section>
+        <div id="vehicle-list" class="vehicle-grid"></div>
+        <div id="empty" class="empty" style="display:none;">No vehicles yet. Use Post Ad to add your first listing.</div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000';
+
+        function getTokenPayload() {
+            const token = localStorage.getItem('token');
+            if (!token) return null;
+            try { return JSON.parse(atob(token.split('.')[1])); } catch { return null; }
+        }
+
+        function requireLogin() {
+            const payload = getTokenPayload();
+            if (!payload) {
+                window.location.href = 'login.html';
+                return false;
+            }
+            return payload;
+        }
+
+        function isEV(vehicle) {
+            return (vehicle.fuelType || '').toString() === 'Electric';
+        }
+
+        function escapeHtml(text) { return String(text).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c])); }
+
+        function createCard(vehicle) {
+            const card = document.createElement('article');
+            card.className = 'card';
+            const hasImages = Array.isArray(vehicle.images) && vehicle.images.length;
+            const imageUrl = hasImages ? `${API_URL}${vehicle.images[0]}` : vehicle.image ? `${API_URL}${vehicle.image}` : 'https://via.placeholder.com/400x250?text=No+Image';
+            const ev = isEV(vehicle);
+            const featured = Number(vehicle.isFeatured || 0);
+            const location = vehicle.location || 'Unknown';
+
+            card.innerHTML = `
+                <div class="card-top">
+                    <img src="${imageUrl}" alt="${escapeHtml(vehicle.title || 'Vehicle')}" onerror="this.src='https://via.placeholder.com/400x250?text=No+Image';" />
+                    ${featured ? '<span class="card-badge">Featured</span>' : ''}
+                    ${ev ? '<span class="card-badge ev">⚡ EV</span>' : ''}
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title">${escapeHtml(vehicle.title || 'Untitled')}</h3>
+                    <div class="card-meta">
+                        <span>${escapeHtml(vehicle.brand || 'Brand')}</span>
+                        <span>${escapeHtml(vehicle.year || 'Year')}</span>
+                        <span>${escapeHtml(vehicle.fuelType || 'Fuel')}</span>
+                        <span>📍 ${escapeHtml(location)}</span>
+                        <span>${featured ? '⭐ Featured' : 'Normal'}</span>
+                        <span>👁️ ${Number(vehicle.views || 0)}</span>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn secondary" onclick="handleEdit(${vehicle.id})">Edit</button>
+                        <button class="btn btn-danger" style="background:#e26985;color:#fff;" onclick="handleDelete(${vehicle.id})">Delete</button>
+                    </div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        async function fetchListings() {
+            const payload = requireLogin();
+            if (!payload) return;
+
+            const token = localStorage.getItem('token');
+            const listingContainer = document.getElementById('vehicle-list');
+            listingContainer.innerHTML = '';
+            document.getElementById('empty').style.display = 'none';
+
+            for (let i = 0; i < 6; i++) {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'card';
+                placeholder.style.minHeight = '220px';
+                placeholder.style.opacity = '0.7';
+                placeholder.style.background = 'linear-gradient(90deg, rgba(244,246,252,1) 8%, rgba(233,239,251,1) 18%, rgba(244,246,252,1) 33%)';
+                placeholder.style.backgroundSize = '800px 100px';
+                placeholder.style.animation = 'skeleton-loading 1.2s infinite linear';
+                listingContainer.appendChild(placeholder);
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/my-vehicles`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error('Failed to retrieve your vehicles');
+                const vehicles = await res.json();
+
+                listingContainer.innerHTML = '';
+                if (!vehicles.length) {
+                    document.getElementById('empty').style.display = 'block';
+                    document.getElementById('total-listings').textContent = '0';
+                    document.getElementById('total-views').textContent = '0';
+                    document.getElementById('total-featured').textContent = '0';
+                    return;
+                }
+
+                let totalViews = 0;
+                let featuredCount = 0;
+
+                vehicles.forEach(v => {
+                    totalViews += Number(v.views || 0);
+                    featuredCount += Number(v.isFeatured || 0);
+                    listingContainer.appendChild(createCard(v));
+                });
+
+                document.getElementById('total-listings').textContent = String(vehicles.length);
+                document.getElementById('total-views').textContent = String(totalViews);
+                document.getElementById('total-featured').textContent = String(featuredCount);
+            } catch (error) {
+                console.error(error);
+                alert('Unable to load your listings right now. Please try again.');
+            }
+        }
+
+        async function handleDelete(id) {
+            if (!confirm('Delete this vehicle?')) return;
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch(`${API_URL}/delete-vehicle/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+                if (!res.ok) throw new Error('Failed to delete');
+                await fetchListings();
+            } catch (error) {
+                console.error(error);
+                alert('Could not delete listing.');
+            }
+        }
+
+        async function handleEdit(id) {
+            const newTitle = prompt('Enter new title (leave blank to keep current):');
+            const newPrice = prompt('Enter new price:');
+            const newBrand = prompt('Enter new brand:');
+            const newYear = prompt('Enter new year:');
+            const newPhone = prompt('Enter contact phone:');
+            const newFuelType = prompt('Enter fuel type (Electric, Petrol, Diesel, Hybrid):');
+
+            const data = {};
+            if (newTitle) data.title = newTitle;
+            if (newPrice) data.price = Number(newPrice);
+            if (newBrand) data.brand = newBrand;
+            if (newYear) data.year = Number(newYear);
+            if (newPhone) data.phone = newPhone;
+            if (newFuelType) data.fuelType = newFuelType;
+
+            if (Object.keys(data).length === 0) return;
+
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch(`${API_URL}/update-vehicle/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                    body: JSON.stringify(data)
+                });
+                if (!res.ok) {
+                    const body = await res.json().catch(() => null);
+                    throw new Error(body?.message || 'Update failed');
+                }
+                alert('Vehicle updated successfully');
+                await fetchListings();
+            } catch (error) {
+                console.error(error);
+                alert('Could not update listing: ' + error.message);
+            }
+        }
+
+        document.getElementById('logoutBtn').onclick = () => { localStorage.removeItem('token'); window.location.href = 'login.html'; };
+        document.getElementById('refreshBtn').onclick = fetchListings;
+
+        fetchListings();
+    </script>
+</body>
+</html>

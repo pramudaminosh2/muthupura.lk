@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Post Vehicle - Muthupura.lk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg:#eef2f8; --surface:#fff; --text:#1f2f4f; --muted:#5b6d8a; --accent1:#3a6ff8; --accent2:#8e52f8; --shadow:0 14px 30px rgba(33,70,122,0.12); }
+        * { box-sizing:border-box; }
+        body { margin:0; min-height:100vh; font-family:'Inter','Poppins',system-ui,sans-serif; background:linear-gradient(130deg,#f7f9fc,#eef2f8); color:var(--text); }
+        .wrapper { max-width: 800px; margin: 0 auto; padding: 20px 14px 36px; }
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-radius: 14px; background: rgba(255,255,255,0.78); border:1px solid rgba(79,102,146,0.2); box-shadow:0 10px 24px rgba(20,41,69,0.1); margin-bottom: 20px; }
+        .brand { display:flex; align-items:center; gap:10px; }
+        .brand img { height:34px; }
+        .brand span { font-weight:800; }
+        .nav-links { display:flex; gap:8px; }
+        .btn { border-radius:999px; border:0; font-weight:700; padding:8px 14px; cursor:pointer; transition: all .2s ease; }
+        .btn.primary { background: linear-gradient(110deg, var(--accent1), var(--accent2)); color:#fff; }
+        .btn.secondary { background:#f1f5ff; color:#2f4f82; border:1px solid rgba(58,111,248,0.2); }
+        .btn:hover { transform: translateY(-1px); }
+        .card { background: var(--surface); border-radius: 16px; box-shadow: var(--shadow); border:1px solid rgba(83, 105, 152, 0.16); padding:24px; }
+        h1 { margin:0 0 8px; font-size:1.9rem; }
+        p { margin:0 0 14px; color:var(--muted); }
+        .form { display:grid; gap:14px; }
+        .field { display:flex; flex-direction:column; gap:6px; }
+        .field label { font-size:.9rem; color:#526781; }
+        .field input, .field select { border:1px solid rgba(74,99,142,0.32); border-radius:10px; padding:10px 12px; font-size:1rem; }
+        .field input:focus, .field select:focus { outline:none; border-color: rgba(58,111,248,0.6); box-shadow: 0 0 0 4px rgba(58,111,248,0.12); }
+        @media(max-width:640px){ .wrapper{padding:16px;} .navbar{flex-wrap:wrap;} }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <nav class="navbar">
+            <a class="brand" href="index.html"><img src="logo.PNG" alt="logo"><span>Muthupura.lk</span></a>
+            <div class="nav-links">
+                <a href="index.html" class="btn secondary">Home</a>
+                <a href="dashboard.html" class="btn secondary" id="mylistings-link" style="display:none;">My Listings</a>
+                <a href="login.html" class="btn secondary" id="auth-link">Login</a>
+                <a href="admin.html" class="btn secondary" id="admin-link" style="display:none;">Admin</a>
+            </div>
+        </nav>
+
+        <article class="card">
+            <h1>Post Your Vehicle</h1>
+            <p>Write a great listing and attract buyers fast. Use a clear front image and complete all fields.</p>
+
+            <form id="vehicleForm" class="form" enctype="multipart/form-data">
+                <div class="field"><label for="title">Title</label><input id="title" name="title" type="text" required></div>
+                <div class="field"><label for="price">Price (LKR)</label><input id="price" name="price" type="number" min="0" required></div>
+                <div class="field"><label for="brand">Brand</label><input id="brand" name="brand" type="text" required></div>
+                <div class="field"><label for="year">Year</label><input id="year" name="year" type="number" min="1900" max="2099" required></div>
+                <div class="field"><label for="phone">Contact Phone</label><input id="phone" name="phone" type="tel" required></div>
+                <div class="field"><label for="fuelType">Fuel Type</label>
+                    <select id="fuelType" name="fuelType" required>
+                        <option value="" disabled selected>Select fuel type</option>
+                        <option value="Electric">Electric</option>
+                        <option value="Petrol">Petrol</option>
+                        <option value="Diesel">Diesel</option>
+                        <option value="Hybrid">Hybrid</option>
+                    </select>
+                </div>
+                <div class="field"><label for="location">Location</label>
+                    <input id="location" name="location" type="text" list="location-options" placeholder="Type or select city" required>
+                    <datalist id="location-options">
+                        <option value="Colombo"></option>
+                        <option value="Gampaha"></option>
+                        <option value="Negombo"></option>
+                        <option value="Chilaw"></option>
+                        <option value="Kurunegala"></option>
+                        <option value="Kandy"></option>
+                        <option value="Matara"></option>
+                        <option value="Galle"></option>
+                        <option value="Anuradhapura"></option>
+                        <option value="Jaffna"></option>
+                        <option value="Batticaloa"></option>
+                        <option value="Trincomalee"></option>
+                        <option value="Ratnapura"></option>
+                        <option value="Badulla"></option>
+                        <option value="Kalutara"></option>
+                    </datalist>
+                </div>
+                <div class="field"><label for="images">Photos (multiple allowed)</label><input id="images" name="images" type="file" accept="image/*" multiple required></div>
+                <div id="image-preview" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:6px;"></div>
+                <button type="submit" class="btn primary">Publish Vehicle</button>
+            </form>
+        </article>
+    </div>
+
+    <script>
+        function getToken() { const t = localStorage.getItem('token'); if(!t) return null; try{return JSON.parse(atob(t.split('.')[1]));}catch{return null;} }
+        const data = getToken();
+        const adminLink = document.getElementById('admin-link');
+        const authLink = document.getElementById('auth-link');
+
+        if(data?.role === 'admin') { adminLink.style.display='inline-flex'; }
+        if(data) {
+            document.getElementById('mylistings-link').style.display='inline-flex';
+            authLink.textContent='Logout';
+            authLink.href='#';
+            authLink.onclick = function() { localStorage.removeItem('token'); location.reload(); };
+        }
+
+        if(!data) { alert('Login required'); location.href='login.html'; }
+
+        const imageInput = document.getElementById('images');
+        const previewContainer = document.getElementById('image-preview');
+
+        imageInput.addEventListener('change', function() {
+            const selectedCount = Array.from(this.files).filter(file => file.type.startsWith('image/')).length;
+            console.log('Image input changed:', { totalSelected: this.files.length, validImages: selectedCount, names: Array.from(this.files).map(f => f.name) });
+            previewContainer.innerHTML = '';
+            Array.from(this.files).forEach(file => {
+                if (!file.type.startsWith('image/')) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.alt = file.name;
+                    img.style.width = '100%';
+                    img.style.borderRadius = '10px';
+                    img.style.boxShadow = '0 2px 10px rgba(0,0,0,0.15)';
+                    previewContainer.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        document.getElementById('vehicleForm').addEventListener('submit', async function(e){
+            e.preventDefault();
+            const formData = new FormData(this);
+            const imagesPayload = formData.getAll('images');
+            console.log('Submitting vehicle form', {
+                title: formData.get('title'),
+                price: formData.get('price'),
+                imagesCount: imagesPayload.length,
+                imageNames: imagesPayload.map(file => file.name)
+            });
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch('http://localhost:3000/add-vehicle', {
+                    method: 'POST',
+                    headers: { Authorization: `Bearer ${token}` },
+                    body: formData
+                });
+                if(!res.ok) {
+                    const errBody = await res.json().catch(() => null);
+                    throw new Error('Add failed: ' + (errBody?.message || res.statusText));
+                }
+                alert('Vehicle posted successfully');
+                location.href = 'index.html';
+            } catch(err) {
+                console.error(err);
+                alert('Unable to post vehicle right now: ' + err.message);
+            }
+        });
+    </script>
+</body>
+</html>

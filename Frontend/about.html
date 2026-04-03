@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About Us - Muthupura.lk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg:#f7f9fd; --surface:#fff; --text:#1e2f54; --muted:#60708e; --accent:#3a6ff8; --card-shadow:0 10px 28px rgba(41,66,111,0.1); }
+        *{box-sizing:border-box;}
+        body{margin:0;font-family:'Inter','Poppins',system-ui,sans-serif;background:linear-gradient(150deg,#f8fbff,#eef3ff);color:var(--text);}
+        .container{max-width:1100px;margin:0 auto;padding:24px;}
+        .navbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 0;position:sticky;top:0;background:rgba(255,255,255,0.72);backdrop-filter:blur(12px);border-bottom:1px solid rgba(165,180,207,0.32);}
+        .navbar a{color:#2d4f8f;text-decoration:none;font-weight:600;padding:8px 10px;border-radius:8px;transition:.2s;}
+        .navbar a:hover{background:rgba(58,111,248,0.12);}
+        .hero{padding:34px 14px 18px;border-radius:18px;background:linear-gradient(135deg,rgba(222,237,255,0.9),rgba(241,236,255,0.9));box-shadow:var(--card-shadow);margin-bottom:20px;}
+        .hero h1{margin:0;font-size:clamp(2rem,4vw,2.8rem);}
+        .hero p{color:var(--muted);line-height:1.6;max-width:720px;}
+        .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+        .card{background:var(--surface);border-radius:16px;padding:16px;border:1px solid rgba(145,173,217,0.28);box-shadow:var(--card-shadow);} .card h3{margin:0 0 8px;font-size:1.05rem;} .card p{margin:0;color:var(--muted);line-height:1.5;}
+        .footer{margin-top:24px;padding:14px 0;text-align:center;color:#667799;font-size:0.92rem;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <a href="index.html"><strong>Muthupura.lk</strong></a>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <a href="index.html">Home</a>
+                <a href="post.html">Post Ad</a>
+                <a href="dashboard.html">My Listings</a>
+                <a href="contact.html">Contact</a>
+            </div>
+        </nav>
+
+        <section class="hero">
+            <h1>About Muthupura.lk</h1>
+            <p>Muthupura.lk is a modern vehicle marketplace designed to make it easier for users to buy, sell, and lease vehicles quickly and securely. Our platform is built for trust, transparency, and fast connections between buyers and sellers.</p>
+        </section>
+
+        <section class="grid">
+            <div class="card">
+                <h3>Trust</h3>
+                <p>We focus on safe listings and clear information so users can make confident purchase decisions.</p>
+            </div>
+            <div class="card">
+                <h3>Simplicity</h3>
+                <p>An intuitive interface with fast filtering helps users find the right vehicle instantly.</p>
+            </div>
+            <div class="card">
+                <h3>Speed</h3>
+                <p>Quick listing setup and responsive search give you faster matches and higher conversion rates.</p>
+            </div>
+            <div class="card">
+                <h3>Community</h3>
+                <p>Built for everyday buyers and sellers who value clear communication and mutually winning outcomes.</p>
+            </div>
+        </section>
+
+        <div class="footer">© 2026 Muthupura.lk – All rights reserved</div>
+    </div>
+</body>
+</html>

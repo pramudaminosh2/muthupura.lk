@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Muthupura.lk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg:#f5f8ff; --surface:#fff; --text:#1f304f; --muted:#5e7093; --accent1:#3a6ff8; --accent2:#8e52f8; --shadow:0 18px 36px rgba(30,62,110,0.11); }
+        *{box-sizing:border-box;}
+        body{margin:0; min-height:100vh; background: linear-gradient(135deg,#e9eff8,#f7fbff); font-family:'Inter','Poppins',system-ui,sans-serif; color:var(--text);}
+        .frame{width:min(760px,95%);margin:0 auto;padding:18px 0;}
+        .navbar{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,0.75);border:1px solid rgba(78,100,145,0.2);box-shadow:0 10px 24px rgba(21,44,85,0.1);}
+        .brand{display:flex;align-items:center;gap:10px;}.brand img{height:34px;}.brand span{font-weight:800;}.nav-links{display:flex;gap:8px;}
+        .btn{border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer;transition:.2s ease;border:1px solid transparent;}.btn.secondary{background:#f1f5ff;color:#2f4f82;border:1px solid rgba(58,111,248,0.2);}.btn.primary{background:linear-gradient(110deg,var(--accent1),var(--accent2));color:#fff;}.btn:hover{transform:translateY(-1px);}
+        .card{background:var(--surface);margin-top:18px;padding:24px;border-radius:18px;box-shadow:var(--shadow);border:1px solid rgba(80,99,142,0.15);}
+        .mode-switch{display:flex;gap:8px;margin-bottom:18px;}
+        .tab{flex:1;border:1px solid rgba(73,98,142,0.3);border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;background:#f7f9ff;color:#2f4f82;transition:.2s ease;}
+        .tab.active{background:linear-gradient(110deg,var(--accent1),var(--accent2));color:#fff;border-color:transparent;}
+        h1{font-size:1.7rem;margin:0 0 6px;} p{margin:0 0 16px;color:var(--muted);} .form{display:grid;gap:12px;}
+        .input-wrapper{position:relative;}
+        .input-wrapper .toggle-password{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:transparent;border:none;cursor:pointer;font-size:1rem;color:#5e7093;}
+        .form input{border:1px solid rgba(73,98,142,0.3);border-radius:10px;padding:10px 12px;font-size:1rem;}.form input:focus{outline:none;border-color:rgba(58,111,248,0.6);box-shadow:0 0 0 4px rgba(58,111,248,0.13);}
+        .error-message{display:none;color:#d12f2f;font-size:.9rem;margin-top:-8px;margin-bottom:8px;}
+        .alert{display:none;padding:12px;border-radius:10px;margin:10px 0;font-weight:600;}
+        .alert.error{background:#fde8ea;color:#821f2d;border:1px solid #e37f88;}
+        .alert.success{background:#e7f7ed;color:#1b6f35;border:1px solid #8fd3a4;}
+        .hidden{display:none !important;}
+        @media(max-width:640px){.frame{padding:14px 0;} .navbar{flex-wrap:wrap;}.btn{width:100%;text-align:center;}}
+    </style>
+</head>
+<body>
+    <div class="frame">
+        <nav class="navbar">
+            <a class="brand" href="index.html"><img src="logo.PNG" alt="logo"><span>Muthupura.lk</span></a>
+            <div class="nav-links">
+                <a href="index.html" class="btn secondary">Home</a>
+                <a href="post.html" class="btn secondary">Post Ad</a>
+                <a href="admin.html" class="btn secondary" id="admin-link" style="display:none;">Admin</a>
+                <span id="user-greeting" style="display:none;font-weight:700;margin-left:8px;color:#2f4f82;"></span>
+                <button class="btn secondary" id="logout-btn" style="display:none;">Logout</button>
+            </div>
+        </nav>
+
+        <div class="card">
+            <div class="mode-switch">
+                <button class="tab active" id="login-mode-btn" type="button">Login</button>
+                <button class="tab" id="register-mode-btn" type="button">Register</button>
+            </div>
+            <div id="alert-box" class="alert"></div>
+
+            <div id="login-panel" class="panel">
+                <h1>Welcome Back</h1>
+                <p>Login to manage your ads and post faster.</p>
+                <div class="form">
+                    <div class="input-wrapper">
+                        <input type="email" id="login-email" placeholder="Email" autocomplete="username" />
+                        <small id="login-email-error" class="error-message"></small>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="password" id="login-password" placeholder="Password" autocomplete="current-password" />
+                        <button type="button" class="toggle-password" data-target="login-password">👁️</button>
+                        <small id="login-password-error" class="error-message"></small>
+                    </div>
+                    <button class="btn primary" id="login-submit" type="button">Login</button>
+                    <button class="btn secondary" id="google-login-btn" type="button" style="margin-top:8px;">Continue with Google</button>
+                    <button class="btn secondary" id="facebook-login-btn" type="button" style="margin-top:8px; background:#1877f2; color:#fff; border-color:rgba(24,119,242,0.3);">Continue with Facebook</button>
+
+                    <div style="margin-top:12px; border-top:1px solid #d1dbf1; padding-top:12px;">
+                        <label for="otp-phone" style="display:block;font-weight:600;margin-bottom:4px;">Login with Phone OTP</label>
+                        <input type="text" id="otp-phone" placeholder="Enter phone number" style="width:100%;padding:8px;border:1px solid rgba(73,98,142,0.3);border-radius:8px;" />
+                        <button class="btn secondary" id="send-otp-btn" type="button" style="margin-top:8px;">Send OTP</button>
+                        <div id="recaptcha-container" style="margin-top:12px;"></div>
+                        <div id="otp-verification" style="display:none;margin-top:8px;">
+                            <input type="text" id="otp-code" placeholder="Enter OTP" style="width:100%;padding:8px;border:1px solid rgba(73,98,142,0.3);border-radius:8px;" />
+                            <button class="btn secondary" id="verify-otp-btn" type="button" style="margin-top:8px;">Verify OTP</button>
+                        </div>
+                    </div>
+                </div>
+                <p class="note">Don’t have an account? <button class="btn secondary" id="switch-to-register" type="button">Register</button></p>
+            </div>
+
+            <div id="register-panel" class="panel hidden">
+                <h1>Create Account</h1>
+                <p>Register and start posting vehicle listings in minutes.</p>
+                <div class="form">
+                    <div class="input-wrapper">
+                        <input type="text" id="register-name" placeholder="Full Name" autocomplete="name" />
+                        <small id="register-name-error" class="error-message"></small>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="email" id="register-email" placeholder="Email" autocomplete="email" />
+                        <small id="register-email-error" class="error-message"></small>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="password" id="register-password" placeholder="Password" autocomplete="new-password" />
+                        <button type="button" class="toggle-password" data-target="register-password">👁️</button>
+                        <small id="register-password-error" class="error-message"></small>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="password" id="register-confirm" placeholder="Confirm Password" autocomplete="new-password" />
+                        <button type="button" class="toggle-password" data-target="register-confirm">👁️</button>
+                        <small id="register-confirm-error" class="error-message"></small>
+                    </div>
+                    <button class="btn primary" id="register-submit" type="button">Register</button>
+                </div>
+                <p class="note">Already have an account? <button class="btn secondary" id="switch-to-login" type="button">Login</button></p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
+        import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyD6APHZMfX39NE3D0QmqhM9CYcJLEYAq7A",
+            authDomain: "muthupuralk.firebaseapp.com",
+            projectId: "muthupuralk",
+            storageBucket: "muthupuralk.firebasestorage.app",
+            messagingSenderId: "181421595643",
+            appId: "1:181421595643:web:20a29817ca1f7aa53a495e",
+            measurementId: "G-SFW03YC9X1"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+
+        let recaptchaVerifier = null;
+        let confirmationResult = null;
+
+        function initRecaptcha() {
+            if (recaptchaVerifier) return;
+            recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+                size: 'invisible',
+                callback: (response) => {
+                    console.log('Recaptcha solved', response);
+                }
+            }, auth);
+            recaptchaVerifier.render().catch(err => {
+                console.error('Recaptcha render failed', err);
+            });
+        }
+
+        initRecaptcha();
+
+        function getToken() {
+            return localStorage.getItem('token');
+        }
+
+        function setToken(token, userName) {
+            if (token) {
+                localStorage.setItem('token', token);
+            }
+            if (userName) {
+                localStorage.setItem('userName', userName);
+            }
+        }
+
+        function clearToken() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userName');
+        }
+
+        function updateNav(user) {
+            const adminLink = document.getElementById('admin-link');
+            const userGreeting = document.getElementById('user-greeting');
+            const logoutBtn = document.getElementById('logout-btn');
+
+            if (user) {
+                userGreeting.textContent = `Hello, ${user.name || user.email}`;
+                userGreeting.style.display = 'inline-flex';
+                logoutBtn.style.display = 'inline-flex';
+                adminLink.style.display = user.role === 'admin' ? 'inline-flex' : 'none';
+            } else {
+                userGreeting.style.display = 'none';
+                logoutBtn.style.display = 'none';
+                adminLink.style.display = 'none';
+            }
+        }
+
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function showFieldError(id, message) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.textContent = message;
+                el.style.display = message ? 'block' : 'none';
+            }
+        }
+
+        function clearFieldErrors() {
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.textContent = '';
+                el.style.display = 'none';
+            });
+        }
+
+        function showAlert(message, type = 'error') {
+            const alertBox = document.getElementById('alert-box');
+            alertBox.textContent = message;
+            alertBox.className = `alert ${type}`;
+            alertBox.style.display = 'block';
+        }
+
+        function hideAlert() {
+            const alertBox = document.getElementById('alert-box');
+            alertBox.style.display = 'none';
+        }
+
+        function setMode(mode) {
+            const isLogin = mode === 'login';
+            document.getElementById('login-panel').classList.toggle('hidden', !isLogin);
+            document.getElementById('register-panel').classList.toggle('hidden', isLogin);
+            document.getElementById('login-mode-btn').classList.toggle('active', isLogin);
+            document.getElementById('register-mode-btn').classList.toggle('active', !isLogin);
+            hideAlert();
+            clearFieldErrors();
+        }
+
+        async function performLogin(email, password, redirect = true) {
+            try {
+                const res = await fetch(`${apiUrl}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await res.json();
+                if (!res.ok) {
+                    showAlert(data.message || 'Login failed', 'error');
+                    return false;
+                }
+
+                setToken(data.token, data.user?.name || '');
+                const role = data.role || data.user?.role || 'user';
+                updateNav(data.user || { role });
+                showAlert('Login successful! Redirecting...', 'success');
+
+                if (redirect) {
+                    setTimeout(() => {
+                        if (role === 'admin') {
+                            window.location.href = 'admin.html';
+                        } else {
+                            window.location.href = 'index.html';
+                        }
+                    }, 700);
+                }
+
+                return true;
+            } catch (error) {
+                console.error('Login request error:', error);
+                showAlert('Unable to login now.', 'error');
+                return false;
+            }
+        }
+
+        document.getElementById('google-login-btn').addEventListener('click', () => {
+            window.open(`${apiUrl}/auth/google`, 'GoogleAuth', 'width=500,height=650');
+        });
+
+        document.getElementById('facebook-login-btn').addEventListener('click', () => {
+            window.open(`${apiUrl}/auth/facebook`, 'FacebookAuth', 'width=500,height=650');
+        });
+
+        document.getElementById('send-otp-btn').addEventListener('click', async () => {
+            const phoneEl = document.getElementById('otp-phone');
+            const rawPhone = phoneEl?.value.trim() || '';
+            if (!rawPhone || !/^\+?[0-9]{7,15}$/.test(rawPhone)) {
+                showAlert('Please enter a valid phone number including country code', 'error');
+                return;
+            }
+
+            initRecaptcha();
+            try {
+                confirmationResult = await signInWithPhoneNumber(auth, rawPhone, recaptchaVerifier);
+                showAlert('OTP sent via Firebase. Check your phone.', 'success');
+                document.getElementById('otp-verification').style.display = 'block';
+            } catch (err) {
+                console.error('Firebase send OTP failed', err);
+                showAlert('Unable to send OTP via Firebase. Please try again.', 'error');
+            }
+        });
+
+        document.getElementById('verify-otp-btn').addEventListener('click', async () => {
+            const otp = document.getElementById('otp-code').value.trim();
+            if (!otp) {
+                showAlert('Please enter the OTP code', 'error');
+                return;
+            }
+
+            if (!confirmationResult) {
+                showAlert('OTP flow was not initialized, press Send OTP first', 'error');
+                return;
+            }
+
+            try {
+                const result = await confirmationResult.confirm(otp);
+                const firebasePhone = result.user?.phoneNumber;
+
+                if (!firebasePhone) {
+                    showAlert('Could not determine phone from Firebase account', 'error');
+                    return;
+                }
+
+                const res = await fetch(`${apiUrl}/otp-login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone: firebasePhone })
+                });
+
+                const data = await res.json();
+                if (!res.ok) {
+                    showAlert(data.message || 'OTP login failed', 'error');
+                    return;
+                }
+
+                if (data.isNewUser) {
+                    localStorage.setItem('pendingPhone', data.phone || firebasePhone.replace(/\D/g, ''));
+                    showAlert('Phone verified. Complete profile to continue.', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'complete-profile.html';
+                    }, 700);
+                    return;
+                }
+
+                setToken(data.token, data.user?.name || '');
+                updateNav(data.user || { role: data.role || 'user' });
+                showAlert('Login successful! Redirecting...', 'success');
+                setTimeout(() => {
+                    if (data.role === 'admin') {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                }, 700);
+            } catch (err) {
+                console.error('Firebase verify OTP failed', err);
+                showAlert('OTP verification failed. Check code and try again.', 'error');
+            }
+        });
+
+        window.addEventListener('message', (event) => {
+            if (!event.data || !event.data.token) return;
+            setToken(event.data.token);
+            updateNav(event.data.user || { role: event.data.role || 'user' });
+            if (event.data.role === 'admin') {
+                window.location.href = 'admin.html';
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        document.getElementById('login-mode-btn').addEventListener('click', () => setMode('login'));
+        document.getElementById('register-mode-btn').addEventListener('click', () => setMode('register'));
+        document.getElementById('switch-to-register').addEventListener('click', () => setMode('register'));
+        document.getElementById('switch-to-login').addEventListener('click', () => setMode('login'));
+
+        document.getElementById('login-submit').addEventListener('click', async () => {
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            hideAlert();
+            clearFieldErrors();
+
+            let isValid = true;
+            if (!email || !isValidEmail(email)) {
+                showFieldError('login-email-error', 'Invalid email format');
+                isValid = false;
+            }
+            if (!password) {
+                showFieldError('login-password-error', 'Password is required');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                return showAlert('Please correct the highlighted fields', 'error');
+            }
+
+            await performLogin(email, password, true);
+        });
+
+        document.getElementById('register-submit').addEventListener('click', async () => {
+            const name = document.getElementById('register-name').value.trim();
+            const email = document.getElementById('register-email').value.trim();
+            const password = document.getElementById('register-password').value;
+            const confirm = document.getElementById('register-confirm').value;
+
+            hideAlert();
+            clearFieldErrors();
+
+            let isValid = true;
+            if (!name) {
+                showFieldError('register-name-error', 'Name is required');
+                isValid = false;
+            }
+            if (!email || !isValidEmail(email)) {
+                showFieldError('register-email-error', 'Invalid email format');
+                isValid = false;
+            }
+            if (!password || password.length < 8) {
+                showFieldError('register-password-error', 'Password must be at least 8 characters');
+                isValid = false;
+            }
+            if (password !== confirm) {
+                showFieldError('register-confirm-error', 'Passwords do not match');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                return showAlert('Please fix errors before continuing', 'error');
+            }
+
+            try {
+                const res = await fetch(`${apiUrl}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+
+                const data = await res.json();
+                if (!res.ok) {
+                    showAlert(data.message || 'Registration failed', 'error');
+                    return;
+                }
+
+                showAlert('Registration successful! Logging in...', 'success');
+                const loggedIn = await performLogin(email, password, true);
+                if (!loggedIn) {
+                    setMode('login');
+                }
+            } catch (error) {
+                console.error('Register request error:', error);
+                showAlert('Unable to register now.', 'error');
+            }
+        });
+
+        document.querySelectorAll('.toggle-password').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetId = btn.dataset.target;
+                const input = document.getElementById(targetId);
+                if (!input) return;
+                const hidden = input.type === 'password';
+                input.type = hidden ? 'text' : 'password';
+                btn.textContent = hidden ? '🙈' : '👁️';
+            });
+        });
+
+        async function checkSession() {
+            const token = getToken();
+            if (!token) {
+                return updateNav(null);
+            }
+
+            try {
+                const res = await fetch(`${apiUrl}/me`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!res.ok) {
+                    clearToken();
+                    updateNav(null);
+                    setMode('login');
+                    return;
+                }
+
+                const data = await res.json();
+                updateNav(data.user);
+                if (window.location.pathname.endsWith('login.html')) {
+                    if (data.user?.role === 'admin') {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                }
+            } catch (err) {
+                console.error('Session check failed', err);
+                clearToken();
+                updateNav(null);
+                setMode('login');
+            }
+        }
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            clearToken();
+            updateNav(null);
+            window.location.href = 'index.html';
+        });
+
+        setMode('login');
+        checkSession();
+    </script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vehicle Detail - Muthupura.lk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg:#f4f7fb; --surface:#ffffff; --text:#1f2f4d; --muted:#68779a; --accent1:#3a6ff8; --accent2:#8e52f8; --shadow:0 14px 30px rgba(33,70,122,0.12); --radius:16px; }
+        *{box-sizing:border-box;}
+        body{margin:0;min-height:100vh;font-family:'Inter','Poppins',system-ui,sans-serif;background:linear-gradient(160deg,var(--bg),#f9fcff);color:var(--text);}
+        .container{max-width:1180px;margin:0 auto;padding:18px 14px 36px;}
+        .navbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,0.78);border:1px solid rgba(79,102,146,0.2);box-shadow:var(--shadow);margin-bottom:18px;}
+        .brand{display:flex;align-items:center;gap:10px;}.brand img{height:34px;}.brand span{font-weight:800;}
+        .nav-links{display:flex;gap:8px;flex-wrap:wrap;}
+        .btn{border:0;border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer;transition:all .2s ease;}
+        .btn.primary{background:linear-gradient(110deg,var(--accent1),var(--accent2));color:#fff;}
+        .btn.secondary{background:#f1f5ff;color:#2f4f82;border:1px solid rgba(58,111,248,0.2);}
+        .btn:hover{transform:translateY(-1px);box-shadow:0 10px 20px rgba(58,111,248,0.25);}
+        .layout{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+        .card{position:relative;background:#fff;border:1px solid rgba(106,129,170,0.16);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;}
+        
+        .gallery-main{position:relative;height:360px;overflow:hidden;border-radius:14px;border:1px solid rgba(90,116,160,0.18);background:#eef3fb;}
+        .gallery-main img{width:100%;height:100%;object-fit:cover;transition:opacity .35s ease,transform .35s ease;}
+        .gallery-arrow{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;border:none;display:inline-flex;align-items:center;justify-content:center;font-size:1.25rem;color:#fff;background:rgba(44,60,120,0.5);cursor:pointer;z-index:2;transition:box-shadow .2s ease,background .2s ease;}
+        .gallery-arrow:hover{background:rgba(58,111,248,0.75);box-shadow:0 6px 15px rgba(33,70,122,0.4);}
+        .gallery-arrow.prev{left:12px;}
+        .gallery-arrow.next{right:12px;}
+        .thumb-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:8px;margin-top:8px;}
+        .thumb-row img{width:100%;height:64px;object-fit:cover;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:transform .2s ease,border-color .2s ease;}
+        .thumb-row img.active{border-color:var(--accent1);transform:scale(1.02);}
+        .detail-title{margin:0 0 10px;font-size:1.8rem;font-weight:800;}
+        .price{font-size:1.6rem;font-weight:800;color:#1e4bb8;margin:.4rem 0;}
+        .meta{display:flex;flex-wrap:wrap;gap:8px;color:#4f648d;font-size:0.9rem;margin-top:6px;}
+        .meta span{background:#f0f5ff;border-radius:10px;padding:6px 9px;}
+        .split{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;}
+        .details-list{list-style:none;padding:0;margin:10px 0 0;}
+        .details-list li{margin-bottom:8px;font-size:0.96rem;}
+        .description{margin-top:14px;color:#5d6f96;}
+        .hidden{display:none;}
+        @media(max-width:900px){.layout{grid-template-columns:1fr;}}        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <a class="brand" href="index.html"><img src="logo.PNG" alt="logo"><span>Muthupura.lk</span></a>
+            <div class="nav-links">
+                <a href="index.html" class="btn secondary">Home</a>
+                <a href="post.html" class="btn secondary">Post Ad</a>
+                <a href="dashboard.html" class="btn secondary">My Listings</a>
+                <a href="about.html" class="btn secondary">About</a>
+            </div>
+        </nav>
+
+        <div id="error-message" class="card" style="display:none;color:#a13636;background:#fff1f1;border-color:#ecbcbc;"></div>
+
+        <div class="layout" id="vehicle-detail" style="display:none;">
+            <div>
+                <div class="gallery-main" id="gallery-main">
+                    <button class="gallery-arrow prev" id="gallery-prev" aria-label="Previous image">&#10094;</button>
+                    <img src="https://via.placeholder.com/640x480?text=No+Image" alt="Main image">
+                    <button class="gallery-arrow next" id="gallery-next" aria-label="Next image">&#10095;</button>
+                </div>
+                <div class="thumb-row" id="gallery-thumbs"></div>
+            </div>
+            <div class="card">
+                <h1 class="detail-title" id="vehicle-title">Loading...</h1>
+                <div class="price" id="vehicle-price">Rs. 0</div>
+                <div class="meta" id="vehicle-meta"></div>
+                <div class="split">
+                    <button class="btn primary" id="contact-btn">📞 Contact Seller</button>
+                    <button class="btn secondary" id="leasing-btn">💰 Get Leasing</button>
+                </div>
+                <ul class="details-list" id="vehicle-info"></ul>
+                <p class="description" id="vehicle-description">No additional description available.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000';
+
+        function getQueryParam(name) {
+            return new URLSearchParams(window.location.search).get(name);
+        }
+
+        function getToken() {
+            return localStorage.getItem('token');
+        }
+
+        function setError(message) {
+            const el = document.getElementById('error-message');
+            el.textContent = message;
+            el.style.display = 'block';
+            document.getElementById('vehicle-detail').style.display = 'none';
+        }
+
+        let detailImages = [];
+        let currentImageIndex = 0;
+        const PLACEHOLDER_IMAGE = 'https://via.placeholder.com/640x480?text=No+Image';
+
+        function setMainGalleryImage(index) {
+            if (!detailImages.length) return;
+            currentImageIndex = ((index % detailImages.length) + detailImages.length) % detailImages.length;
+            const currentSrc = detailImages[currentImageIndex];
+            const mainImage = document.querySelector('#gallery-main img');
+            mainImage.style.opacity = '0';
+            setTimeout(() => {
+                mainImage.src = currentSrc;
+                mainImage.alt = `Photo ${currentImageIndex + 1}`;
+                mainImage.style.opacity = '1';
+            }, 160);
+            const thumbs = document.getElementById('gallery-thumbs');
+            thumbs.querySelectorAll('img').forEach((img, i) => img.classList.toggle('active', i === currentImageIndex));
+            console.log('Gallery set to image', currentImageIndex + 1, 'of', detailImages.length);
+        }
+
+        function renderVehicle(v) {
+            if (!v) {
+                setError('Vehicle not found');
+                return;
+            }
+
+            document.getElementById('error-message').style.display = 'none';
+            const detailSection = document.getElementById('vehicle-detail');
+            detailSection.style.display = 'grid';
+
+            const title = document.getElementById('vehicle-title');
+            const price = document.getElementById('vehicle-price');
+            const meta = document.getElementById('vehicle-meta');
+            const info = document.getElementById('vehicle-info');
+            const mainImage = document.querySelector('#gallery-main img');
+            const thumbs = document.getElementById('gallery-thumbs');
+            const prevBtn = document.getElementById('gallery-prev');
+            const nextBtn = document.getElementById('gallery-next');
+            const contactBtn = document.getElementById('contact-btn');
+            const leasingBtn = document.getElementById('leasing-btn');
+            const desc = document.getElementById('vehicle-description');
+
+            title.textContent = v.title || 'Untitled Vehicle';
+            price.textContent = `Rs. ${Number(v.price || 0).toLocaleString()}`;
+            const location = v.location || 'Unknown';
+            meta.innerHTML = `<span>Brand: ${v.brand || '-'}</span><span>Year: ${v.year || '-'}</span><span>Fuel: ${v.fuelType || '-'}</span><span>📍 ${location}</span><span>👁️ ${v.views || 0}</span>`;
+
+            // normalize images from API
+            let rawImages = [];
+            if (Array.isArray(v.images)) rawImages = v.images;
+            else if (typeof v.images === 'string' && v.images.trim()) {
+                try { rawImages = JSON.parse(v.images); } catch (_) { rawImages = v.images.split(',').map(s => s.trim()); }
+            } else if (v.image) {
+                rawImages = [v.image];
+            }
+
+            const normalizedImages = [...new Set((rawImages || []).filter(Boolean).map(src => src.trim()))];
+            detailImages = normalizedImages.length ? normalizedImages.map(src => `${API_URL}${src}`) : [PLACEHOLDER_IMAGE];
+            console.log('Vehicle images loaded:', normalizedImages.length, normalizedImages);
+
+            mainImage.src = detailImages[0] || PLACEHOLDER_IMAGE;
+            mainImage.alt = v.title || 'Vehicle Image';
+
+            thumbs.innerHTML = '';
+            detailImages.forEach((src, idx) => {
+                const thumb = document.createElement('img');
+                thumb.src = src;
+                thumb.alt = `Photo ${idx + 1}`;
+                if (idx === 0) thumb.classList.add('active');
+                thumb.onclick = () => setMainGalleryImage(idx);
+                thumbs.appendChild(thumb);
+            });
+
+            currentImageIndex = 0;
+            setMainGalleryImage(0);
+
+            prevBtn.onclick = () => setMainGalleryImage(currentImageIndex - 1);
+            nextBtn.onclick = () => setMainGalleryImage(currentImageIndex + 1);
+
+            let touchStartX = 0;
+            const galleryWrapper = document.getElementById('gallery-main');
+            galleryWrapper.ontouchstart = (evt) => { touchStartX = evt.changedTouches[0].clientX; };
+            galleryWrapper.ontouchend = (evt) => {
+                const diff = evt.changedTouches[0].clientX - touchStartX;
+                if (Math.abs(diff) > 40) {
+                    if (diff < 0) nextBtn.click(); else prevBtn.click();
+                }
+            };
+
+            console.log('Number of images received:', detailImages.length, 'Number rendered:', thumbs.children.length);
+
+            contactBtn.onclick = () => {
+                const phone = v.phone || '94777150660';
+                window.open(`https://wa.me/${phone}`,'_blank');
+            };
+
+            leasingBtn.onclick = () => {
+                window.open(`https://wa.me/94777150660?text=${encodeURIComponent('I want leasing for ' + (v.title || 'this vehicle'))}`,'_blank');
+            };
+
+
+            info.innerHTML = `
+                <li><strong>Brand:</strong> ${v.brand || 'N/A'}</li>
+                <li><strong>Year:</strong> ${v.year || 'N/A'}</li>
+                <li><strong>Fuel Type:</strong> ${v.fuelType || 'N/A'}</li>
+                <li><strong>Location:</strong> ${location}</li>
+                <li><strong>Views:</strong> ${v.views || 0}</li>
+                <li><strong>Seller Phone:</strong> ${v.phone || 'N/A'}</li>
+            `;
+
+            desc.textContent = `Full listing details for ${v.title || 'this vehicle'}. Submit and contact seller for viewing and test-drives.`;
+        }
+
+        async function fetchVehicle() {
+            const id = getQueryParam('id');
+            if (!id) { setError('Vehicle identifier missing.'); return; }
+
+            try {
+                const res = await fetch(`${API_URL}/vehicle/${id}`);
+                if (!res.ok) {
+                    if (res.status === 404) { setError('Vehicle not found.'); } else { setError('Failed to load vehicle details.'); }
+                    return;
+                }
+                const data = await res.json();
+                renderVehicle(data);
+
+                fetch(`${API_URL}/vehicle/${id}/view`, { method: 'POST' }).catch(() => {});
+            } catch (e) {
+                console.error(e);
+                setError('Unable to load vehicle. Please try again.');
+            }
+        }
+
+        fetchVehicle();
+    </script>
+</body>
+</html>
