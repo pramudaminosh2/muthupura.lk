@@ -669,12 +669,27 @@
             try {
                 const res = await fetch(`${API_URL}/get-vehicles`, { cache: 'no-store' });
                 if (!res.ok) throw new Error('Failed to fetch vehicles');
-                const data = await res.json();
-                vehiclesData = data;
+                const response = await res.json();
+                console.log('📥 API Response received:', response);
+                
+                // Handle new API response format: { success: true, data: [...] }
+                if (response.success && response.data && Array.isArray(response.data)) {
+                    vehiclesData = response.data;
+                    console.log(`✅ Loaded ${vehiclesData.length} vehicles from API`);
+                } else if (Array.isArray(response)) {
+                    // Backward compatibility: old format was just array
+                    vehiclesData = response;
+                    console.log(`✅ Loaded ${vehiclesData.length} vehicles (legacy format)`);
+                } else {
+                    console.error('❌ Invalid vehicle data format:', response);
+                    vehiclesData = [];
+                    throw new Error('Invalid response format from server');
+                }
+                
                 populateBrandChips();
                 applyFilters();
             } catch (error) {
-                console.error(error);
+                console.error('❌ Error fetching vehicles:', error);
                 showMessage('error', 'Unable to load vehicles at the moment. Please reload later.');
             } finally {
                 showLoader(false);
@@ -764,6 +779,13 @@
         }
 
         function applyFilters() {
+            // Safety check for vehicle data
+            if (!vehiclesData || !Array.isArray(vehiclesData)) {
+                console.error('❌ Invalid vehicle data:', vehiclesData);
+                showMessage('error', 'Vehicle data unavailable');
+                return;
+            }
+            
             const brand = document.getElementById('filter-brand').value.trim().toLowerCase();
             const minPrice = Number(document.getElementById('filter-min-price').value);
             const maxPrice = Number(document.getElementById('filter-max-price').value);
@@ -818,6 +840,12 @@
         }
 
         function populateBrandChips() {
+            // Safety check for vehicle data
+            if (!vehiclesData || !Array.isArray(vehiclesData) || vehiclesData.length === 0) {
+                console.warn('⚠️ No vehicle data available for brand chips');
+                return;
+            }
+            
             const brandSet = [...new Set(vehiclesData.map(v => (v.brand || '').toString().trim()).filter(Boolean))].slice(0, 12);
             const container = document.getElementById('brand-buttons');
             container.innerHTML = '';

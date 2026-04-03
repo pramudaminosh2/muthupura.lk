@@ -140,19 +140,38 @@
         let confirmationResult = null;
 
         function initRecaptcha() {
-            if (recaptchaVerifier) return;
-            recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
-                size: 'invisible',
-                callback: (response) => {
-                    console.log('Recaptcha solved', response);
-                }
-            }, auth);
-            recaptchaVerifier.render().catch(err => {
-                console.error('Recaptcha render failed', err);
-            });
+            if (recaptchaVerifier) {
+                console.log('✅ RecaptchaVerifier already initialized');
+                return;
+            }
+
+            try {
+                console.log('🔏 Initializing RecaptchaVerifier...');
+                recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+                    size: 'normal',
+                    callback: (response) => {
+                        console.log('✅ Recaptcha verified successfully');
+                    },
+                    onExpired: () => {
+                        console.warn('⚠️ Recaptcha expired, will re-initialize on next OTP attempt');
+                        recaptchaVerifier = null;
+                    }
+                }, auth);
+
+                console.log('✅ RecaptchaVerifier initialized successfully');
+            } catch (err) {
+                console.error('❌ RecaptchaVerifier initialization failed:', err);
+                recaptchaVerifier = null;
+                throw err;
+            }
         }
 
-        initRecaptcha();
+        // Initialize recaptcha once Firebase is loaded
+        try {
+            initRecaptcha();
+        } catch (err) {
+            console.warn('⚠️ Recaptcha will initialize on first OTP attempt:', err.message);
+        }
 
         const apiUrl = 'https://muthupura-backend.onrender.com';
 
@@ -280,43 +299,82 @@
         document.getElementById('send-otp-btn').addEventListener('click', async () => {
             const phoneEl = document.getElementById('otp-phone');
             const rawPhone = phoneEl?.value.trim() || '';
+            
             if (!rawPhone || !/^\+?[0-9]{7,15}$/.test(rawPhone)) {
-                showAlert('Please enter a valid phone number including country code', 'error');
+                showAlert('Please enter a valid phone number including country code (e.g., +94712345678)', 'error');
                 return;
             }
 
-            initRecaptcha();
             try {
+                console.log('📱 Sending OTP for phone:', rawPhone);
+                
+                // Initialize or reinitialize recaptcha if needed
+                if (!recaptchaVerifier) {
+                    console.log('🔏 RecaptchaVerifier not ready, reinitializing...');
+                    initRecaptcha();
+                }
+
+                showAlert('Sending OTP...', 'success');
+                console.log('📤 Calling signInWithPhoneNumber...');
+                
                 confirmationResult = await signInWithPhoneNumber(auth, rawPhone, recaptchaVerifier);
-                showAlert('OTP sent via Firebase. Check your phone.', 'success');
+                
+                console.log('✅ OTP sent successfully');
+                showAlert('✅ OTP sent via Firebase. Check your phone.', 'success');
                 document.getElementById('otp-verification').style.display = 'block';
+                
             } catch (err) {
-                console.error('Firebase send OTP failed', err);
-                showAlert('Unable to send OTP via Firebase. Please try again.', 'error');
+                console.error('❌ Firebase OTP error:', err);
+                console.error('Error code:', err.code);
+                console.error('Error message:', err.message);
+                
+                // Clear recaptcha on error so it can be reinitialized
+                recaptchaVerifier = null;
+                confirmationResult = null;
+                
+                let errorMsg = 'Unable to send OTP. Please try again.';
+                if (err.code === 'auth/invalid-phone-number') {
+                    errorMsg = 'Invalid phone number. Please include country code (e.g., +94712345678)';
+                } else if (err.code === 'auth/quota-exceeded') {
+                    errorMsg = 'Too many attempts. Please try again later.';
+                } else if (err.code === 'auth/internal-error') {
+                    errorMsg = 'Firebase service error. Please check your phone number and try again.';
+                }
+                
+                showAlert(errorMsg, 'error');
             }
         });
 
         document.getElementById('verify-otp-btn').addEventListener('click', async () => {
             const otp = document.getElementById('otp-code').value.trim();
-            if (!otp) {
-                showAlert('Please enter the OTP code', 'error');
+            
+            if (!otp || otp.length < 6) {
+                showAlert('Please enter the 6-digit OTP code', 'error');
                 return;
             }
 
             if (!confirmationResult) {
-                showAlert('OTP flow was not initialized, press Send OTP first', 'error');
+                showAlert('⚠️ OTP session expired. Press Send OTP again.', 'error');
+                document.getElementById('otp-verification').style.display = 'none';
+                recaptchaVerifier = null;
                 return;
             }
 
             try {
+                console.log('🔐 Verifying OTP...');
                 const result = await confirmationResult.confirm(otp);
                 const firebasePhone = result.user?.phoneNumber;
+                
+                console.log('✅ OTP verified successfully');
+                console.log('Firebase phone:', firebasePhone);
 
                 if (!firebasePhone) {
+                    console.error('❌ No phone number from Firebase');
                     showAlert('Could not determine phone from Firebase account', 'error');
                     return;
                 }
 
+                console.log('📤 Logging in with phone:', firebasePhone);
                 const res = await fetch(`${apiUrl}/otp-login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -330,6 +388,7 @@
                 }
 
                 if (data.isNewUser) {
+                    console.log('📋 New user detected, redirecting to complete profile');
                     localStorage.setItem('pendingPhone', data.phone || firebasePhone.replace(/\D/g, ''));
                     showAlert('Phone verified. Complete profile to continue.', 'success');
                     setTimeout(() => {
@@ -338,6 +397,7 @@
                     return;
                 }
 
+                console.log('✅ OTP login successful');
                 setToken(data.token, data.user?.name || '');
                 updateNav(data.user || { role: data.role || 'user' });
                 showAlert('Login successful! Redirecting...', 'success');
@@ -349,8 +409,18 @@
                     }
                 }, 700);
             } catch (err) {
-                console.error('Firebase verify OTP failed', err);
-                showAlert('OTP verification failed. Check code and try again.', 'error');
+                console.error('❌ OTP verification failed:', err);
+                console.error('Error code:', err.code);
+                console.error('Error message:', err.message);
+                
+                let errorMsg = 'OTP verification failed. Check code and try again.';
+                if (err.code === 'auth/invalid-verification-code') {
+                    errorMsg = 'Invalid OTP code. Please check and try again.';
+                } else if (err.code === 'auth/code-expired') {
+                    errorMsg = 'OTP has expired. Press Send OTP to get a new code.';
+                }
+                
+                showAlert(errorMsg, 'error');
             }
         });
 

@@ -30,7 +30,14 @@ const FACEBOOK_TOKEN_URL = 'https://graph.facebook.com/v16.0/oauth/access_token'
 const FACEBOOK_USERINFO_URL = 'https://graph.facebook.com/v16.0/me';
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: [
+        'https://muthupuralk.web.app',
+        'http://localhost:5500',
+        'http://127.0.0.1:5500'
+    ],
+    credentials: true
+}));
 app.use(session({
     secret: process.env.SESSION_SECRET || 'muthupura-session-secret',
     resave: false,
