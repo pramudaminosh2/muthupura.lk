@@ -136,9 +136,24 @@ let db = mysql.createConnection({
 
 db.connect((err) => {
     if (err) {
-        console.error('Database connection failed:', err);
+        console.error('❌ Database connection FAILED:', err.message);
+        console.error('Connection details:', {
+            host: process.env.DB_HOST,
+            user: process.env.DB_USER,
+            database: process.env.DB_NAME,
+            port: process.env.DB_PORT
+        });
+        process.exit(1);
     } else {
-        console.log('Connected to MySQL ✅');
+        console.log('\n✅ Database Connection SUCCESS');
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log('Connection Details:');
+        console.log(`  Host: ${process.env.DB_HOST}`);
+        console.log(`  Database: ${process.env.DB_NAME}`);
+        console.log(`  User: ${process.env.DB_USER}`);
+        console.log(`  Port: ${process.env.DB_PORT}`);
+        console.log(`  SSL: ${process.env.DB_SSL === 'true' ? 'Enabled' : 'Disabled'}`);
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
         // Ensure required vehicle fields exist for featured and view counter
         db.query("ALTER TABLE vehicles ADD COLUMN isFeatured TINYINT(1) DEFAULT 0", alterErr => {
@@ -384,103 +399,166 @@ function requireAdmin(req, res, next) {
 }
 
 app.post('/login', (req, res) => {
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
 
-    if (!email || !password) {
-        return res.status(400).json({ message: 'Email and password are required' });
-    }
-
-    const normalizedEmail = email.trim().toLowerCase();
-
-    const sql = 'SELECT * FROM users WHERE email = ?';
-
-    db.query(sql, [normalizedEmail], async (err, results) => {
-        if (err) {
-            console.error('Login query error:', err);
-            return res.status(500).json({ message: 'Internal server error' });
-        }
-
-        console.log('Login request:', { email: normalizedEmail });
-        if (results.length === 0) {
-            console.log('Login failed: user account does not exist', normalizedEmail);
-            return res.status(404).json({ message: 'User account does not exist' });
-        }
-
-        const user = results[0];
-        console.log('Login: user found', { id: user.id, email: user.email, role: user.role });
-
-        const match = await bcrypt.compare(password, user.password);
-        console.log('Login password match:', { email: normalizedEmail, success: match });
-
-        if (!match) {
-            return res.status(401).json({ message: 'Invalid password' });
-        }
-
-        const payload = {
-            id: user.id,
-            name: user.name,
-            role: user.role
-        };
-        const token = jwt.sign(payload, SECRET, { expiresIn: '6h' });
-
-        console.log('Login success payload:', payload);
-
-        res.json({
-            message: 'Login success',
-            token,
-            role: user.role,
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role
-            }
-        });
-    });
-});
-
-app.post('/otp-login', (req, res) => {
-    const { phone } = req.body;
-    if (!phone || typeof phone !== 'string') {
-        return res.status(400).json({ message: 'Phone number is required' });
-    }
-
-    const normalizedPhone = phone.replace(/\D/g, '');
-    if (!normalizedPhone || normalizedPhone.length < 7 || normalizedPhone.length > 15) {
-        return res.status(400).json({ message: 'Invalid phone number' });
-    }
-
-    db.query('SELECT * FROM users WHERE phone = ?', [normalizedPhone], (err, results) => {
-        if (err) {
-            console.error('OTP login DB lookup error', err);
-            return res.status(500).json({ message: 'Internal server error' });
-        }
-
-        if (results.length > 0) {
-            const user = results[0];
-            const payload = { id: user.id, name: user.name, role: user.role || 'user' };
-            const token = jwt.sign(payload, SECRET, { expiresIn: '6h' });
-            return res.json({
-                message: 'OTP login success',
-                token,
-                role: payload.role,
-                user: {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email,
-                    phone: user.phone,
-                    role: payload.role
-                },
-                isNewUser: false
+        if (!email || !password) {
+            console.log('❌ /login - Missing email or password');
+            return res.status(400).json({ 
+                success: false,
+                message: 'Email and password are required' 
             });
         }
 
-        return res.json({
-            message: 'User not found, please complete profile',
-            isNewUser: true,
-            phone: normalizedPhone
+        const normalizedEmail = email.trim().toLowerCase();
+        console.log('🔐 /login attempt:', normalizedEmail);
+
+        const sql = 'SELECT * FROM users WHERE email = ?';
+
+        db.query(sql, [normalizedEmail], async (err, results) => {
+            if (err) {
+                console.error('❌ /login - Database query error:', err.message);
+                return res.status(500).json({ 
+                    success: false,
+                    message: 'Internal server error',
+                    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+                });
+            }
+
+            if (results.length === 0) {
+                console.log('❌ /login failed - User not found:', normalizedEmail);
+                return res.status(404).json({ 
+                    success: false,
+                    message: 'User account does not exist' 
+                });
+            }
+
+            const user = results[0];
+            console.log('✅ /login - User found:', { id: user.id, email: user.email });
+
+            try {
+                const match = await bcrypt.compare(password, user.password);
+                
+                if (!match) {
+                    console.log('❌ /login - Invalid password for:', normalizedEmail);
+                    return res.status(401).json({ 
+                        success: false,
+                        message: 'Invalid password' 
+                    });
+                }
+
+                const payload = {
+                    id: user.id,
+                    name: user.name,
+                    role: user.role
+                };
+                const token = jwt.sign(payload, SECRET, { expiresIn: '6h' });
+
+                console.log('✅ /login success:', { userId: user.id, email: normalizedEmail });
+
+                res.json({
+                    success: true,
+                    message: 'Login success',
+                    token,
+                    role: user.role,
+                    user: {
+                        id: user.id,
+                        name: user.name,
+                        email: user.email,
+                        role: user.role
+                    }
+                });
+            } catch (bcryptErr) {
+                console.error('❌ /login - Password comparison error:', bcryptErr.message);
+                return res.status(500).json({
+                    success: false,
+                    message: 'Internal server error',
+                    error: process.env.NODE_ENV === 'development' ? bcryptErr.message : undefined
+                });
+            }
         });
-    });
+    } catch (err) {
+        console.error('❌ Unexpected error in /login:', err.message);
+        res.status(500).json({
+            success: false,
+            message: 'Unexpected server error',
+            error: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
+    }
+});
+
+app.post('/otp-login', (req, res) => {
+    try {
+        const { phone } = req.body;
+        
+        if (!phone || typeof phone !== 'string') {
+            console.log('❌ /otp-login - Missing or invalid phone');
+            return res.status(400).json({ 
+                success: false,
+                message: 'Phone number is required' 
+            });
+        }
+
+        const normalizedPhone = phone.replace(/\D/g, '');
+        if (!normalizedPhone || normalizedPhone.length < 7 || normalizedPhone.length > 15) {
+            console.log('❌ /otp-login - Invalid phone format:', normalizedPhone);
+            return res.status(400).json({ 
+                success: false,
+                message: 'Invalid phone number' 
+            });
+        }
+
+        console.log('📱 /otp-login attempt:', normalizedPhone);
+
+        db.query('SELECT * FROM users WHERE phone = ?', [normalizedPhone], (err, results) => {
+            if (err) {
+                console.error('❌ /otp-login - Database error:', err.message);
+                return res.status(500).json({ 
+                    success: false,
+                    message: 'Internal server error',
+                    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+                });
+            }
+
+            if (results.length > 0) {
+                const user = results[0];
+                const payload = { id: user.id, name: user.name, role: user.role || 'user' };
+                const token = jwt.sign(payload, SECRET, { expiresIn: '6h' });
+                
+                console.log('✅ /otp-login success:', { userId: user.id, phone: normalizedPhone });
+                
+                return res.json({
+                    success: true,
+                    message: 'OTP login success',
+                    token,
+                    role: payload.role,
+                    user: {
+                        id: user.id,
+                        name: user.name,
+                        email: user.email,
+                        phone: user.phone,
+                        role: payload.role
+                    },
+                    isNewUser: false
+                });
+            }
+
+            console.log('📝 /otp-login - New user detected:', normalizedPhone);
+            return res.json({
+                success: true,
+                message: 'User not found, please complete profile',
+                isNewUser: true,
+                phone: normalizedPhone
+            });
+        });
+    } catch (err) {
+        console.error('❌ Unexpected error in /otp-login:', err.message);
+        res.status(500).json({
+            success: false,
+            message: 'Unexpected server error',
+            error: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
+    }
 });
 
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
@@ -718,83 +796,130 @@ app.get('/', (req, res) => {
 
 // 🟢 Add Vehicle
 app.post('/add-vehicle', authenticateToken, upload.array('images', 10), (req, res) => {
-    const { title, price, brand, year, phone, fuelType, location } = req.body;
-    const ownerId = req.user?.id || null;
+    try {
+        const { title, price, brand, year, phone, fuelType, location } = req.body;
+        const ownerId = req.user?.id || null;
 
-    const formErrors = [];
+        const formErrors = [];
 
-    if (!title || typeof title !== 'string' || !title.trim()) formErrors.push('title');
-    if (!brand || typeof brand !== 'string' || !brand.trim()) formErrors.push('brand');
-    if (!fuelType || !['Electric', 'Petrol', 'Diesel', 'Hybrid'].includes(fuelType)) formErrors.push('fuelType');
+        if (!title || typeof title !== 'string' || !title.trim()) formErrors.push('title');
+        if (!brand || typeof brand !== 'string' || !brand.trim()) formErrors.push('brand');
+        if (!fuelType || !['Electric', 'Petrol', 'Diesel', 'Hybrid'].includes(fuelType)) formErrors.push('fuelType');
 
-    const normalizedPrice = Number(price);
-    if (Number.isNaN(normalizedPrice) || normalizedPrice < 0) formErrors.push('price');
+        const normalizedPrice = Number(price);
+        if (Number.isNaN(normalizedPrice) || normalizedPrice < 0) formErrors.push('price');
 
-    const normalizedYear = Number(year);
-    const currentYear = new Date().getFullYear();
-    if (!Number.isInteger(normalizedYear) || normalizedYear < 1900 || normalizedYear > currentYear + 1) formErrors.push('year');
+        const normalizedYear = Number(year);
+        const currentYear = new Date().getFullYear();
+        if (!Number.isInteger(normalizedYear) || normalizedYear < 1900 || normalizedYear > currentYear + 1) formErrors.push('year');
 
-    const phoneValue = (phone || '').toString().trim();
-    if (!phoneValue || phoneValue.length < 7 || phoneValue.length > 20) formErrors.push('phone');
+        const phoneValue = (phone || '').toString().trim();
+        if (!phoneValue || phoneValue.length < 7 || phoneValue.length > 20) formErrors.push('phone');
 
-    const selectedLocation = (location || 'Unknown').toString().trim();
-    if (!selectedLocation) formErrors.push('location');
+        const selectedLocation = (location || 'Unknown').toString().trim();
+        if (!selectedLocation) formErrors.push('location');
 
-    const files = Array.isArray(req.files) ? req.files : [];
-    console.log('add-vehicle request observations:', {
-        fieldsReceived: Object.keys(req.body),
-        filesReceived: files.length,
-        fileNames: files.map(f => f.originalname),
-        fileSavedNames: files.map(f => f.filename)
-    });
+        const files = Array.isArray(req.files) ? req.files : [];
+        console.log('📝 /add-vehicle request:', {
+            fieldsReceived: Object.keys(req.body),
+            filesCount: files.length,
+            ownerId: ownerId
+        });
 
-    if (!files.length) formErrors.push('images');
+        if (!files.length) formErrors.push('images');
 
-    if (formErrors.length) {
-        console.log('add-vehicle validation failed', { formErrors });
-        return res.status(400).json({ message: 'Validation failed', invalidFields: formErrors });
-    }
-
-    const imagePaths = files.map(file => `/uploads/${file.filename}`);
-    const primaryImage = imagePaths[0] || null;
-    const imagesJson = JSON.stringify(imagePaths);
-    console.log('add-vehicle image paths to save', imagePaths, 'json length', imagesJson.length);
-    const sql = "INSERT INTO vehicles (title, price, brand, year, phone, image, images, fuelType, ownerId, location, isFeatured, views, featuredUntil, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-    const now = new Date();
-    const createdAt = now.toISOString().slice(0, 19).replace('T', ' ');
-
-    db.query(sql, [title.trim(), normalizedPrice, brand.trim(), normalizedYear, phoneValue, primaryImage, imagesJson, fuelType, ownerId, selectedLocation, 0, 0, null, createdAt], (err, result) => {
-        if (err) {
-            console.error('Error saving vehicle:', err);
-            return res.status(500).json({ message: 'Error saving vehicle ❌' });
+        if (formErrors.length) {
+            console.log('❌ /add-vehicle validation failed:', { formErrors });
+            return res.status(400).json({ 
+                success: false,
+                message: 'Validation failed', 
+                invalidFields: formErrors 
+            });
         }
 
-        console.log('Vehicle inserted ID', result.insertId, 'images saved count', imagePaths.length);
-        res.json({ message: 'Vehicle saved with images ✅', id: result.insertId, images: imagePaths });
-    });
+        const imagePaths = files.map(file => `/uploads/${file.filename}`);
+        const primaryImage = imagePaths[0] || null;
+        const imagesJson = JSON.stringify(imagePaths);
+        console.log('📤 Saving vehicle with', imagePaths.length, 'images');
+
+        const sql = "INSERT INTO vehicles (title, price, brand, year, phone, image, images, fuelType, ownerId, location, isFeatured, views, featuredUntil, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        const now = new Date();
+        const createdAt = now.toISOString().slice(0, 19).replace('T', ' ');
+
+        db.query(sql, [title.trim(), normalizedPrice, brand.trim(), normalizedYear, phoneValue, primaryImage, imagesJson, fuelType, ownerId, selectedLocation, 0, 0, null, createdAt], (err, result) => {
+            if (err) {
+                console.error('❌ Database error saving vehicle:', err.message);
+                return res.status(500).json({ 
+                    success: false,
+                    message: 'Error saving vehicle',
+                    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+                });
+            }
+            console.log(`✅ Vehicle saved with ID ${result.insertId} and ${imagePaths.length} images`);
+            res.json({ 
+                success: true,
+                message: 'Vehicle saved ✅', 
+                id: result.insertId, 
+                images: imagePaths 
+            });
+        });
+    } catch (err) {
+        console.error('❌ Unexpected error in /add-vehicle:', err.message);
+        res.status(500).json({
+            success: false,
+            message: 'Unexpected server error',
+            error: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
+    }
 });
 
 // 🟢 Get All Vehicles
 app.get('/get-vehicles', (req, res) => {
-    expireFeaturedAds(err => {
-        if (err) {
-            console.error('Error expiring featured ads', err);
-        }
-
-        const sql = "SELECT * FROM vehicles ORDER BY isFeatured DESC, views DESC, createdAt DESC, id DESC";
-
-        db.query(sql, (err, results) => {
+    try {
+        expireFeaturedAds(err => {
             if (err) {
-                console.error(err);
-                return res.status(500).json({ message: 'Error fetching vehicles' });
+                console.error('❌ Error expiring featured ads:', err.message);
             }
 
-            const normalizedResults = results.map(normalizeVehicleRecord);
-            console.log('get-vehicles returned', normalizedResults.length, 'vehicles; first images', (normalizedResults[0]?.images || []).length);
-            res.json(normalizedResults);
+            const sql = "SELECT * FROM vehicles ORDER BY isFeatured DESC, views DESC, createdAt DESC, id DESC";
+            console.log('📤 Fetching vehicles from database...');
+
+            db.query(sql, (err, results) => {
+                if (err) {
+                    console.error('❌ Database query error in /get-vehicles:', err.message);
+                    return res.status(500).json({ 
+                        success: false,
+                        message: 'Error fetching vehicles',
+                        error: process.env.NODE_ENV === 'development' ? err.message : undefined
+                    });
+                }
+
+                try {
+                    const normalizedResults = results.map(normalizeVehicleRecord);
+                    console.log(`✅ /get-vehicles returned ${normalizedResults.length} vehicles`);
+                    res.json({
+                        success: true,
+                        data: normalizedResults,
+                        count: normalizedResults.length
+                    });
+                } catch (normalizeErr) {
+                    console.error('❌ Error normalizing vehicle data:', normalizeErr.message);
+                    return res.status(500).json({
+                        success: false,
+                        message: 'Error processing vehicle data',
+                        error: process.env.NODE_ENV === 'development' ? normalizeErr.message : undefined
+                    });
+                }
+            });
         });
-    });
+    } catch (err) {
+        console.error('❌ Unexpected error in /get-vehicles:', err.message);
+        res.status(500).json({
+            success: false,
+            message: 'Unexpected server error',
+            error: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
+    }
 });
 
 // 🟢 Get Vehicle by ID
