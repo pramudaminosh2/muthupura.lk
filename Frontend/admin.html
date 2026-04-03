@@ -68,7 +68,7 @@
         async function loadVehicles(){
             const token = localStorage.getItem('token');
             try {
-                const response = await fetch('http://localhost:3000/admin/vehicles', { headers: { Authorization: `Bearer ${token}` } });
+                const response = await fetch('https://muthupura-lk.onrender.com/admin/vehicles', { headers: { Authorization: `Bearer ${token}` } });
                 if(!response.ok) throw new Error('Failed to load');
                 const vehicles = await response.json();
 
@@ -90,7 +90,7 @@
                         <td>${v.phone||''}</td>
                         <td>${v.fuelType||''}</td>
                         <td>${v.ownerId||''}</td>
-                        <td><img class="thumb" src="http://localhost:3000${v.image||''}" onerror="this.src='https://via.placeholder.com/60x40?text=No'" /></td>
+                        <td><img class="thumb" src="https://muthupura-lk.onrender.com${v.image||''}" onerror="this.src='https://via.placeholder.com/60x40?text=No'" /></td>
                         <td>
                             <button class="btn ${v.isFeatured?'secondary':'primary'}" onclick="toggleFeature(${v.id},${v.isFeatured})">${v.isFeatured?'Unfeature':'Feature'}</button>
                             <button class="btn danger" onclick="deleteAd(${v.id})">Delete</button>
@@ -108,13 +108,13 @@
         async function toggleFeature(id, current){
             const token = localStorage.getItem('token');
             try {
-                const res = await fetch(`http://localhost:3000/toggle-feature/${id}`, { method:'PUT', headers:{'Content-Type':'application/json', Authorization:`Bearer ${token}`}});
+                const res = await fetch(`https://muthupura-lk.onrender.com/toggle-feature/${id}`, { method:'PUT', headers:{'Content-Type':'application/json', Authorization:`Bearer ${token}`}});
                 if(!res.ok) throw new Error();
                 await loadVehicles();
             } catch(err){ console.error(err); alert('Feature toggle failed.'); }
         }
 
-        async function deleteAd(id){ if(!confirm('Delete this vehicle?')) return; const token = localStorage.getItem('token'); try { const res = await fetch(`http://localhost:3000/delete-vehicle/${id}`, { method:'DELETE', headers:{Authorization:`Bearer ${token}`}}); if(!res.ok) throw new Error(); await loadVehicles(); } catch(err){ console.error(err); alert('Delete failed.'); }}
+        async function deleteAd(id){ if(!confirm('Delete this vehicle?')) return; const token = localStorage.getItem('token'); try { const res = await fetch(`https://muthupura-lk.onrender.com/delete-vehicle/${id}`, { method:'DELETE', headers:{Authorization:`Bearer ${token}`}}); if(!res.ok) throw new Error(); await loadVehicles(); } catch(err){ console.error(err); alert('Delete failed.'); }}
 
         loadVehicles();
     </script>
