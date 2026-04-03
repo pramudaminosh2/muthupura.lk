@@ -141,7 +141,7 @@
             });
             const token = localStorage.getItem('token');
             try {
-                const res = await fetch('http://localhost:3000/add-vehicle', {
+                const res = await fetch('https://muthupura-lk.onrender.com/add-vehicle', {
                     method: 'POST',
                     headers: { Authorization: `Bearer ${token}` },
                     body: formData

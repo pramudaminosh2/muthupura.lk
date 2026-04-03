@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const app = express();
 const mysql = require('mysql2');
@@ -9,7 +11,7 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Google OAuth settings
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID';
@@ -119,10 +121,17 @@ passport.use(new FacebookStrategy({
 }));
 
 let db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '1234',
-    database: 'muthupura'
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: parseInt(process.env.DB_PORT) || 3306,
+    ssl: {
+        rejectUnauthorized: false
+    },
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
 db.connect((err) => {
@@ -1040,5 +1049,9 @@ app.use((err, req, res, next) => {
 
 // start server
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    const serverUrl = process.env.NODE_ENV === 'production' 
+        ? (process.env.API_URL || `http://localhost:${PORT}`)
+        : `http://localhost:${PORT}`;
+    console.log(`🚀 Server running on ${serverUrl}`);
+    console.log(`📊 Database: ${process.env.DB_HOST}`);
 });
