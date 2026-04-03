@@ -55,8 +55,10 @@
         </div>
     </div>
 
+    <script src="config.js"></script>
     <script>
-        const apiUrl = 'https://muthupura-lk.onrender.com';
+        console.log('📡 Using API URL:', API_BASE_URL);
+        const apiUrl = API_BASE_URL;
 
         function showAlert(message, type) {
             const alertBox = document.getElementById('alert-box');

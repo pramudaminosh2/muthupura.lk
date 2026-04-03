@@ -58,7 +58,10 @@
         <p class="note">Use features to highlight top vehicles; delete outdated listings quickly.</p>
     </div>
 
+    <script src="config.js"></script>
     <script>
+        console.log('📡 Using API URL:', API_BASE_URL);
+        
         function getPayload(){ const t=localStorage.getItem('token'); if(!t) return null; try{return JSON.parse(atob(t.split('.')[1]));}catch{return null;} }
         function requireAdmin(){ const p=getPayload(); if(!p||p.role!=='admin'){ alert('Admin login required'); window.location.href='login.html'; return false; } return true; }
         if(!requireAdmin()) throw new Error('Unauthorized');
@@ -68,7 +71,8 @@
         async function loadVehicles(){
             const token = localStorage.getItem('token');
             try {
-                const response = await fetch('https://muthupura-lk.onrender.com/admin/vehicles', { headers: { Authorization: `Bearer ${token}` } });
+                console.log('📤 Calling API: ' + API_BASE_URL + '/admin/vehicles');
+                const response = await fetch(`${API_BASE_URL}/admin/vehicles`, { headers: { Authorization: `Bearer ${token}` } });
                 if(!response.ok) throw new Error('Failed to load');
                 const vehicles = await response.json();
 
@@ -90,7 +94,7 @@
                         <td>${v.phone||''}</td>
                         <td>${v.fuelType||''}</td>
                         <td>${v.ownerId||''}</td>
-                        <td><img class="thumb" src="https://muthupura-lk.onrender.com${v.image||''}" onerror="this.src='https://via.placeholder.com/60x40?text=No'" /></td>
+                        <td><img class="thumb" src="${API_BASE_URL}${v.image||''}" onerror="this.src='https://via.placeholder.com/60x40?text=No'" /></td>
                         <td>
                             <button class="btn ${v.isFeatured?'secondary':'primary'}" onclick="toggleFeature(${v.id},${v.isFeatured})">${v.isFeatured?'Unfeature':'Feature'}</button>
                             <button class="btn danger" onclick="deleteAd(${v.id})">Delete</button>
@@ -108,13 +112,14 @@
         async function toggleFeature(id, current){
             const token = localStorage.getItem('token');
             try {
-                const res = await fetch(`https://muthupura-lk.onrender.com/toggle-feature/${id}`, { method:'PUT', headers:{'Content-Type':'application/json', Authorization:`Bearer ${token}`}});
+                console.log('📤 Calling API: ' + API_BASE_URL + '/toggle-feature/' + id);
+                const res = await fetch(`${API_BASE_URL}/toggle-feature/${id}`, { method:'PUT', headers:{'Content-Type':'application/json', Authorization:`Bearer ${token}`}});
                 if(!res.ok) throw new Error();
                 await loadVehicles();
             } catch(err){ console.error(err); alert('Feature toggle failed.'); }
         }
 
-        async function deleteAd(id){ if(!confirm('Delete this vehicle?')) return; const token = localStorage.getItem('token'); try { const res = await fetch(`https://muthupura-lk.onrender.com/delete-vehicle/${id}`, { method:'DELETE', headers:{Authorization:`Bearer ${token}`}}); if(!res.ok) throw new Error(); await loadVehicles(); } catch(err){ console.error(err); alert('Delete failed.'); }}
+        async function deleteAd(id){ if(!confirm('Delete this vehicle?')) return; const token = localStorage.getItem('token'); try { console.log('📤 Calling API: ' + API_BASE_URL + '/delete-vehicle/' + id); const res = await fetch(`${API_BASE_URL}/delete-vehicle/${id}`, { method:'DELETE', headers:{Authorization:`Bearer ${token}`}}); if(!res.ok) throw new Error(); await loadVehicles(); } catch(err){ console.error(err); alert('Delete failed.'); }}
 
         loadVehicles();
     </script>

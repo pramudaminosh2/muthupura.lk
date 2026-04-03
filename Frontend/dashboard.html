@@ -74,8 +74,10 @@
         <div id="empty" class="empty" style="display:none;">No vehicles yet. Use Post Ad to add your first listing.</div>
     </div>
 
+    <script src="config.js"></script>
     <script>
-        const API_URL = 'https://muthupura-lk.onrender.com';
+        const API_URL = API_BASE_URL;
+        console.log('📡 Using API URL:', API_URL);
 
         function getTokenPayload() {
             const token = localStorage.getItem('token');

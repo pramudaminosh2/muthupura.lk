@@ -80,8 +80,10 @@
         </div>
     </div>
 
+    <script src="config.js"></script>
     <script>
-        const API_URL = 'https://muthupura-lk.onrender.com';
+        console.log('📡 Using API URL:', API_BASE_URL);
+        const API_URL = API_BASE_URL;
 
         function getQueryParam(name) {
             return new URLSearchParams(window.location.search).get(name);
