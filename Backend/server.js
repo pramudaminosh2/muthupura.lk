@@ -30,21 +30,29 @@ const FACEBOOK_OAUTH_URL = 'https://www.facebook.com/v16.0/dialog/oauth';
 const FACEBOOK_TOKEN_URL = 'https://graph.facebook.com/v16.0/oauth/access_token';
 const FACEBOOK_USERINFO_URL = 'https://graph.facebook.com/v16.0/me';
 
-// Enable CORS with permissive settings for development
+// Enable CORS with specific Firebase origin
+const cors = require('cors');
+
 app.use(cors({
-    origin: "*",
+    origin: "https://muthupuralk.web.app",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true
 }));
 
-// Ensure CORS headers are always set, including on errors and OPTIONS requests
+// Manual preflight handler for /add-vehicle
+app.options('/add-vehicle', (req, res) => {
+    res.header("Access-Control-Allow-Origin", "https://muthupuralk.web.app");
+    res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.sendStatus(200);
+});
+
+// Global headers fallback middleware
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
-    if (req.method === 'OPTIONS') {
-        return res.sendStatus(204);
-    }
+    res.header("Access-Control-Allow-Origin", "https://muthupuralk.web.app");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     next();
 });
 
