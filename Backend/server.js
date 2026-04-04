@@ -6,6 +6,7 @@ const mysql = require('mysql2');
 const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 const session = require('express-session');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
@@ -304,6 +305,19 @@ const storage = multer.diskStorage({
         cb(null, filename);
     }
 });
+
+// Ensure uploads directory exists at startup
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+    try {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+        console.log(`📁 Created uploads directory: ${uploadsDir}`);
+    } catch (err) {
+        console.error(`❌ Failed to create uploads directory: ${err.message}`);
+    }
+} else {
+    console.log(`✅ Uploads directory confirmed: ${uploadsDir}`);
+}
 
 const bcrypt = require('bcrypt');
 
@@ -759,7 +773,19 @@ app.get('/profile', authenticateToken, (req, res) => {
 
 const upload = multer({ storage: storage });
 
-app.use('/uploads', express.static('uploads'));
+// Serve uploaded images with proper headers and caching
+app.use('/uploads', express.static('uploads', {
+    maxAge: '1d',
+    etag: false,
+    lastModified: true,
+    setHeaders: (res, path) => {
+        // Allow browsers to cache images
+        res.set('Cache-Control', 'public, max-age=86400');
+        res.set('Content-Disposition', 'inline');
+    }
+}));
+
+console.log('📡 Image serving middleware configured for /uploads');
 
 function normalizeVehicleRecord(vehicle) {
     const record = { ...vehicle };
@@ -1171,6 +1197,23 @@ app.delete('/delete-vehicle/:id', authenticateToken, (req, res) => {
 // 404 JSON fallback
 app.use((req, res) => {
     res.status(404).json({ message: 'Not found' });
+});
+
+// Multer file upload error handler
+app.use((err, req, res, next) => {
+    if (err instanceof multer.MulterError) {
+        console.error('❌ Multer upload error:', err.code, err.field, err.message);
+        if (err.code === 'LIMIT_FILE_SIZE') {
+            return res.status(400).json({ success: false, message: 'File too large' });
+        }
+        if (err.code === 'LIMIT_FILE_COUNT') {
+            return res.status(400).json({ success: false, message: 'Too many files' });
+        }
+        return res.status(400).json({ success: false, message: 'File upload error: ' + err.message });
+    } else if (err) {
+        return next(err);
+    }
+    next();
 });
 
 // global error handler: JSON output only
