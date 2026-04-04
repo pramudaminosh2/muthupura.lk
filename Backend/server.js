@@ -791,84 +791,26 @@ app.get('/', (req, res) => {
     res.send('Muthupura backend is running 🚀');
 });
 
-// 🟢 Add Vehicle
-app.post('/add-vehicle', authenticateToken, upload.array('images', 10), (req, res) => {
-    console.log('🔥 /add-vehicle hit - AuthenticateToken passed');
+// 🧪 Test Route - Verify Backend Working
+app.get('/test', (req, res) => {
+    res.send("Backend working ✅");
+});
+
+// 🟢 Add Vehicle (TEST VERSION - SIMPLE FILE UPLOAD VERIFICATION)
+app.post('/add-vehicle', upload.array('images', 10), async (req, res) => {
+    console.log("🔥 POST /add-vehicle hit");
+
     try {
-        const { title, price, brand, year, phone, fuelType, location } = req.body;
-        const ownerId = req.user?.id || null;
+        const imageUrls = req.files.map(file => file.path);
 
-        const formErrors = [];
+        console.log("FILES:", imageUrls);
+        console.log("BODY:", req.body);
 
-        if (!title || typeof title !== 'string' || !title.trim()) formErrors.push('title');
-        if (!brand || typeof brand !== 'string' || !brand.trim()) formErrors.push('brand');
-        if (!fuelType || !['Electric', 'Petrol', 'Diesel', 'Hybrid'].includes(fuelType)) formErrors.push('fuelType');
+        res.json({ success: true, message: "Vehicle added test" });
 
-        const normalizedPrice = Number(price);
-        if (Number.isNaN(normalizedPrice) || normalizedPrice < 0) formErrors.push('price');
-
-        const normalizedYear = Number(year);
-        const currentYear = new Date().getFullYear();
-        if (!Number.isInteger(normalizedYear) || normalizedYear < 1900 || normalizedYear > currentYear + 1) formErrors.push('year');
-
-        const phoneValue = (phone || '').toString().trim();
-        if (!phoneValue || phoneValue.length < 7 || phoneValue.length > 20) formErrors.push('phone');
-
-        const selectedLocation = (location || 'Unknown').toString().trim();
-        if (!selectedLocation) formErrors.push('location');
-
-        const files = Array.isArray(req.files) ? req.files : [];
-        console.log('📝 /add-vehicle request:', {
-            fieldsReceived: Object.keys(req.body),
-            filesCount: files.length,
-            ownerId: ownerId
-        });
-
-        if (!files.length) formErrors.push('images');
-
-        if (formErrors.length) {
-            console.log('❌ /add-vehicle validation failed:', { formErrors });
-            return res.status(400).json({ 
-                success: false,
-                message: 'Validation failed', 
-                invalidFields: formErrors 
-            });
-        }
-
-        const imagePaths = files.map(file => file.path);
-        const primaryImage = imagePaths[0] || null;
-        const imagesJson = JSON.stringify(imagePaths);
-        console.log('📤 Saving vehicle with', imagePaths.length, 'Cloudinary images');
-        console.log('🔗 First image URL:', primaryImage?.substring(0, 80) + '...' || 'none');
-
-        const sql = "INSERT INTO vehicles (title, price, brand, year, phone, image, images, fuelType, ownerId, location, isFeatured, views, featuredUntil, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        const now = new Date();
-        const createdAt = now.toISOString().slice(0, 19).replace('T', ' ');
-
-        db.query(sql, [title.trim(), normalizedPrice, brand.trim(), normalizedYear, phoneValue, primaryImage, imagesJson, fuelType, ownerId, selectedLocation, 0, 0, null, createdAt], (err, result) => {
-            if (err) {
-                console.error('❌ Database error saving vehicle:', err.message);
-                return res.status(500).json({ 
-                    success: false,
-                    message: 'Error saving vehicle',
-                    error: process.env.NODE_ENV === 'development' ? err.message : undefined
-                });
-            }
-            console.log(`✅ Vehicle saved with ID ${result.insertId} and ${imagePaths.length} images`);
-            res.json({ 
-                success: true,
-                message: 'Vehicle saved ✅', 
-                id: result.insertId, 
-                images: imagePaths 
-            });
-        });
     } catch (err) {
-        console.error('❌ Unexpected error in /add-vehicle:', err.message);
-        res.status(500).json({
-            success: false,
-            message: 'Unexpected server error',
-            error: process.env.NODE_ENV === 'development' ? err.message : undefined
-        });
+        console.error("UPLOAD ERROR:", err);
+        res.status(500).json({ error: "Upload failed" });
     }
 });
 
