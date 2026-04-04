@@ -14,6 +14,14 @@ const upload = require('./upload');
 
 const PORT = process.env.PORT || 3000;
 
+// Enable CORS - FIRST middleware after app creation
+app.use(cors({
+    origin: "https://muthupuralk.web.app",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"],
+    credentials: true
+}));
+
 // Google OAuth settings
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID';
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || 'YOUR_GOOGLE_CLIENT_SECRET';
@@ -29,14 +37,6 @@ const FACEBOOK_REDIRECT_URI = process.env.FACEBOOK_REDIRECT_URI || 'http://local
 const FACEBOOK_OAUTH_URL = 'https://www.facebook.com/v16.0/dialog/oauth';
 const FACEBOOK_TOKEN_URL = 'https://graph.facebook.com/v16.0/oauth/access_token';
 const FACEBOOK_USERINFO_URL = 'https://graph.facebook.com/v16.0/me';
-
-// Enable CORS - must be FIRST before all routes and error handlers
-app.use(cors({
-    origin: "https://muthupuralk.web.app",
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"],
-    credentials: true
-}));
 
 // Body parsing middleware
 app.use(express.json());
@@ -242,7 +242,7 @@ db.connect((err) => {
                             console.error('Failed to enforce email NOT NULL:', modifyErr);
                         }
                         db.query('ALTER TABLE users ADD UNIQUE INDEX uniq_users_email (email)', indexErr => {
-                            if (indexErr && indexErr.code !== 'ER_DUP_KEY') {
+                            if (indexErr && indexErr.code !== 'ER_DUP_KEY' && !indexErr.message.includes('Duplicate key name')) {
                                 console.error('Failed to add unique index on email:', indexErr);
                             }
                         });
@@ -1217,9 +1217,9 @@ app.use((err, req, res, next) => {
     res.header("Access-Control-Allow-Origin", "https://muthupuralk.web.app");
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-    
+    res.header("Access-Control-Allow-Credentials", "true");
     console.error('Unhandled error:', err);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(err.status || 500).json({ success: false, message: err.message || 'Internal server error' });
 });
 
 // start server
