@@ -31,24 +31,10 @@ const FACEBOOK_TOKEN_URL = 'https://graph.facebook.com/v16.0/oauth/access_token'
 const FACEBOOK_USERINFO_URL = 'https://graph.facebook.com/v16.0/me';
 
 // Enable CORS - must be FIRST before all routes and error handlers
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "https://muthupuralk.web.app");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-    res.header("Access-Control-Allow-Credentials", "true");
-    
-    // Handle preflight OPTIONS requests
-    if (req.method === 'OPTIONS') {
-        return res.sendStatus(204);
-    }
-    next();
-});
-
-// CORS package for additional compatibility
 app.use(cors({
     origin: "https://muthupuralk.web.app",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"],
     credentials: true
 }));
 
@@ -225,6 +211,12 @@ db.connect((err) => {
         db.query("ALTER TABLE vehicles ADD COLUMN location VARCHAR(128) DEFAULT 'Unknown'", alterErr => {
             if (alterErr && alterErr.code !== 'ER_DUP_FIELDNAME') {
                 console.error('Failed to add location column:', alterErr);
+            }
+        });
+
+        db.query("ALTER TABLE vehicles ADD COLUMN description TEXT NULL", alterErr => {
+            if (alterErr && alterErr.code !== 'ER_DUP_FIELDNAME') {
+                console.error('Failed to add description column:', alterErr);
             }
         });
 
@@ -812,63 +804,66 @@ app.get('/test', (req, res) => {
 });
 
 // 🟢 Add Vehicle - Production Route
-app.post('/add-vehicle', upload.array('images', 10), async (req, res) => {
+app.post('/add-vehicle', upload.single('image'), async (req, res) => {
     console.log("🔥 POST /add-vehicle hit");
-    console.log("FILES RECEIVED:", req.files);
+    console.log("FILE RECEIVED:", req.file);
     
     try {
         // Extract form data
-        const { model, price, description, category, year } = req.body;
+        const { title, brand, year, price, fuelType, location, phone, description } = req.body;
         
         // Validate required fields
-        if (!model || !price || !description || !category || !year) {
+        if (!title || !brand || !year || !price || !fuelType || !location || !phone) {
             return res.status(400).json({ 
                 success: false, 
-                message: 'Missing required fields: model, price, description, category, year' 
+                message: 'Missing required fields: title, brand, year, price, fuelType, location, phone' 
             });
         }
         
-        // Ensure at least one image was uploaded
-        if (!Array.isArray(req.files) || !req.files.length) {
+        // Ensure image was uploaded
+        if (!req.file) {
             return res.status(400).json({ 
                 success: false, 
-                message: 'At least one image file is required' 
+                message: 'Image file is required' 
             });
         }
         
-        const imageUrls = req.files.map(file => file.path);
-        const image_url = imageUrls[0];
+        const image_url = req.file.path; // Cloudinary URL
         
         console.log('📝 Vehicle form data:', {
-            model,
-            price: parseFloat(price),
-            description,
-            category,
+            title,
+            brand,
             year: parseInt(year),
+            price: parseFloat(price),
+            fuelType,
+            location,
+            phone,
+            description: description || null,
             image_url: image_url.substring(0, 80) + '...'
         });
         
         // Insert into database
         const sql = `
             INSERT INTO vehicles 
-            (title, price, brand, year, phone, image, images, fuelType, ownerId, location, isFeatured, views, featuredUntil, createdAt)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+            (title, price, brand, year, phone, image, images, fuelType, ownerId, location, isFeatured, views, featuredUntil, description, createdAt)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
         `;
         
         const values = [
-            model,                                    // title
+            title,                                   // title
             parseFloat(price),                       // price
-            category,                                // brand
+            brand,                                   // brand
             parseInt(year),                          // year
-            '',                                      // phone (optional)
+            phone,                                   // phone
             image_url,                               // image
-            JSON.stringify(imageUrls),               // images (JSON array)
-            'Other',                                 // fuelType (default)
+            JSON.stringify([image_url]),             // images (JSON array)
+            fuelType,                                // fuelType
             null,                                    // ownerId
-            'Unknown',                               // location
+            location,                                // location
             0,                                       // isFeatured
             0,                                       // views
-            null                                     // featuredUntil
+            null,                                    // featuredUntil
+            description || null                      // description
         ];
         
         db.query(sql, values, (err, result) => {
