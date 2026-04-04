@@ -151,7 +151,7 @@ let db = mysql.createConnection({
     database: process.env.DB_NAME,
     port: parseInt(process.env.DB_PORT) || 3306,
     ssl: {
-        rejectUnauthorized: false
+        rejectUnauthorized: true
     },
     waitForConnections: true,
     connectionLimit: 10,
@@ -811,21 +811,92 @@ app.get('/test', (req, res) => {
     res.send("Backend working ✅");
 });
 
-// 🟢 Add Vehicle (TEST VERSION - SIMPLE FILE UPLOAD VERIFICATION)
-app.post('/add-vehicle', upload.array('images', 10), async (req, res) => {
+// 🟢 Add Vehicle - Production Route
+app.post('/add-vehicle', upload.single('image'), async (req, res) => {
     console.log("🔥 POST /add-vehicle hit");
-
+    
     try {
-        const imageUrls = req.files.map(file => file.path);
-
-        console.log("FILES:", imageUrls);
-        console.log("BODY:", req.body);
-
-        res.json({ success: true, message: "Vehicle added test" });
-
+        // Extract form data
+        const { model, price, description, category, year } = req.body;
+        
+        // Validate required fields
+        if (!model || !price || !description || !category || !year) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Missing required fields: model, price, description, category, year' 
+            });
+        }
+        
+        // Ensure image was uploaded
+        if (!req.file) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Image file is required' 
+            });
+        }
+        
+        // Get Cloudinary image URL
+        const image_url = req.file.path; // Cloudinary URL
+        
+        console.log('📝 Vehicle form data:', {
+            model,
+            price: parseFloat(price),
+            description,
+            category,
+            year: parseInt(year),
+            image_url: image_url.substring(0, 80) + '...'
+        });
+        
+        // Insert into database
+        const sql = `
+            INSERT INTO vehicles 
+            (title, price, brand, year, phone, image, images, fuelType, ownerId, location, isFeatured, views, featuredUntil, createdAt)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+        `;
+        
+        const values = [
+            model,                                    // title
+            parseFloat(price),                       // price
+            category,                                // brand
+            parseInt(year),                          // year
+            '',                                      // phone (optional)
+            image_url,                               // image
+            JSON.stringify([image_url]),             // images (JSON array)
+            'Other',                                 // fuelType (default)
+            null,                                    // ownerId
+            'Unknown',                               // location
+            0,                                       // isFeatured
+            0,                                       // views
+            null                                     // featuredUntil
+        ];
+        
+        db.query(sql, values, (err, result) => {
+            if (err) {
+                console.error('❌ Database error:', err.message);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: 'Failed to save vehicle',
+                    error: process.env.NODE_ENV === 'development' ? err.message : null
+                });
+            }
+            
+            console.log(`✅ Vehicle saved with ID: ${result.insertId}`);
+            
+            res.status(201).json({ 
+                success: true, 
+                message: 'Vehicle posted successfully', 
+                vehicleId: result.insertId,
+                image_url: image_url
+            });
+        });
+        
     } catch (err) {
-        console.error("UPLOAD ERROR:", err);
-        res.status(500).json({ error: "Upload failed" });
+        console.error('❌ Unexpected error in /add-vehicle:', err.message);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error',
+            error: process.env.NODE_ENV === 'development' ? err.message : null
+        });
     }
 });
 
