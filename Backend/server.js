@@ -804,9 +804,9 @@ app.get('/test', (req, res) => {
 });
 
 // 🟢 Add Vehicle - Production Route
-app.post('/add-vehicle', upload.single('image'), async (req, res) => {
+app.post('/add-vehicle', upload.array('images', 10), async (req, res) => {
     console.log("🔥 POST /add-vehicle hit");
-    console.log("FILE RECEIVED:", req.file);
+    console.log("FILES RECEIVED:", req.files);
     
     try {
         // Extract form data
@@ -820,15 +820,16 @@ app.post('/add-vehicle', upload.single('image'), async (req, res) => {
             });
         }
         
-        // Ensure image was uploaded
-        if (!req.file) {
+        // Ensure at least one image was uploaded
+        if (!Array.isArray(req.files) || !req.files.length) {
             return res.status(400).json({ 
                 success: false, 
-                message: 'Image file is required' 
+                message: 'At least one image file is required' 
             });
         }
         
-        const image_url = req.file.path; // Cloudinary URL
+        const imageUrls = req.files.map(file => file.path);
+        const image_url = imageUrls[0]; // Use first image as primary
         
         console.log('📝 Vehicle form data:', {
             title,
@@ -856,7 +857,7 @@ app.post('/add-vehicle', upload.single('image'), async (req, res) => {
             parseInt(year),                          // year
             phone,                                   // phone
             image_url,                               // image
-            JSON.stringify([image_url]),             // images (JSON array)
+            JSON.stringify(imageUrls),               // images (JSON array)
             fuelType,                                // fuelType
             null,                                    // ownerId
             location,                                // location
