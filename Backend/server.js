@@ -4,11 +4,8 @@ const express = require('express');
 const app = express();
 const mysql = require('mysql2');
 const cors = require('cors');
-const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const session = require('express-session');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
@@ -16,19 +13,6 @@ const FacebookStrategy = require('passport-facebook').Strategy;
 const upload = require('./upload');
 
 const PORT = process.env.PORT || 3000;
-
-require('dotenv').config();
-
-// Configure Cloudinary
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-});
-
-if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY) {
-    console.warn('⚠️ WARNING: Cloudinary credentials not configured in .env');
-}
 
 // Google OAuth settings
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID';
@@ -309,16 +293,7 @@ db.connect((err) => {
     }
 });
 
-const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: {
-        folder: 'muthupura-lk/vehicles',
-        resource_type: 'auto',
-        allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp']
-    }
-});
-
-console.log('☁️ Cloudinary storage configured for image uploads');
+// Cloudinary and multer storage setup is now handled in Backend/upload.js
 
 const bcrypt = require('bcrypt');
 
@@ -772,9 +747,7 @@ app.get('/profile', authenticateToken, (req, res) => {
     });
 });
 
-const upload = multer({ storage: storage });
-
-// Images are now served from Cloudinary - no local /uploads middleware needed
+// Cloudinary upload storage is handled by Backend/upload.js
 console.log('☁️ Images will be served from Cloudinary CDN');
 
 function normalizeVehicleRecord(vehicle) {
@@ -1193,7 +1166,7 @@ app.use((req, res) => {
 
 // Multer file upload error handler
 app.use((err, req, res, next) => {
-    if (err instanceof multer.MulterError) {
+    if (err && err.name === 'MulterError') {
         console.error('❌ Multer upload error:', err.code, err.field, err.message);
         if (err.code === 'LIMIT_FILE_SIZE') {
             return res.status(400).json({ success: false, message: 'File too large' });
