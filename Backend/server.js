@@ -2,17 +2,6 @@ require('dotenv').config();
 
 const express = require('express');
 const app = express();
-const mysql = require('mysql2');
-const cors = require('cors');
-const path = require('path');
-const fs = require('fs');
-const session = require('express-session');
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const FacebookStrategy = require('passport-facebook').Strategy;
-const upload = require('./upload');
-
-const PORT = process.env.PORT || 3000;
 
 // Enable CORS - FIRST middleware after app creation
 app.use(cors({
@@ -21,6 +10,11 @@ app.use(cors({
     allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"],
     credentials: true
 }));
+
+// Handle preflight requests
+app.options('*', cors());
+
+const mysql = require('mysql2');
 
 // Google OAuth settings
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID';
