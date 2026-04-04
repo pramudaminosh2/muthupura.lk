@@ -88,7 +88,7 @@
 
         /**
          * Get image URL from vehicle data
-         * Images are now stored as Cloudinary URLs directly
+         * Images are now stored as Firebase Storage URLs directly
          */
         function getImageUrl(images) {
             try {
@@ -167,7 +167,7 @@
             const location = v.location || 'Unknown';
             meta.innerHTML = `<span>Brand: ${v.brand || '-'}</span><span>Year: ${v.year || '-'}</span><span>Fuel: ${v.fuelType || '-'}</span><span>📍 ${location}</span><span>👁️ ${v.views || 0}</span>`;
 
-            // Cloudinary URLs are stored as JSON array - parse and use directly
+            // Firebase Storage URLs are stored as JSON array - parse and use directly
             let detailImagesArray = [];
             if (typeof v.images === 'string' && v.images.trim()) {
                 try {
@@ -185,9 +185,9 @@
                 detailImagesArray = [v.image];
             }
 
-            // All images should be full Cloudinary URLs - use directly
+            // All images should be full Firebase Storage URLs - use directly
             detailImages = detailImagesArray.filter(Boolean).length ? detailImagesArray : [PLACEHOLDER_IMAGE];
-            console.log('☁️ Vehicle images loaded from Cloudinary:', { count: detailImages.length, urls: detailImages.map(u => u.substring(0, 60) + '...') });
+            console.log('☁️ Vehicle images loaded from Firebase Storage:', { count: detailImages.length, urls: detailImages.map(u => u.substring(0, 60) + '...') });
 
             mainImage.src = detailImages[0] || PLACEHOLDER_IMAGE;
             mainImage.alt = v.title || 'Vehicle Image';

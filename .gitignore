@@ -68,7 +68,7 @@ node_modules/
 # dataconnect generated files
 .dataconnect
 
-#Cloudinary configuration file
+#Firebase service account key
 .md
 .md
 .txt

@@ -1,20 +1,37 @@
 require('dotenv').config();
 
 const express = require('express');
+const cors = require('cors');
+const session = require('express-session');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
 const app = express();
 
 // Enable CORS - FIRST middleware after app creation
 app.use(cors({
     origin: "https://muthupuralk.web.app",
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"],
     credentials: true
 }));
 
-// Handle preflight requests
-app.options('*', cors());
-
 const mysql = require('mysql2');
+
+// Firebase Storage setup
+const bucket = require('./firebase');
+
+// Multer setup for memory storage
+const multer = require('multer');
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB per file
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'), false);
+    }
+  }
+});
 
 // Google OAuth settings
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID';
@@ -295,7 +312,41 @@ db.connect((err) => {
     }
 });
 
-// Cloudinary and multer storage setup is now handled in Backend/upload.js
+// Firebase Storage setup for image uploads
+
+// Helper function to upload file to Firebase Storage
+async function uploadToFirebase(file) {
+  const fileName = `vehicles/${Date.now()}_${file.originalname}`;
+  const fileUpload = bucket.file(fileName);
+
+  const stream = fileUpload.createWriteStream({
+    metadata: {
+      contentType: file.mimetype,
+    },
+  });
+
+  return new Promise((resolve, reject) => {
+    stream.on('error', (error) => {
+      console.error('Upload error:', error);
+      reject(error);
+    });
+
+    stream.on('finish', async () => {
+      try {
+        // Make the file publicly accessible
+        await fileUpload.makePublic();
+        // Get the public URL
+        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+        resolve(publicUrl);
+      } catch (publicError) {
+        console.error('Error making file public:', publicError);
+        reject(publicError);
+      }
+    });
+
+    stream.end(file.buffer);
+  });
+}
 
 const bcrypt = require('bcrypt');
 
@@ -749,8 +800,8 @@ app.get('/profile', authenticateToken, (req, res) => {
     });
 });
 
-// Cloudinary upload storage is handled by Backend/upload.js
-console.log('☁️ Images will be served from Cloudinary CDN');
+// Firebase Storage setup for image uploads
+console.log('☁️ Images will be served from Firebase Storage');
 
 function normalizeVehicleRecord(vehicle) {
     const record = { ...vehicle };
@@ -798,7 +849,7 @@ app.get('/test', (req, res) => {
 });
 
 // 🟢 Add Vehicle - Production Route
-app.post('/add-vehicle', upload.any(), async (req, res) => {
+app.post('/add-vehicle', upload.array('images', 10), async (req, res) => {
     console.log("🔥 POST /add-vehicle hit");
     console.log("FILES RECEIVED:", req.files);
     
@@ -822,7 +873,22 @@ app.post('/add-vehicle', upload.any(), async (req, res) => {
             });
         }
         
-        const imageUrls = req.files.map(file => file.path);
+        // Upload images to Firebase Storage
+        const imageUrls = [];
+        for (const file of req.files) {
+            try {
+                const url = await uploadToFirebase(file);
+                imageUrls.push(url);
+                console.log('✅ Uploaded image:', url);
+            } catch (uploadError) {
+                console.error('❌ Failed to upload image:', uploadError);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: 'Failed to upload image to storage' 
+                });
+            }
+        }
+        
         const image_url = imageUrls[0]; // Use first image as primary
         
         console.log('📝 Vehicle form data:', {
@@ -974,7 +1040,7 @@ app.get('/my-vehicles', authenticateToken, (req, res) => {
 });
 
 // 🟢 UpdateLogged-in Vehicle
-app.put('/update-vehicle/:id', authenticateToken, upload.array('images', 10), (req, res) => {
+app.put('/update-vehicle/:id', authenticateToken, upload.array('images', 10), async (req, res) => {
     const vehicleId = req.params.id;
     const userId = req.user.id;
 
@@ -993,10 +1059,19 @@ app.put('/update-vehicle/:id', authenticateToken, upload.array('images', 10), (r
 
     const files = Array.isArray(req.files) ? req.files : [];
     if (files.length) {
-        const imagePaths = files.map(file => file.path);
-        fields.push('images = ?'); values.push(JSON.stringify(imagePaths));
-        fields.push('image = ?'); values.push(imagePaths[0] || null);
-        console.log('☁️ Updated vehicle with', imagePaths.length, 'Cloudinary images');
+        try {
+            const imageUrls = [];
+            for (const file of files) {
+                const url = await uploadToFirebase(file);
+                imageUrls.push(url);
+            }
+            fields.push('images = ?'); values.push(JSON.stringify(imageUrls));
+            fields.push('image = ?'); values.push(imageUrls[0] || null);
+            console.log('☁️ Updated vehicle with', imageUrls.length, 'Firebase images');
+        } catch (uploadError) {
+            console.error('❌ Failed to upload images:', uploadError);
+            return res.status(500).json({ message: 'Failed to upload images' });
+        }
     }
 
     if (!fields.length) {
@@ -1217,6 +1292,7 @@ app.use((err, req, res, next) => {
 });
 
 // start server
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     const serverUrl = process.env.NODE_ENV === 'production' 
         ? (process.env.API_URL || `http://localhost:${PORT}`)

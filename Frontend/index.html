@@ -563,7 +563,7 @@
 
         /**
          * Get image URL from vehicle data
-         * Images are now stored as Cloudinary URLs directly
+         * Images are now stored as Firebase Storage URLs directly
          * @param {string|array} images - JSON string or array of image URLs
          * @returns {string} - First image URL or fallback
          */
@@ -575,7 +575,7 @@
                 } else if (Array.isArray(images)) {
                     imageArray = images;
                 }
-                // Return first Cloudinary URL or fallback
+                // Return first Firebase Storage URL or fallback
                 return (imageArray && imageArray[0]) || FALLBACK_IMAGE;
             } catch (e) {
                 console.warn('⚠️ Failed to parse images:', e.message);
