@@ -135,31 +135,49 @@
 
         document.getElementById('vehicleForm').addEventListener('submit', async function(e){
             e.preventDefault();
+            
             const formData = new FormData(this);
             const imagesPayload = formData.getAll('images');
+            
+            console.log('🚀 FORM DATA READY');
             console.log('Submitting vehicle form', {
                 title: formData.get('title'),
                 price: formData.get('price'),
+                brand: formData.get('brand'),
+                year: formData.get('year'),
+                phone: formData.get('phone'),
+                fuelType: formData.get('fuelType'),
+                location: formData.get('location'),
                 imagesCount: imagesPayload.length,
                 imageNames: imagesPayload.map(file => file.name)
             });
-            const token = localStorage.getItem('token');
+            
             try {
                 console.log('📤 Calling API: ' + API_URL + '/add-vehicle');
+                console.log('Fetch options:', { method: 'POST', bodyType: 'FormData' });
+                
                 const res = await fetch(`${API_URL}/add-vehicle`, {
                     method: 'POST',
-                    headers: { Authorization: `Bearer ${token}` },
                     body: formData
                 });
+                
+                console.log('Response status:', res.status, res.statusText);
+                
+                const data = await res.json();
+                console.log('Response data:', data);
+                
                 if(!res.ok) {
-                    const errBody = await res.json().catch(() => null);
-                    throw new Error('Add failed: ' + (errBody?.message || res.statusText));
+                    throw new Error('Server error: ' + (data?.message || data?.error || res.statusText));
                 }
+                
+                console.log('✅ SUCCESS:', data);
                 alert('Vehicle posted successfully');
                 location.href = 'index.html';
+                
             } catch(err) {
-                console.error(err);
-                alert('Unable to post vehicle right now: ' + err.message);
+                console.error('❌ FETCH ERROR:', err);
+                console.error('Error message:', err.message);
+                alert('Unable to post vehicle: ' + err.message);
             }
         });
     </script>
