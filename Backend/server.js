@@ -1220,14 +1220,14 @@ app.post('/vehicle/:id/view', (req, res) => {
     });
 });
 
-app.delete('/delete-vehicle/:id', authenticateToken, (req, res) => {
+app.delete('/delete-vehicle/:id', authenticateToken, async (req, res) => {
     const id = req.params.id;
     const userId = req.user.id;
 
-    const selectSql = "SELECT ownerId FROM vehicles WHERE id = ?";
-    db.query(selectSql, [id], (err, results) => {
+    const selectSql = "SELECT ownerId, images FROM vehicles WHERE id = ?";
+    db.query(selectSql, [id], async (err, results) => {
         if (err) {
-            console.error(err);
+            console.error('❌ Error fetching vehicle:', err);
             return res.status(500).json({ message: 'Error deleting vehicle' });
         }
 
@@ -1236,21 +1236,61 @@ app.delete('/delete-vehicle/:id', authenticateToken, (req, res) => {
         }
 
         const ownerId = results[0].ownerId;
+        const imagesJson = results[0].images;
+
         if (req.user.role !== 'admin' && ownerId !== userId) {
             return res.status(403).json({ message: 'You are not allowed to delete this vehicle' });
         }
 
-        console.log("Delete request for ID:", id);
+        console.log("🗑️  Delete request for vehicle ID:", id);
 
-        const sql = "DELETE FROM vehicles WHERE id = ?";
-        db.query(sql, [id], (err, result) => {
+        // Step 1: Delete images from Firebase Storage
+        let deletedImageCount = 0;
+        try {
+            if (imagesJson) {
+                let imageUrls = [];
+                try {
+                    imageUrls = typeof imagesJson === 'string' ? JSON.parse(imagesJson) : imageUrls;
+                } catch (parseErr) {
+                    console.warn('⚠️  Could not parse images JSON:', parseErr.message);
+                }
+
+                for (const imageUrl of imageUrls) {
+                    try {
+                        // Extract file path from Firebase URL
+                        // URL format: https://firebasestorage.googleapis.com/v0/b/{bucket}/o/{filePath}?alt=media&token=...
+                        const filePathMatch = imageUrl.match(/\/o\/(.+?)\?/);
+                        if (filePathMatch && filePathMatch[1]) {
+                            const filePath = decodeURIComponent(filePathMatch[1]);
+                            console.log('🔍 Extracted file path:', filePath);
+
+                            // Delete from Firebase Storage
+                            const file = bucket.file(filePath);
+                            await file.delete();
+                            deletedImageCount++;
+                            console.log(`✅ Deleted image from storage: ${filePath}`);
+                        }
+                    } catch (imgDeleteErr) {
+                        console.warn(`⚠️  Failed to delete image ${imageUrl}:`, imgDeleteErr.message);
+                        // Continue with next image even if one fails
+                    }
+                }
+            }
+        } catch (storageErr) {
+            console.warn('⚠️  Storage cleanup encountered issues:', storageErr.message);
+            // Don't block vehicle deletion if image cleanup fails
+        }
+
+        // Step 2: Delete database record
+        const deleteSql = "DELETE FROM vehicles WHERE id = ?";
+        db.query(deleteSql, [id], (err, result) => {
             if (err) {
-                console.error(err);
+                console.error('❌ Error deleting database record:', err);
                 return res.status(500).json({ message: 'Error deleting vehicle' });
             }
 
-            console.log("Deleted rows:", result.affectedRows);
-            res.json({ message: 'Vehicle deleted' });
+            console.log(`✅ Vehicle ${id} deleted - Removed ${deletedImageCount} images from storage`);
+            res.json({ message: 'Vehicle deleted', imagesRemoved: deletedImageCount });
         });
     });
 });

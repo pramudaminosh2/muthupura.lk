@@ -675,6 +675,7 @@
         const API_URL = API_BASE_URL;
         console.log('📡 Using API URL:', API_URL);
         let vehiclesData = [];
+        let selectedCategory = null; // Track selected category chip: 'cars', 'bikes', 'ev', or null
         const FALLBACK_IMAGE = '/logo.PNG';
         const LOCATION_OPTIONS = ['Colombo','Gampaha','Negombo','Chilaw','Kurunegala','Kandy','Matara','Galle','Anuradhapura','Jaffna','Batticaloa','Trincomalee','Ratnapura','Badulla','Kalutara'];
 
@@ -842,6 +843,26 @@
             return (vehicle.fuelType || '').toString().trim() === 'Electric';
         }
 
+        /**
+         * Detect vehicle category: 'car', 'bike', or null if uncertain
+         * Uses title, brand, and type hints
+         */
+        function getVehicleCategory(vehicle) {
+            const title = (vehicle.title || '').toLowerCase();
+            const brand = (vehicle.brand || '').toLowerCase();
+            const type = (vehicle.type || '').toLowerCase();
+            
+            // Bike keywords
+            const bikeKeywords = ['bike', 'motorcycle', 'cruiser', 'sports', 'scooter', 'vespa', 'honda cb', 'yamaha', 'ktm', 'bajaj', 'tvs', 'hero', 'keeway', 'rusi'];
+            if (type === 'bike' || bikeKeywords.some(kw => title.includes(kw) || brand.includes(kw))) return 'bike';
+            
+            // Car keywords
+            const carKeywords = ['car', 'vehicle', 'sedan', 'suv', 'van', 'hatchback', 'coupe', 'cuv', 'toyota', 'honda', 'hyundai', 'maruti', 'nissan', 'ford', 'mazda', 'skoda', 'kia'];
+            if (type === 'car' || carKeywords.some(kw => title.includes(kw) || brand.includes(kw))) return 'car';
+            
+            return null;
+        }
+
         function createCard(vehicle) {
             const card = document.createElement('article');
             card.className = 'card';
@@ -960,6 +981,18 @@
                 const yearValue = String(v.year || '');
                 const locationValue = (v.location || '').toString().toLowerCase();
 
+                // Category filter from hero chips
+                if (selectedCategory) {
+                    const vehicleCategory = getVehicleCategory(v);
+                    if (selectedCategory === 'ev') {
+                        if (!isEV(v)) return false;
+                    } else if (selectedCategory === 'cars') {
+                        if (vehicleCategory !== 'car') return false;
+                    } else if (selectedCategory === 'bikes') {
+                        if (vehicleCategory !== 'bike') return false;
+                    }
+                }
+
                 if (brand && !brandValue.includes(brand) && !title.includes(brand)) return false;
                 if (location && !locationValue.includes(location)) return false;
                 if (!Number.isNaN(minPrice) && minPrice > 0 && price < minPrice) return false;
@@ -970,6 +1003,7 @@
                 return true;
             });
 
+            console.log(`🔍 Applied filters - Category: ${selectedCategory}, Results: ${filtered.length}/${vehiclesData.length}`);
             renderVehicles(filtered);
             const grid = document.getElementById('vehicle-list');
             grid.classList.add('visible');
@@ -982,6 +1016,8 @@
             });
             document.querySelectorAll('.chip.active').forEach(el => el.classList.remove('active'));
             document.getElementById('location-suggestions').classList.add('hidden');
+            selectedCategory = null; // Reset category filter
+            console.log('🗑️ All filters cleared');
             applyFilters();
         }
 
@@ -1068,13 +1104,21 @@
                 const el = document.getElementById(id);
                 if (!el) return;
                 el.addEventListener('keypress', e => {
-                    if (e.key === 'Enter') { e.preventDefault(); applyFilters(); document.getElementById('location-suggestions').classList.add('hidden'); }
+                    if (e.key === 'Enter') { 
+                        e.preventDefault();
+                        selectedCategory = null; // Reset category when using other filters
+                        applyFilters();
+                        document.getElementById('location-suggestions').classList.add('hidden');
+                    }
                 });
             });
 
             const locationEl = document.getElementById('filter-location');
             if (locationEl) {
-                locationEl.addEventListener('input', () => updateLocationSuggestions());
+                locationEl.addEventListener('input', () => {
+                    selectedCategory = null; // Reset category when using location filter
+                    updateLocationSuggestions();
+                });
                 locationEl.addEventListener('focus', () => updateLocationSuggestions());
             }
         }
@@ -1092,27 +1136,44 @@
                     const filterSearchEl = document.getElementById('filter-search');
                     const heroLocationEl = document.getElementById('hero-location');
 
-                    if (heroSearchEl) {
-                        if (type === 'cars') heroSearchEl.value = 'car';
-                        else if (type === 'bikes') heroSearchEl.value = 'bike';
-                        else if (type === 'ev') heroSearchEl.value = 'electric';
-                        else heroSearchEl.value = '';
+                    // Set selected category and clear search
+                    if (type === 'cars') {
+                        selectedCategory = 'cars';
+                    } else if (type === 'bikes') {
+                        selectedCategory = 'bikes';
+                    } else if (type === 'ev') {
+                        selectedCategory = 'ev';
+                    } else {
+                        selectedCategory = null;
                     }
 
-                    if (filterSearchEl && heroSearchEl) {
-                        filterSearchEl.value = heroSearchEl.value;
-                    }
+                    // Clear search fields to avoid conflicting filters
+                    if (heroSearchEl) heroSearchEl.value = '';
+                    if (filterSearchEl) filterSearchEl.value = '';
                     if (heroLocationEl) heroLocationEl.value = '';
 
+                    console.log(`🏷️ Selected category chip: ${selectedCategory}`);
                     applyFilters();
                 });
             });
+        }
+
+        // Initialize and set first chip to active (Cars)
+        function initializeHeroChips() {
+            const chips = document.querySelectorAll('.hero-chip');
+            if (chips.length > 0) {
+                chips[0].click(); // Auto-select first chip (Cars)
+            }
         }
 
         updateNavigation();
         setupEnterKey();
         setupHeroChips();
         fetchVehicles();
+        // Initialize chips after a brief delay to ensure DOM is ready
+        setTimeout(() => {
+            initializeHeroChips();
+        }, 100);
     </script>
 </body>
 </html>
