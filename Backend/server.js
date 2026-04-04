@@ -31,10 +31,11 @@ const FACEBOOK_TOKEN_URL = 'https://graph.facebook.com/v16.0/oauth/access_token'
 const FACEBOOK_USERINFO_URL = 'https://graph.facebook.com/v16.0/me';
 
 // Enable CORS with permissive settings for development
-app.use(cors());
-
-// Handle preflight requests
-app.options('*', cors());
+app.use(cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
 // Body parsing middleware
 app.use(express.json());
