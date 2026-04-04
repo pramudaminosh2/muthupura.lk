@@ -814,7 +814,7 @@ app.get('/test', (req, res) => {
 });
 
 // 🟢 Add Vehicle (TEST VERSION - SIMPLE FILE UPLOAD VERIFICATION)
-app.post('/add-vehicle', upload.array('images', 10), async (req, res) => {
+app.post('https://muthupura-lk.onrender.com/add-vehicle', upload.array('images', 10), async (req, res) => {
     console.log("🔥 POST /add-vehicle hit");
 
     try {
