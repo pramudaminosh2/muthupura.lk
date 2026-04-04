@@ -68,10 +68,9 @@ node_modules/
 # dataconnect generated files
 .dataconnect
 
-#Firebase service account key
-.md
-.md
-.txt
-
-#Firebase Admin SDK
+# Firebase service account key (contains sensitive credentials)
 serviceAccountKey.json
+
+# Firebase debug logs
+firebase-debug.log*
+firebase-debug.*.log*
