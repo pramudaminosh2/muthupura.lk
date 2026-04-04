@@ -30,17 +30,15 @@ const FACEBOOK_OAUTH_URL = 'https://www.facebook.com/v16.0/dialog/oauth';
 const FACEBOOK_TOKEN_URL = 'https://graph.facebook.com/v16.0/oauth/access_token';
 const FACEBOOK_USERINFO_URL = 'https://graph.facebook.com/v16.0/me';
 
+// Enable CORS with permissive settings for development
+app.use(cors());
+
+// Handle preflight requests
+app.options('*', cors());
+
+// Body parsing middleware
 app.use(express.json());
-app.use(cors({
-    origin: [
-        'https://muthupuralk.web.app',
-        'http://localhost:5500',
-        'http://127.0.0.1:5500'
-    ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(express.urlencoded({ extended: true }));
 app.use(session({
     secret: process.env.SESSION_SECRET || 'muthupura-session-secret',
     resave: false,
@@ -794,6 +792,7 @@ app.get('/', (req, res) => {
 
 // 🟢 Add Vehicle
 app.post('/add-vehicle', authenticateToken, upload.array('images', 10), (req, res) => {
+    console.log('🔥 /add-vehicle hit - AuthenticateToken passed');
     try {
         const { title, price, brand, year, phone, fuelType, location } = req.body;
         const ownerId = req.user?.id || null;
