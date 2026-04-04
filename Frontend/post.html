@@ -93,6 +93,8 @@
     <script src="config.js"></script>
     <script>
         console.log('📡 Using API URL:', API_BASE_URL);
+        const API_URL = API_BASE_URL;
+        
         function getToken() { const t = localStorage.getItem('token'); if(!t) return null; try{return JSON.parse(atob(t.split('.')[1]));}catch{return null;} }
         const data = getToken();
         const adminLink = document.getElementById('admin-link');
@@ -143,8 +145,8 @@
             });
             const token = localStorage.getItem('token');
             try {
-                console.log('📤 Calling API: ' + API_BASE_URL + '/add-vehicle');
-                const res = await fetch(`${API_BASE_URL}/add-vehicle`, {
+                console.log('📤 Calling API: ' + API_URL + '/add-vehicle');
+                const res = await fetch(`${API_URL}/add-vehicle`, {
                     method: 'POST',
                     headers: { Authorization: `Bearer ${token}` },
                     body: formData

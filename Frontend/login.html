@@ -111,6 +111,7 @@
         </div>
     </div>
 
+
     <script src="config.js"></script>
     <script type="module">
 
@@ -174,7 +175,7 @@
             console.warn('⚠️ Recaptcha will initialize on first OTP attempt:', err.message);
         }
 
-        const apiUrl = API_BASE_URL;
+        const API_URL = API_BASE_URL;
 
         function getToken() {
             return localStorage.getItem('token');
@@ -254,7 +255,7 @@
 
         async function performLogin(email, password, redirect = true) {
             try {
-                const res = await fetch(`${apiUrl}/login`, {
+                const res = await fetch(`${API_URL}/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
@@ -290,11 +291,11 @@
         }
 
         document.getElementById('google-login-btn').addEventListener('click', () => {
-            window.open(`${apiUrl}/auth/google`, 'GoogleAuth', 'width=500,height=650');
+            window.open(`${API_URL}/auth/google`, 'GoogleAuth', 'width=500,height=650');
         });
 
         document.getElementById('facebook-login-btn').addEventListener('click', () => {
-            window.open(`${apiUrl}/auth/facebook`, 'FacebookAuth', 'width=500,height=650');
+            window.open(`${API_URL}/auth/facebook`, 'FacebookAuth', 'width=500,height=650');
         });
 
         document.getElementById('send-otp-btn').addEventListener('click', async () => {
@@ -376,7 +377,7 @@
                 }
 
                 console.log('📤 Logging in with phone:', firebasePhone);
-                const res = await fetch(`${apiUrl}/otp-login`, {
+                const res = await fetch(`${API_URL}/otp-login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ phone: firebasePhone })
@@ -497,7 +498,7 @@
             }
 
             try {
-                const res = await fetch(`${apiUrl}/register`, {
+                const res = await fetch(`${API_URL}/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, email, password })
@@ -538,7 +539,7 @@
             }
 
             try {
-                const res = await fetch(`${apiUrl}/me`, {
+                const res = await fetch(`${API_URL}/me`, {
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`

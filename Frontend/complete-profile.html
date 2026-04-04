@@ -58,7 +58,7 @@
     <script src="config.js"></script>
     <script>
         console.log('📡 Using API URL:', API_BASE_URL);
-        const apiUrl = API_BASE_URL;
+        const API_URL = API_BASE_URL;
 
         function showAlert(message, type) {
             const alertBox = document.getElementById('alert-box');
@@ -114,7 +114,7 @@
             }
 
             try {
-                const response = await fetch(`${apiUrl}/complete-profile`, {
+                const response = await fetch(`${API_URL}/complete-profile`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, email, phone })

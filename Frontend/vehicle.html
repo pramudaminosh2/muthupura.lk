@@ -61,7 +61,7 @@
             <div>
                 <div class="gallery-main" id="gallery-main">
                     <button class="gallery-arrow prev" id="gallery-prev" aria-label="Previous image">&#10094;</button>
-                    <img src="https://via.placeholder.com/640x480?text=No+Image" alt="Main image">
+                    <img src="/logo.PNG" alt="Main image">
                     <button class="gallery-arrow next" id="gallery-next" aria-label="Next image">&#10095;</button>
                 </div>
                 <div class="thumb-row" id="gallery-thumbs"></div>
@@ -84,25 +84,25 @@
     <script>
         console.log('📡 Using API URL:', API_BASE_URL);
         const API_URL = API_BASE_URL;
-        const PLACEHOLDER_IMAGE = 'https://via.placeholder.com/640x480?text=No+Image';
+        const PLACEHOLDER_IMAGE = '/logo.PNG';
 
         /**
-         * Build proper image URL from backend
+         * Get image URL from vehicle data
+         * Images are now stored as Cloudinary URLs directly
          */
-        function getImageUrl(imagePath) {
-            if (!imagePath || typeof imagePath !== 'string') return PLACEHOLDER_IMAGE;
-            
-            imagePath = imagePath.trim();
-            
-            if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-                return imagePath;
+        function getImageUrl(images) {
+            try {
+                let imageArray = [];
+                if (typeof images === 'string') {
+                    imageArray = JSON.parse(images || '[]');
+                } else if (Array.isArray(images)) {
+                    imageArray = images;
+                }
+                return (imageArray && imageArray[0]) || PLACEHOLDER_IMAGE;
+            } catch (e) {
+                console.warn('⚠️ Failed to parse images:', e.message);
+                return PLACEHOLDER_IMAGE;
             }
-            
-            if (!imagePath.startsWith('/')) {
-                imagePath = '/uploads/' + imagePath;
-            }
-            
-            return `${API_URL}${imagePath}`;
         }
 
         function getQueryParam(name) {
@@ -132,7 +132,7 @@
             setTimeout(() => {
                 mainImage.src = currentSrc;
                 mainImage.alt = `Photo ${currentImageIndex + 1}`;
-                mainImage.onerror = () => { mainImage.src = PLACEHOLDER_IMAGE; console.warn('⚠️ Image failed to load:', currentSrc); };
+                mainImage.onerror = () => { mainImage.src = '/logo.PNG'; console.warn('⚠️ Image failed to load:', currentSrc); };
                 mainImage.style.opacity = '1';
             }, 160);
             const thumbs = document.getElementById('gallery-thumbs');
@@ -167,29 +167,38 @@
             const location = v.location || 'Unknown';
             meta.innerHTML = `<span>Brand: ${v.brand || '-'}</span><span>Year: ${v.year || '-'}</span><span>Fuel: ${v.fuelType || '-'}</span><span>📍 ${location}</span><span>👁️ ${v.views || 0}</span>`;
 
-            // normalize images from API
-            let rawImages = [];
-            if (Array.isArray(v.images)) rawImages = v.images;
-            else if (typeof v.images === 'string' && v.images.trim()) {
-                try { rawImages = JSON.parse(v.images); } catch (_) { rawImages = v.images.split(',').map(s => s.trim()); }
-            } else if (v.image) {
-                rawImages = [v.image];
+            // Cloudinary URLs are stored as JSON array - parse and use directly
+            let detailImagesArray = [];
+            if (typeof v.images === 'string' && v.images.trim()) {
+                try {
+                    const parsed = JSON.parse(v.images);
+                    detailImagesArray = Array.isArray(parsed) ? parsed : [];
+                } catch (e) {
+                    console.warn('⚠️ Failed to parse images JSON:', e.message);
+                }
+            } else if (Array.isArray(v.images)) {
+                detailImagesArray = v.images;
             }
 
-            const normalizedImages = [...new Set((rawImages || []).filter(Boolean).map(src => src.trim()))];
-            detailImages = normalizedImages.length ? normalizedImages.map(src => getImageUrl(src)) : [PLACEHOLDER_IMAGE];
-            console.log('🖼️ Vehicle images loaded:', { count: normalizedImages.length, paths: normalizedImages, urls: detailImages });
+            // Fallback to single image field if no array
+            if (!detailImagesArray.length && v.image) {
+                detailImagesArray = [v.image];
+            }
+
+            // All images should be full Cloudinary URLs - use directly
+            detailImages = detailImagesArray.filter(Boolean).length ? detailImagesArray : [PLACEHOLDER_IMAGE];
+            console.log('☁️ Vehicle images loaded from Cloudinary:', { count: detailImages.length, urls: detailImages.map(u => u.substring(0, 60) + '...') });
 
             mainImage.src = detailImages[0] || PLACEHOLDER_IMAGE;
             mainImage.alt = v.title || 'Vehicle Image';
-            mainImage.onerror = () => { mainImage.src = PLACEHOLDER_IMAGE; console.warn('⚠️ Main image failed to load'); };
+            mainImage.onerror = () => { mainImage.src = '/logo.PNG'; console.warn('⚠️ Main image failed to load'); };
 
             thumbs.innerHTML = '';
-            detailImages.forEach((src, idx) => {
+            detailImages.forEach((urlSrc, idx) => {
                 const thumb = document.createElement('img');
-                thumb.src = src;
+                thumb.src = urlSrc;
                 thumb.alt = `Photo ${idx + 1}`;
-                thumb.onerror = () => { thumb.src = PLACEHOLDER_IMAGE; console.warn('⚠️ Thumbnail failed:', src); };
+                thumb.onerror = () => { thumb.src = '/logo.PNG'; console.warn('⚠️ Thumbnail failed'); };
                 if (idx === 0) thumb.classList.add('active');
                 thumb.onclick = () => setMainGalleryImage(idx);
                 thumbs.appendChild(thumb);

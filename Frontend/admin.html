@@ -61,25 +61,26 @@
     <script src="config.js"></script>
     <script>
         console.log('📡 Using API URL:', API_BASE_URL);
+        const API_URL = API_BASE_URL;
 
         /**
-         * Build proper image URL from backend
+         * Get image URL from vehicle data
+         * Images are now stored as Cloudinary URLs directly
          */
-        function getImageUrl(imagePath) {
-            const FALLBACK = 'https://via.placeholder.com/60x40?text=No';
-            if (!imagePath || typeof imagePath !== 'string') return FALLBACK;
-            
-            imagePath = imagePath.trim();
-            
-            if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-                return imagePath;
+        function getImageUrl(images) {
+            const FALLBACK = '/logo.PNG';
+            try {
+                let imageArray = [];
+                if (typeof images === 'string') {
+                    imageArray = JSON.parse(images || '[]');
+                } else if (Array.isArray(images)) {
+                    imageArray = images;
+                }
+                return (imageArray && imageArray[0]) || FALLBACK;
+            } catch (e) {
+                console.warn('⚠️ Failed to parse images:', e.message);
+                return FALLBACK;
             }
-            
-            if (!imagePath.startsWith('/')) {
-                imagePath = '/uploads/' + imagePath;
-            }
-            
-            return `${API_BASE_URL}${imagePath}`;
         }
         
         function getPayload(){ const t=localStorage.getItem('token'); if(!t) return null; try{return JSON.parse(atob(t.split('.')[1]));}catch{return null;} }
@@ -91,8 +92,8 @@
         async function loadVehicles(){
             const token = localStorage.getItem('token');
             try {
-                console.log('📤 Calling API: ' + API_BASE_URL + '/admin/vehicles');
-                const response = await fetch(`${API_BASE_URL}/admin/vehicles`, { headers: { Authorization: `Bearer ${token}` } });
+                console.log('📤 Calling API: ' + API_URL + '/admin/vehicles');
+                const response = await fetch(`${API_URL}/admin/vehicles`, { headers: { Authorization: `Bearer ${token}` } });
                 if(!response.ok) throw new Error('Failed to load');
                 const vehicles = await response.json();
 
@@ -114,7 +115,7 @@
                         <td>${v.phone||''}</td>
                         <td>${v.fuelType||''}</td>
                         <td>${v.ownerId||''}</td>
-                        <td><img class="thumb" src="${getImageUrl(v.image)}" onerror="this.src='https://via.placeholder.com/60x40?text=No';console.warn('⚠️ Thumb failed:', this.src);" /></td>
+                        <td><img class="thumb" src="${getImageUrl(v.image)}" onerror="this.src='/logo.PNG';console.warn('⚠️ Thumb failed:', this.src);" /></td>
                         <td>
                             <button class="btn ${v.isFeatured?'secondary':'primary'}" onclick="toggleFeature(${v.id},${v.isFeatured})">${v.isFeatured?'Unfeature':'Feature'}</button>
                             <button class="btn danger" onclick="deleteAd(${v.id})">Delete</button>
@@ -132,14 +133,14 @@
         async function toggleFeature(id, current){
             const token = localStorage.getItem('token');
             try {
-                console.log('📤 Calling API: ' + API_BASE_URL + '/toggle-feature/' + id);
-                const res = await fetch(`${API_BASE_URL}/toggle-feature/${id}`, { method:'PUT', headers:{'Content-Type':'application/json', Authorization:`Bearer ${token}`}});
+                console.log('📤 Calling API: ' + API_URL + '/toggle-feature/' + id);
+                const res = await fetch(`${API_URL}/toggle-feature/${id}`, { method:'PUT', headers:{'Content-Type':'application/json', Authorization:`Bearer ${token}`}});
                 if(!res.ok) throw new Error();
                 await loadVehicles();
             } catch(err){ console.error(err); alert('Feature toggle failed.'); }
         }
 
-        async function deleteAd(id){ if(!confirm('Delete this vehicle?')) return; const token = localStorage.getItem('token'); try { console.log('📤 Calling API: ' + API_BASE_URL + '/delete-vehicle/' + id); const res = await fetch(`${API_BASE_URL}/delete-vehicle/${id}`, { method:'DELETE', headers:{Authorization:`Bearer ${token}`}}); if(!res.ok) throw new Error(); await loadVehicles(); } catch(err){ console.error(err); alert('Delete failed.'); }}
+        async function deleteAd(id){ if(!confirm('Delete this vehicle?')) return; const token = localStorage.getItem('token'); try { console.log('📤 Calling API: ' + API_URL + '/delete-vehicle/' + id); const res = await fetch(`${API_URL}/delete-vehicle/${id}`, { method:'DELETE', headers:{Authorization:`Bearer ${token}`}}); if(!res.ok) throw new Error(); await loadVehicles(); } catch(err){ console.error(err); alert('Delete failed.'); }}
 
         loadVehicles();
     </script>

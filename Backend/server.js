@@ -7,12 +7,28 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const session = require('express-session');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
+const upload = require('./upload');
 
 const PORT = process.env.PORT || 3000;
+
+require('dotenv').config();
+
+// Configure Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY) {
+    console.warn('⚠️ WARNING: Cloudinary credentials not configured in .env');
+}
 
 // Google OAuth settings
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID';
@@ -293,31 +309,16 @@ db.connect((err) => {
     }
 });
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-        // use timestamp + random suffix to avoid collisions when multiple files are uploaded at once
-        const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-        const ext = path.extname(file.originalname).toLowerCase();
-        const filename = `${uniqueSuffix}${ext}`;
-        cb(null, filename);
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'muthupura-lk/vehicles',
+        resource_type: 'auto',
+        allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp']
     }
 });
 
-// Ensure uploads directory exists at startup
-const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-    try {
-        fs.mkdirSync(uploadsDir, { recursive: true });
-        console.log(`📁 Created uploads directory: ${uploadsDir}`);
-    } catch (err) {
-        console.error(`❌ Failed to create uploads directory: ${err.message}`);
-    }
-} else {
-    console.log(`✅ Uploads directory confirmed: ${uploadsDir}`);
-}
+console.log('☁️ Cloudinary storage configured for image uploads');
 
 const bcrypt = require('bcrypt');
 
@@ -773,19 +774,8 @@ app.get('/profile', authenticateToken, (req, res) => {
 
 const upload = multer({ storage: storage });
 
-// Serve uploaded images with proper headers and caching
-app.use('/uploads', express.static('uploads', {
-    maxAge: '1d',
-    etag: false,
-    lastModified: true,
-    setHeaders: (res, path) => {
-        // Allow browsers to cache images
-        res.set('Cache-Control', 'public, max-age=86400');
-        res.set('Content-Disposition', 'inline');
-    }
-}));
-
-console.log('📡 Image serving middleware configured for /uploads');
+// Images are now served from Cloudinary - no local /uploads middleware needed
+console.log('☁️ Images will be served from Cloudinary CDN');
 
 function normalizeVehicleRecord(vehicle) {
     const record = { ...vehicle };
@@ -870,10 +860,11 @@ app.post('/add-vehicle', authenticateToken, upload.array('images', 10), (req, re
             });
         }
 
-        const imagePaths = files.map(file => `/uploads/${file.filename}`);
+        const imagePaths = files.map(file => file.path);
         const primaryImage = imagePaths[0] || null;
         const imagesJson = JSON.stringify(imagePaths);
-        console.log('📤 Saving vehicle with', imagePaths.length, 'images');
+        console.log('📤 Saving vehicle with', imagePaths.length, 'Cloudinary images');
+        console.log('🔗 First image URL:', primaryImage?.substring(0, 80) + '...' || 'none');
 
         const sql = "INSERT INTO vehicles (title, price, brand, year, phone, image, images, fuelType, ownerId, location, isFeatured, views, featuredUntil, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         const now = new Date();
@@ -1008,9 +999,10 @@ app.put('/update-vehicle/:id', authenticateToken, upload.array('images', 10), (r
 
     const files = Array.isArray(req.files) ? req.files : [];
     if (files.length) {
-        const imagePaths = files.map(file => `/uploads/${file.filename}`);
+        const imagePaths = files.map(file => file.path);
         fields.push('images = ?'); values.push(JSON.stringify(imagePaths));
         fields.push('image = ?'); values.push(imagePaths[0] || null);
+        console.log('☁️ Updated vehicle with', imagePaths.length, 'Cloudinary images');
     }
 
     if (!fields.length) {
