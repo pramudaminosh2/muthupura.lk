@@ -804,7 +804,7 @@ app.get('/test', (req, res) => {
 });
 
 // 🟢 Add Vehicle - Production Route
-app.post('/add-vehicle', upload.array('images', 10), async (req, res) => {
+app.post('/add-vehicle', upload.any(), async (req, res) => {
     console.log("🔥 POST /add-vehicle hit");
     console.log("FILES RECEIVED:", req.files);
     
