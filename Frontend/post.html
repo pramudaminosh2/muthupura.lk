@@ -153,10 +153,10 @@
             });
             
             try {
-                console.log('📤 Calling API: ' + API_URL + '/add-vehicle');
+                console.log('📤 Calling API: https://muthupura-lk.onrender.com/add-vehicle');
                 console.log('Fetch options:', { method: 'POST', bodyType: 'FormData' });
                 
-                const res = await fetch(`${API_URL}/add-vehicle`, {
+                const res = await fetch(`https://muthupura-lk.onrender.com/add-vehicle`, {
                     method: 'POST',
                     body: formData
                 });
