@@ -37,7 +37,9 @@ app.use(cors({
         'http://localhost:5500',
         'http://127.0.0.1:5500'
     ],
-    credentials: true
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(session({
     secret: process.env.SESSION_SECRET || 'muthupura-session-secret',
