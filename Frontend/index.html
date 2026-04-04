@@ -558,6 +558,7 @@
         const API_URL = API_BASE_URL;
         console.log('📡 Using API URL:', API_URL);
         let vehiclesData = [];
+        const FALLBACK_IMAGE = 'https://via.placeholder.com/400x250?text=No+Image';
         const LOCATION_OPTIONS = ['Colombo','Gampaha','Negombo','Chilaw','Kurunegala','Kandy','Matara','Galle','Anuradhapura','Jaffna','Batticaloa','Trincomalee','Ratnapura','Badulla','Kalutara'];
 
         function getTokenPayload() {
@@ -707,15 +708,22 @@
             card.className = 'card';
             card.style.cursor = 'pointer';
 
-            const images = Array.isArray(vehicle.images) ? [...new Set(vehicle.images.filter(Boolean))] : [];
-            const imageUrl = images.length ? `${API_URL}${images[0]}` : vehicle.image ? `${API_URL}${vehicle.image}` : 'https://via.placeholder.com/400x250?text=No+Image';
+            const images = Array.isArray(vehicle.images) ? vehicle.images.filter(Boolean) : [];
+            let imageUrl = FALLBACK_IMAGE;
+            
+            if (images.length > 0) {
+                imageUrl = `${API_URL}${images[0]}`;
+            } else if (vehicle.image) {
+                imageUrl = `${API_URL}${vehicle.image}`;
+            }
+            
             const featured = Number(vehicle.isFeatured || 0);
             const ev = isEV(vehicle);
             const location = vehicle.location || 'Unknown';
 
             card.innerHTML = `
                 <div class="card-top">
-                    <img src="${imageUrl}" alt="${vehicle.title || 'Vehicle'}" onerror="this.src='https://via.placeholder.com/400x250?text=No+Image';" />
+                    <img src="${imageUrl}" alt="${vehicle.title || 'Vehicle'}" onerror="this.src='${FALLBACK_IMAGE}';" />
                     <div style="position:absolute;left:16px;bottom:14px;z-index:2;color:#fff;text-shadow:0 3px 10px rgba(0,0,0,0.6);">
                         <h3 style="margin:0;font-size:1.05rem;font-weight:800;">${vehicle.title || 'Untitled'}</h3>
                         <p style="margin:4px 0 0;font-size:1rem;font-weight:700;">Rs. ${Number(vehicle.price || 0).toLocaleString()}</p>
