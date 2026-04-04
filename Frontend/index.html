@@ -561,6 +561,32 @@
         const FALLBACK_IMAGE = 'https://via.placeholder.com/400x250?text=No+Image';
         const LOCATION_OPTIONS = ['Colombo','Gampaha','Negombo','Chilaw','Kurunegala','Kandy','Matara','Galle','Anuradhapura','Jaffna','Batticaloa','Trincomalee','Ratnapura','Badulla','Kalutara'];
 
+        /**
+         * Build proper image URL from backend
+         * Ensures image paths are correctly concatenated with backend URL
+         * @param {string} imagePath - Path from API (e.g., /uploads/image.jpg or just filename)
+         * @returns {string} - Full image URL or fallback
+         */
+        function getImageUrl(imagePath) {
+            if (!imagePath || typeof imagePath !== 'string') return FALLBACK_IMAGE;
+            
+            imagePath = imagePath.trim();
+            
+            // Already a full URL
+            if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+                return imagePath;
+            }
+            
+            // Ensure path starts with /uploads/ or /
+            if (!imagePath.startsWith('/')) {
+                imagePath = '/uploads/' + imagePath;
+            }
+            
+            const fullUrl = `${API_URL}${imagePath}`;
+            console.log('🖼️ Image URL constructed:', { original: imagePath, full: fullUrl });
+            return fullUrl;
+        }
+
         function getTokenPayload() {
             const token = localStorage.getItem('token');
             if (!token) return null;
@@ -712,9 +738,9 @@
             let imageUrl = FALLBACK_IMAGE;
             
             if (images.length > 0) {
-                imageUrl = `${API_URL}${images[0]}`;
+                imageUrl = getImageUrl(images[0]);
             } else if (vehicle.image) {
-                imageUrl = `${API_URL}${vehicle.image}`;
+                imageUrl = getImageUrl(vehicle.image);
             }
             
             const featured = Number(vehicle.isFeatured || 0);
@@ -723,7 +749,7 @@
 
             card.innerHTML = `
                 <div class="card-top">
-                    <img src="${imageUrl}" alt="${vehicle.title || 'Vehicle'}" onerror="this.src='${FALLBACK_IMAGE}';" />
+                    <img src="${imageUrl}" alt="${vehicle.title || 'Vehicle'}" onerror="this.src='${FALLBACK_IMAGE}';console.warn('⚠️ Image failed to load:', this.src);" />
                     <div style="position:absolute;left:16px;bottom:14px;z-index:2;color:#fff;text-shadow:0 3px 10px rgba(0,0,0,0.6);">
                         <h3 style="margin:0;font-size:1.05rem;font-weight:800;">${vehicle.title || 'Untitled'}</h3>
                         <p style="margin:4px 0 0;font-size:1rem;font-weight:700;">Rs. ${Number(vehicle.price || 0).toLocaleString()}</p>

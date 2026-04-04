@@ -78,6 +78,26 @@
     <script>
         const API_URL = API_BASE_URL;
         console.log('📡 Using API URL:', API_URL);
+        const FALLBACK_IMAGE = 'https://via.placeholder.com/400x250?text=No+Image';
+
+        /**
+         * Build proper image URL from backend
+         */
+        function getImageUrl(imagePath) {
+            if (!imagePath || typeof imagePath !== 'string') return FALLBACK_IMAGE;
+            
+            imagePath = imagePath.trim();
+            
+            if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+                return imagePath;
+            }
+            
+            if (!imagePath.startsWith('/')) {
+                imagePath = '/uploads/' + imagePath;
+            }
+            
+            return `${API_URL}${imagePath}`;
+        }
 
         function getTokenPayload() {
             const token = localStorage.getItem('token');
@@ -104,14 +124,14 @@
             const card = document.createElement('article');
             card.className = 'card';
             const hasImages = Array.isArray(vehicle.images) && vehicle.images.length;
-            const imageUrl = hasImages ? `${API_URL}${vehicle.images[0]}` : vehicle.image ? `${API_URL}${vehicle.image}` : 'https://via.placeholder.com/400x250?text=No+Image';
+            const imageUrl = hasImages ? getImageUrl(vehicle.images[0]) : getImageUrl(vehicle.image);
             const ev = isEV(vehicle);
             const featured = Number(vehicle.isFeatured || 0);
             const location = vehicle.location || 'Unknown';
 
             card.innerHTML = `
                 <div class="card-top">
-                    <img src="${imageUrl}" alt="${escapeHtml(vehicle.title || 'Vehicle')}" onerror="this.src='https://via.placeholder.com/400x250?text=No+Image';" />
+                    <img src="${imageUrl}" alt="${escapeHtml(vehicle.title || 'Vehicle')}" onerror="this.src='${FALLBACK_IMAGE}';console.warn('⚠️ Image failed:', this.src);" />
                     ${featured ? '<span class="card-badge">Featured</span>' : ''}
                     ${ev ? '<span class="card-badge ev">⚡ EV</span>' : ''}
                 </div>

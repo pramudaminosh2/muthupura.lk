@@ -61,6 +61,26 @@
     <script src="config.js"></script>
     <script>
         console.log('📡 Using API URL:', API_BASE_URL);
+
+        /**
+         * Build proper image URL from backend
+         */
+        function getImageUrl(imagePath) {
+            const FALLBACK = 'https://via.placeholder.com/60x40?text=No';
+            if (!imagePath || typeof imagePath !== 'string') return FALLBACK;
+            
+            imagePath = imagePath.trim();
+            
+            if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+                return imagePath;
+            }
+            
+            if (!imagePath.startsWith('/')) {
+                imagePath = '/uploads/' + imagePath;
+            }
+            
+            return `${API_BASE_URL}${imagePath}`;
+        }
         
         function getPayload(){ const t=localStorage.getItem('token'); if(!t) return null; try{return JSON.parse(atob(t.split('.')[1]));}catch{return null;} }
         function requireAdmin(){ const p=getPayload(); if(!p||p.role!=='admin'){ alert('Admin login required'); window.location.href='login.html'; return false; } return true; }
@@ -94,7 +114,7 @@
                         <td>${v.phone||''}</td>
                         <td>${v.fuelType||''}</td>
                         <td>${v.ownerId||''}</td>
-                        <td><img class="thumb" src="${API_BASE_URL}${v.image||''}" onerror="this.src='https://via.placeholder.com/60x40?text=No'" /></td>
+                        <td><img class="thumb" src="${getImageUrl(v.image)}" onerror="this.src='https://via.placeholder.com/60x40?text=No';console.warn('⚠️ Thumb failed:', this.src);" /></td>
                         <td>
                             <button class="btn ${v.isFeatured?'secondary':'primary'}" onclick="toggleFeature(${v.id},${v.isFeatured})">${v.isFeatured?'Unfeature':'Feature'}</button>
                             <button class="btn danger" onclick="deleteAd(${v.id})">Delete</button>

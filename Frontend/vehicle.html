@@ -84,6 +84,26 @@
     <script>
         console.log('📡 Using API URL:', API_BASE_URL);
         const API_URL = API_BASE_URL;
+        const PLACEHOLDER_IMAGE = 'https://via.placeholder.com/640x480?text=No+Image';
+
+        /**
+         * Build proper image URL from backend
+         */
+        function getImageUrl(imagePath) {
+            if (!imagePath || typeof imagePath !== 'string') return PLACEHOLDER_IMAGE;
+            
+            imagePath = imagePath.trim();
+            
+            if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+                return imagePath;
+            }
+            
+            if (!imagePath.startsWith('/')) {
+                imagePath = '/uploads/' + imagePath;
+            }
+            
+            return `${API_URL}${imagePath}`;
+        }
 
         function getQueryParam(name) {
             return new URLSearchParams(window.location.search).get(name);
@@ -102,7 +122,6 @@
 
         let detailImages = [];
         let currentImageIndex = 0;
-        const PLACEHOLDER_IMAGE = 'https://via.placeholder.com/640x480?text=No+Image';
 
         function setMainGalleryImage(index) {
             if (!detailImages.length) return;
@@ -113,6 +132,7 @@
             setTimeout(() => {
                 mainImage.src = currentSrc;
                 mainImage.alt = `Photo ${currentImageIndex + 1}`;
+                mainImage.onerror = () => { mainImage.src = PLACEHOLDER_IMAGE; console.warn('⚠️ Image failed to load:', currentSrc); };
                 mainImage.style.opacity = '1';
             }, 160);
             const thumbs = document.getElementById('gallery-thumbs');
@@ -157,17 +177,19 @@
             }
 
             const normalizedImages = [...new Set((rawImages || []).filter(Boolean).map(src => src.trim()))];
-            detailImages = normalizedImages.length ? normalizedImages.map(src => `${API_URL}${src}`) : [PLACEHOLDER_IMAGE];
-            console.log('Vehicle images loaded:', normalizedImages.length, normalizedImages);
+            detailImages = normalizedImages.length ? normalizedImages.map(src => getImageUrl(src)) : [PLACEHOLDER_IMAGE];
+            console.log('🖼️ Vehicle images loaded:', { count: normalizedImages.length, paths: normalizedImages, urls: detailImages });
 
             mainImage.src = detailImages[0] || PLACEHOLDER_IMAGE;
             mainImage.alt = v.title || 'Vehicle Image';
+            mainImage.onerror = () => { mainImage.src = PLACEHOLDER_IMAGE; console.warn('⚠️ Main image failed to load'); };
 
             thumbs.innerHTML = '';
             detailImages.forEach((src, idx) => {
                 const thumb = document.createElement('img');
                 thumb.src = src;
                 thumb.alt = `Photo ${idx + 1}`;
+                thumb.onerror = () => { thumb.src = PLACEHOLDER_IMAGE; console.warn('⚠️ Thumbnail failed:', src); };
                 if (idx === 0) thumb.classList.add('active');
                 thumb.onclick = () => setMainGalleryImage(idx);
                 thumbs.appendChild(thumb);
