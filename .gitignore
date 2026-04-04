@@ -72,3 +72,6 @@ node_modules/
 .md
 .md
 .txt
+
+#Firebase Admin SDK
+serviceAccountKey.json
