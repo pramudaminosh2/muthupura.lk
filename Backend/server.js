@@ -30,29 +30,27 @@ const FACEBOOK_OAUTH_URL = 'https://www.facebook.com/v16.0/dialog/oauth';
 const FACEBOOK_TOKEN_URL = 'https://graph.facebook.com/v16.0/oauth/access_token';
 const FACEBOOK_USERINFO_URL = 'https://graph.facebook.com/v16.0/me';
 
-// Enable CORS with specific Firebase origin
+// Enable CORS - must be FIRST before all routes and error handlers
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "https://muthupuralk.web.app");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    res.header("Access-Control-Allow-Credentials", "true");
+    
+    // Handle preflight OPTIONS requests
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(204);
+    }
+    next();
+});
+
+// CORS package for additional compatibility
 app.use(cors({
     origin: "https://muthupuralk.web.app",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
 }));
-
-// Manual preflight handler for /add-vehicle
-app.options('/add-vehicle', (req, res) => {
-    res.header("Access-Control-Allow-Origin", "https://muthupuralk.web.app");
-    res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    res.sendStatus(200);
-});
-
-// Global headers fallback middleware
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "https://muthupuralk.web.app");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    next();
-});
 
 // Body parsing middleware
 app.use(express.json());
@@ -1127,6 +1125,10 @@ app.use((req, res) => {
 
 // Multer file upload error handler
 app.use((err, req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "https://muthupuralk.web.app");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    
     if (err && err.name === 'MulterError') {
         console.error('❌ Multer upload error:', err.code, err.field, err.message);
         if (err.code === 'LIMIT_FILE_SIZE') {
@@ -1144,6 +1146,10 @@ app.use((err, req, res, next) => {
 
 // global error handler: JSON output only
 app.use((err, req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "https://muthupuralk.web.app");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    
     console.error('Unhandled error:', err);
     res.status(500).json({ message: 'Internal server error' });
 });
