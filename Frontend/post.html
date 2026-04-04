@@ -83,7 +83,7 @@
                         <option value="Kalutara"></option>
                     </datalist>
                 </div>
-                <div class="field"><label for="images">Photos (multiple allowed)</label><input id="images" name="images" type="file" accept="image/*" multiple required></div>
+                <div class="field"><label for="image">Photos (multiple allowed)</label><input id="image" name="images" type="file" accept="image/*" multiple required></div>
                 <div id="image-preview" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:6px;"></div>
                 <button type="submit" class="btn primary">Publish Vehicle</button>
             </form>
@@ -110,7 +110,7 @@
 
         if(!data) { alert('Login required'); location.href='login.html'; }
 
-        const imageInput = document.getElementById('images');
+        const imageInput = document.getElementById('image');
         const previewContainer = document.getElementById('image-preview');
 
         imageInput.addEventListener('change', function() {
@@ -136,9 +136,23 @@
         document.getElementById('vehicleForm').addEventListener('submit', async function(e){
             e.preventDefault();
             
-            const formData = new FormData(this);
+            const formData = new FormData();
+            const files = document.getElementById('image').files;
+
+            for (let i = 0; i < files.length; i++) {
+                formData.append('images', files[i]);
+            }
+
+            formData.append('title', document.getElementById('title').value);
+            formData.append('price', document.getElementById('price').value);
+            formData.append('brand', document.getElementById('brand').value);
+            formData.append('year', document.getElementById('year').value);
+            formData.append('phone', document.getElementById('phone').value);
+            formData.append('fuelType', document.getElementById('fuelType').value);
+            formData.append('location', document.getElementById('location').value);
+
             const imagesPayload = formData.getAll('images');
-            
+
             console.log('🚀 FORM DATA READY');
             console.log('Submitting vehicle form', {
                 title: formData.get('title'),
