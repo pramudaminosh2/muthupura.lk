@@ -31,8 +31,6 @@ const FACEBOOK_TOKEN_URL = 'https://graph.facebook.com/v16.0/oauth/access_token'
 const FACEBOOK_USERINFO_URL = 'https://graph.facebook.com/v16.0/me';
 
 // Enable CORS with specific Firebase origin
-const cors = require('cors');
-
 app.use(cors({
     origin: "https://muthupuralk.web.app",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
