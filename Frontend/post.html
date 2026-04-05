@@ -50,71 +50,6 @@
             padding: 20px 0;
         }
 
-        .topbar {
-            display: flex;
-            flex-wrap: nowrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 28px;
-            padding: 14px 20px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.92) 100%);
-            border: 1.2px solid rgba(58,111,248,0.14);
-            border-radius: 18px;
-            box-shadow: 0 20px 60px rgba(25, 73, 145, 0.09), inset 0 1px 1px rgba(255,255,255,0.9);
-            backdrop-filter: blur(8px);
-            position: relative;
-            z-index: 4;
-        }
-
-        .topbar::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 18px;
-            background: linear-gradient(135deg, rgba(58,111,248,0.02), rgba(142,82,248,0.01));
-            pointer-events: none;
-        }
-
-        .brand {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            color: var(--text);
-            font-weight: 800;
-            font-size: 1.1rem;
-            letter-spacing: -0.02em;
-            transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-            flex-shrink: 0;
-            position: relative;
-            z-index: 1;
-        }
-
-        .brand:hover {
-            transform: translateY(-2px);
-            color: var(--accent1);
-        }
-
-        .brand:active {
-            transform: translateY(0);
-        }
-
-        .brand img {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            object-fit: cover;
-            box-shadow: 0 10px 28px rgba(58,111,248,0.18);
-            border: 2px solid rgba(58,111,248,0.12);
-            transition: all 0.28s ease;
-        }
-
-        .brand:hover img {
-            box-shadow: 0 14px 36px rgba(58,111,248,0.24);
-            border-color: rgba(58,111,248,0.24);
-        }
-
         .header-copy {
             margin-bottom: 36px;
             animation: fadeInDown 0.6s ease;
@@ -188,92 +123,6 @@
                 opacity: 1;
                 transform: translateY(0);
             }
-        }
-
-        .nav-links {
-            display: flex;
-            flex-wrap: nowrap;
-            gap: 10px;
-            position: relative;
-            z-index: 1;
-            align-items: center;
-            margin-left: auto;
-        }
-
-        .btn,
-        .action-pill {
-            border: none;
-            border-radius: 999px;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 0.93rem;
-            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-            white-space: nowrap;
-            position: relative;
-            overflow: hidden;
-            min-height: 44px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn::before,
-        .action-pill::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: rgba(255,255,255,0.1);
-            transform: scaleX(0);
-            transform-origin: right;
-            transition: transform 0.3s ease;
-            border-radius: inherit;
-        }
-
-        .btn:hover::before,
-        .action-pill:hover::before {
-            transform: scaleX(1);
-            transform-origin: left;
-        }
-
-        .btn.primary,
-        .action-pill.primary {
-            background: linear-gradient(110deg, var(--accent1), var(--accent2));
-            color: #fff;
-            box-shadow: 0 20px 56px rgba(58,111,248,0.18), inset 0 1px 0 rgba(255,255,255,0.35);
-            padding: 11px 26px;
-        }
-
-        .btn.primary:hover,
-        .action-pill.primary:hover {
-            box-shadow: 0 26px 66px rgba(58,111,248,0.26), inset 0 1px 0 rgba(255,255,255,0.35);
-            transform: translateY(-2px);
-        }
-
-        .btn.primary:active,
-        .action-pill.primary:active {
-            transform: translateY(0);
-        }
-
-        .btn.secondary,
-        .action-pill.secondary {
-            background: linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.96));
-            color: #2f4f82;
-            border: 1.2px solid rgba(58,111,248,0.22);
-            padding: 11px 22px;
-            box-shadow: 0 10px 28px rgba(58,111,248,0.09), inset 0 1px 0 rgba(255,255,255,0.7);
-        }
-
-        .btn.secondary:hover,
-        .action-pill.secondary:hover {
-            background: linear-gradient(135deg, #f9faff 0%, #ffffff 100%);
-            border-color: rgba(58,111,248,0.4);
-            box-shadow: 0 14px 36px rgba(58,111,248,0.14), inset 0 1px 0 rgba(255,255,255,0.8);
-            transform: translateY(-2px);
-        }
-
-        .btn.secondary:active,
-        .action-pill.secondary:active {
-            transform: translateY(0);
         }
 
         .form-shell {
@@ -596,39 +445,8 @@
         }
 
         @media (max-width: 640px) {
-            .topbar {
-                gap: 12px;
-                margin-bottom: 22px;
-                padding: 12px 16px;
-                border-radius: 16px;
-            }
-
-            .brand {
-                font-size: 1rem;
-                gap: 10px;
-            }
-
-            .brand img {
-                width: 38px;
-                height: 38px;
-            }
-
-            .nav-links {
-                gap: 8px;
-                flex-shrink: 1;
-                min-width: 0;
-            }
-
-            .btn.secondary,
-            .action-pill.secondary {
-                padding: 10px 16px;
-                font-size: 0.88rem;
-            }
-
-            .btn.primary,
-            .action-pill.primary {
-                padding: 10px 18px;
-                font-size: 0.88rem;
+            .page-shell {
+                padding: 16px 0;
             }
 
             .header-copy {
@@ -649,34 +467,8 @@
         }
 
         @media (min-width: 641px) {
-            .topbar {
-                gap: 20px;
-                padding: 16px 24px;
-            }
-
-            .brand {
-                font-size: 1.15rem;
-            }
-
-            .brand img {
-                width: 42px;
-                height: 42px;
-            }
-
-            .nav-links {
-                gap: 12px;
-            }
-
-            .btn.secondary,
-            .action-pill.secondary {
-                padding: 11px 24px;
-                font-size: 0.94rem;
-            }
-
-            .btn.primary,
-            .action-pill.primary {
-                padding: 11px 28px;
-                font-size: 0.94rem;
+            .page-shell {
+                padding-top: 24px;
             }
 
             .form-grid.two {
@@ -717,12 +509,6 @@
                 max-width: 1120px;
             }
 
-            .topbar {
-                margin-bottom: 36px;
-                padding: 18px 28px;
-                border-radius: 20px;
-            }
-
             .header-copy {
                 margin-bottom: 44px;
                 padding: 40px 40px;
@@ -752,8 +538,7 @@
 
         /* Accessibility: Focus states for keyboard navigation */
         .btn:focus-visible,
-        .action-pill:focus-visible,
-        .brand:focus-visible {
+        .action-pill:focus-visible {
             outline: 3px solid var(--accent1);
             outline-offset: 2px;
         }
@@ -794,24 +579,30 @@
 </head>
 <body>
     <div class="page-shell">
-        <div class="topbar" id="navbar" style="background: linear-gradient(135deg, rgba(58,111,248,0.9), rgba(142,82,248,0.9)); border: none;">
-            <a class="brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk logo"><span style="color: white;">Muthupura.lk</span></a>
+        <nav class="navbar" id="navbar">
+            <a class="nav-brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk"><span>Muthupura.lk</span></a>
             <div class="nav-links">
-                <a class="action-pill secondary" href="index.html" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">Home</a>
-                <a class="action-pill secondary" id="mylistings-link" href="dashboard.html" style="display:none; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">My Listings</a>
-                <a class="action-pill secondary" id="auth-link" href="login.html" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">Login</a>
-                <a class="action-pill secondary" id="admin-link" href="admin.html" style="display:none; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">Admin</a>
+                <a href="index.html">Home</a>
+                <a href="post.html">Post Ad</a>
+                <a href="dashboard.html" id="mylistings-link" style="display:none;">My Listings</a>
+                <a href="about.html">About Us</a>
+                <a href="contact.html">Contact Us</a>
+                <a id="auth-link" href="login.html">Login</a>
+                <a id="admin-link" href="admin.html" style="display:none;">Admin</a>
             </div>
             <div class="hamburger" id="navbar-hamburger">
                 <span></span>
                 <span></span>
                 <span></span>
             </div>
-        </div>
-        
-        <div class="mobile-menu" id="mobile-menu" style="top: 60px;">
+        </nav>
+
+        <div class="mobile-menu" id="mobile-menu">
             <a href="index.html">Home</a>
-            <a id="mylistings-link-mobile" href="dashboard.html" style="display:none;">My Listings</a>
+            <a href="post.html">Post Ad</a>
+            <a href="dashboard.html" id="mylistings-link-mobile" style="display:none;">My Listings</a>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact Us</a>
             <a id="auth-link-mobile" href="login.html">Login</a>
             <a id="admin-link-mobile" href="admin.html" style="display:none;">Admin</a>
         </div>

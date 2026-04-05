@@ -303,21 +303,36 @@
                         <small id="login-password-error" class="error-message"></small>
                     </div>
                     <button class="btn primary" id="login-submit" type="button">Login</button>
-                    <button class="btn secondary" id="google-login-btn" type="button" style="margin-top:8px;">Continue with Google</button>
-                    <button class="btn secondary" id="facebook-login-btn" type="button" style="margin-top:8px; background:#1877f2; color:#fff; border-color:rgba(24,119,242,0.3);">Continue with Facebook</button>
 
-                    <div style="margin-top:12px; border-top:1px solid #d1dbf1; padding-top:12px;">
-                        <label for="otp-phone" style="display:block;font-weight:600;margin-bottom:4px;">Login with Phone OTP</label>
-                        <input type="text" id="otp-phone" placeholder="Enter phone number" style="width:100%;padding:8px;border:1px solid rgba(73,98,142,0.3);border-radius:8px;" />
-                        <button class="btn secondary" id="send-otp-btn" type="button" style="margin-top:8px;">Send OTP</button>
-                        <div id="recaptcha-container" style="margin-top:12px;"></div>
-                        <div id="otp-verification" style="display:none;margin-top:8px;">
-                            <input type="text" id="otp-code" placeholder="Enter OTP" style="width:100%;padding:8px;border:1px solid rgba(73,98,142,0.3);border-radius:8px;" />
-                            <button class="btn secondary" id="verify-otp-btn" type="button" style="margin-top:8px;">Verify OTP</button>
+                    <div class="button-group" style="margin-top: 16px;">
+                        <button class="btn secondary" id="google-login-btn" type="button">Continue with Google</button>
+                        <button class="btn secondary" id="facebook-login-btn" type="button" style="margin-top: 8px;">Continue with Facebook</button>
+                    </div>
+
+                    <div class="divider" style="margin: 20px 0; border-top: 1px solid rgba(58,111,248,0.1); position: relative;">
+                        <span style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: white; padding: 0 12px; color: var(--muted); font-size: 0.85rem;">or</span>
+                    </div>
+
+                    <div class="otp-section" style="margin-top: 16px;">
+                        <label for="otp-phone" style="display:block; font-weight:600; margin-bottom:8px; color: var(--text);">Login with Phone OTP</label>
+                        <div class="input-wrapper" style="margin-bottom: 12px;">
+                            <input type="text" id="otp-phone" placeholder="Enter phone number" style="width:100%; padding:12px 16px; border:1.1px solid var(--border-strong); border-radius:12px; font-size:1rem;" />
+                        </div>
+                        <button class="btn secondary" id="send-otp-btn" type="button">Send OTP</button>
+                        <div id="recaptcha-container" style="margin-top: 16px;"></div>
+                        <div id="otp-verification" style="display:none; margin-top:16px;">
+                            <div class="input-wrapper" style="margin-bottom: 12px;">
+                                <input type="text" id="otp-code" placeholder="Enter OTP" style="width:100%; padding:12px 16px; border:1.1px solid var(--border-strong); border-radius:12px; font-size:1rem;" />
+                            </div>
+                            <button class="btn secondary" id="verify-otp-btn" type="button">Verify OTP</button>
                         </div>
                     </div>
                 </div>
-                <p class="note">Don’t have an account? <button class="btn secondary" id="switch-to-register" type="button">Register</button></p>
+                <div class="switch-prompt" style="text-align: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(58,111,248,0.1);">
+                    <p style="margin: 0; color: var(--muted); font-size: 0.9rem;">Don't have an account?
+                        <button class="btn secondary" id="switch-to-register" type="button" style="display: inline; width: auto; padding: 4px 12px; margin-left: 8px; font-size: 0.9rem; min-height: auto;">Register</button>
+                    </p>
+                </div>
             </div>
 
             <div id="register-panel" class="panel hidden">
@@ -344,10 +359,12 @@
                     </div>
                     <button class="btn primary" id="register-submit" type="button">Register</button>
                 </div>
-                <p class="note">Already have an account? <button class="btn secondary" id="switch-to-login" type="button">Login</button></p>
+                <div class="switch-prompt" style="text-align: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(58,111,248,0.1);">
+                    <p style="margin: 0; color: var(--muted); font-size: 0.9rem;">Already have an account?
+                        <button class="btn secondary" id="switch-to-login" type="button" style="display: inline; width: auto; padding: 4px 12px; margin-left: 8px; font-size: 0.9rem; min-height: auto;">Login</button>
+                    </p>
+                </div>
             </div>
-        </div>
-    </div>
 
 
     <script src="config.js"></script>

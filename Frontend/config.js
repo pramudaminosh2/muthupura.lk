@@ -4,7 +4,7 @@
  * Change only this file to update API endpoints across the entire frontend
  */
 
-const API_BASE_URL = 'https://muthupura-lk.onrender.com';
+const API_BASE_URL = 'http://localhost:3000';
 
 // Validation check
 if (!API_BASE_URL || typeof API_BASE_URL !== 'string') {
