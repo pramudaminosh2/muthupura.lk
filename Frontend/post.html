@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -8,190 +8,830 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg:#eef2f8; --surface:#fff; --text:#1f2f4f; --muted:#5b6d8a; --accent1:#3a6ff8; --accent2:#8e52f8; --shadow:0 14px 30px rgba(33,70,122,0.12); }
-        * { box-sizing:border-box; }
-        body { margin:0; min-height:100vh; font-family:'Inter','Poppins',system-ui,sans-serif; background:linear-gradient(130deg,#f7f9fc,#eef2f8); color:var(--text); }
-        .wrapper { max-width: 800px; margin: 0 auto; padding: 20px 14px 36px; }
-        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-radius: 14px; background: rgba(255,255,255,0.78); border:1px solid rgba(79,102,146,0.2); box-shadow:0 10px 24px rgba(20,41,69,0.1); margin-bottom: 20px; }
-        .brand { display:flex; align-items:center; gap:10px; }
-        .brand img { height:34px; }
-        .brand span { font-weight:800; }
-        .nav-links { display:flex; gap:8px; }
-        .btn { border-radius:999px; border:0; font-weight:700; padding:8px 14px; cursor:pointer; transition: all .2s ease; }
-        .btn.primary { background: linear-gradient(110deg, var(--accent1), var(--accent2)); color:#fff; }
-        .btn.secondary { background:#f1f5ff; color:#2f4f82; border:1px solid rgba(58,111,248,0.2); }
-        .btn:hover { transform: translateY(-1px); }
-        .card { background: var(--surface); border-radius: 16px; box-shadow: var(--shadow); border:1px solid rgba(83, 105, 152, 0.16); padding:24px; }
-        h1 { margin:0 0 8px; font-size:1.9rem; }
-        p { margin:0 0 14px; color:var(--muted); }
-        .form { display:grid; gap:14px; }
-        .field { display:flex; flex-direction:column; gap:6px; }
-        .field label { font-size:.9rem; color:#526781; }
-        .field input, .field select { border:1px solid rgba(74,99,142,0.32); border-radius:10px; padding:10px 12px; font-size:1rem; }
-        .field input:focus, .field select:focus { outline:none; border-color: rgba(58,111,248,0.6); box-shadow: 0 0 0 4px rgba(58,111,248,0.12); }
-        @media(max-width:640px){ .wrapper{padding:16px;} .navbar{flex-wrap:wrap;} }
+        :root {
+            color-scheme: light;
+            --bg: #eef2f8;
+            --surface: #ffffff;
+            --surface-soft: rgba(255,255,255,0.88);
+            --text: #1f2f4f;
+            --muted: #5b6d8a;
+            --border: rgba(74,99,142,0.18);
+            --accent1: #3a6ff8;
+            --accent2: #8e52f8;
+            --shadow: 0 24px 70px rgba(25, 73, 145, 0.10);
+            --radius: 18px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+            font-family: 'Inter', 'Poppins', system-ui, sans-serif;
+            background: radial-gradient(circle at top, rgba(58,111,248,0.14), transparent 30%),
+                        linear-gradient(180deg, #f6f8fb 0%, #eef2f8 100%);
+            color: var(--text);
+        }
+
+        body {
+            padding: 0 16px 32px;
+        }
+
+        .page-shell {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 24px 0;
+        }
+
+        .topbar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .brand img {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
+        .header-copy h1 {
+            margin: 0 0 10px;
+            font-size: clamp(2rem, 3vw, 2.6rem);
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+        }
+
+        .header-copy p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.75;
+            max-width: 770px;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn,
+        .action-pill {
+            border: none;
+            border-radius: 999px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+
+        .btn.primary,
+        .action-pill.primary {
+            background: linear-gradient(110deg, var(--accent1), var(--accent2));
+            color: #fff;
+            box-shadow: 0 18px 50px rgba(58,111,248,0.15);
+            padding: 12px 22px;
+        }
+
+        .btn.secondary,
+        .action-pill.secondary {
+            background: #ffffff;
+            color: #2f4f82;
+            border: 1px solid rgba(58,111,248,0.18);
+            padding: 12px 20px;
+        }
+
+        .btn:hover,
+        .action-pill:hover {
+            transform: translateY(-2px);
+        }
+
+        .form-shell {
+            display: grid;
+            gap: 18px;
+        }
+
+        .section-card {
+            background: var(--surface);
+            border: 1px solid rgba(117, 142, 186, 0.14);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 26px;
+            animation: fadeInUp 0.45s ease both;
+        }
+
+        .section-card h2 {
+            margin: 0 0 10px;
+            font-size: 1.15rem;
+        }
+
+        .section-card p {
+            margin: 0 0 18px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 14px;
+        }
+
+        .form-grid.two {
+            grid-template-columns: 1fr;
+        }
+
+        .field {
+            display: grid;
+            gap: 8px;
+        }
+
+        .field label {
+            font-size: 0.92rem;
+            color: #4f648c;
+        }
+
+        .field input,
+        .field select,
+        .field textarea {
+            width: 100%;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.94);
+            border-radius: 14px;
+            padding: 14px 16px;
+            font-size: 1rem;
+            color: var(--text);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .field input:focus,
+        .field select:focus,
+        .field textarea:focus {
+            outline: none;
+            border-color: rgba(58,111,248,0.55);
+            box-shadow: 0 0 0 5px rgba(58,111,248,0.12);
+        }
+
+        .field textarea {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        .field .error-message {
+            display: block;
+            min-height: 18px;
+            font-size: 0.84rem;
+            color: #d12845;
+        }
+
+        .field.invalid input,
+        .field.invalid select,
+        .field.invalid textarea,
+        .field.invalid .custom-select input {
+            border-color: #d12845;
+            box-shadow: 0 0 0 5px rgba(209,40,69,0.12);
+        }
+
+        .custom-select {
+            position: relative;
+        }
+
+        .dropdown-list {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: calc(100% + 8px);
+            background: #fff;
+            border: 1px solid rgba(74,99,142,0.22);
+            border-radius: 14px;
+            max-height: 210px;
+            overflow-y: auto;
+            box-shadow: 0 16px 40px rgba(36,80,145,0.12);
+            z-index: 10;
+            display: none;
+        }
+
+        .dropdown-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(58,111,248,0.08);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0,1fr));
+            gap: 12px;
+        }
+
+        .feature-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border: 1px solid rgba(74,99,142,0.16);
+            border-radius: 14px;
+            background: #fafbff;
+            cursor: pointer;
+            transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+            user-select: none;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-1px);
+            border-color: rgba(58,111,248,0.28);
+            box-shadow: 0 12px 30px rgba(58,111,248,0.08);
+        }
+
+        .feature-card input {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 1px solid rgba(74,99,142,0.35);
+            border-radius: 7px;
+            display: grid;
+            place-items: center;
+            background: #fff;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .feature-card input:checked {
+            border-color: var(--accent1);
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+        }
+
+        .feature-card input:checked::after {
+            content: '\2713';
+            color: #fff;
+            font-size: 0.9rem;
+        }
+
+        .feature-card span {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .upload-dropzone {
+            position: relative;
+            min-height: 190px;
+            border: 2px dashed rgba(58,111,248,0.32);
+            border-radius: 20px;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            padding: 24px;
+            background: rgba(58,111,248,0.04);
+            transition: border-color 0.2s ease, background-color 0.2s ease;
+        }
+
+        .upload-dropzone.drag-over {
+            border-color: rgba(58,111,248,0.7);
+            background: rgba(58,111,248,0.14);
+        }
+
+        .upload-dropzone input {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-copy {
+            z-index: 1;
+            max-width: 320px;
+        }
+
+        .upload-copy svg {
+            width: 54px;
+            height: 54px;
+            margin-bottom: 14px;
+            color: var(--accent1);
+        }
+
+        .upload-copy strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1rem;
+            color: var(--text);
+        }
+
+        .upload-copy span {
+            color: var(--muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .preview-card {
+            position: relative;
+            border-radius: 18px;
+            overflow: hidden;
+            background: #f7f9ff;
+            min-height: 110px;
+            display: grid;
+            place-items: center;
+        }
+
+        .preview-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .preview-card .badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            color: #fff;
+            background: linear-gradient(110deg, var(--accent1), var(--accent2));
+            letter-spacing: 0.03em;
+            box-shadow: 0 12px 28px rgba(58,111,248,0.18);
+        }
+
+        .submit-row {
+            display: flex;
+            justify-content: flex-end;
+            padding-top: 2px;
+        }
+
+        .submit-row .btn.primary {
+            width: 100%;
+        }
+
+        .footer-note {
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        @media (min-width: 720px) {
+            .form-grid.two {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .section-card {
+                padding: 28px;
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(3, minmax(0,1fr));
+            }
+        }
+
+        @media (min-width: 1024px) {
+            body {
+                padding: 0 24px 36px;
+            }
+
+            .page-shell {
+                padding-top: 32px;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .sticky-submit {
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 5;
+            background: rgba(238,242,248,0.95);
+            backdrop-filter: blur(12px);
+            padding: 14px 0 8px;
+        }
     </style>
 </head>
 <body>
-    <div class="wrapper">
-        <nav class="navbar">
-            <a class="brand" href="index.html"><img src="logo.PNG" alt="logo"><span>Muthupura.lk</span></a>
+    <div class="page-shell">
+        <div class="topbar">
+            <a class="brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk logo"><span>Muthupura.lk</span></a>
             <div class="nav-links">
-                <a href="index.html" class="btn secondary">Home</a>
-                <a href="dashboard.html" class="btn secondary" id="mylistings-link" style="display:none;">My Listings</a>
-                <a href="login.html" class="btn secondary" id="auth-link">Login</a>
-                <a href="admin.html" class="btn secondary" id="admin-link" style="display:none;">Admin</a>
+                <a class="action-pill secondary" href="index.html">Home</a>
+                <a class="action-pill secondary" id="mylistings-link" href="dashboard.html" style="display:none;">My Listings</a>
+                <a class="action-pill secondary" id="auth-link" href="login.html">Login</a>
+                <a class="action-pill secondary" id="admin-link" href="admin.html" style="display:none;">Admin</a>
             </div>
-        </nav>
+        </div>
 
-        <article class="card">
-            <h1>Post Your Vehicle</h1>
-            <p>Write a great listing and attract buyers fast. Use a clear front image and complete all fields.</p>
+        <section class="header-copy">
+            <h1>Post your vehicle with confidence</h1>
+            <p>Create a high-quality listing in minutes. Upload clear photos, add rich details, and help buyers find your vehicle faster.</p>
+        </section>
 
-            <form id="vehicleForm" class="form" enctype="multipart/form-data">
-                <div class="field"><label for="title">Title</label><input id="title" name="title" type="text" required></div>
-                <div class="field"><label for="price">Price (LKR)</label><input id="price" name="price" type="number" min="0" required></div>
-                <div class="field"><label for="brand">Brand</label><input id="brand" name="brand" type="text" required></div>
-                <div class="field"><label for="year">Year</label><input id="year" name="year" type="number" min="1900" max="2099" required></div>
-                <div class="field"><label for="phone">Contact Phone</label><input id="phone" name="phone" type="tel" required></div>
-                <div class="field"><label for="fuelType">Fuel Type</label>
-                    <select id="fuelType" name="fuelType" required>
-                        <option value="" disabled selected>Select fuel type</option>
-                        <option value="Electric">Electric</option>
-                        <option value="Petrol">Petrol</option>
-                        <option value="Diesel">Diesel</option>
-                        <option value="Hybrid">Hybrid</option>
-                    </select>
+        <form id="vehicleForm" class="form-shell" enctype="multipart/form-data" novalidate>
+            <section class="section-card">
+                <h2>Contact Info</h2>
+                <p>Share your details so interested buyers can connect with you quickly.</p>
+                <div class="form-grid two">
+                    <div class="field" data-required>
+                        <label for="sellerName">Name</label>
+                        <input id="sellerName" name="sellerName" type="text" placeholder="Enter your name" required>
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="field" data-required>
+                        <label for="phone">Phone Number</label>
+                        <input id="phone" name="phone" type="tel" placeholder="07x xxx xxxx" required>
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="field" data-required>
+                        <label for="city">City</label>
+                        <input id="city" name="city" list="city-options" placeholder="Select or type city" required>
+                        <datalist id="city-options">
+                            <option value="Colombo"></option>
+                            <option value="Gampaha"></option>
+                            <option value="Negombo"></option>
+                            <option value="Kandy"></option>
+                            <option value="Galle"></option>
+                            <option value="Jaffna"></option>
+                            <option value="Matara"></option>
+                            <option value="Trincomalee"></option>
+                            <option value="Ratnapura"></option>
+                            <option value="Anuradhapura"></option>
+                        </datalist>
+                        <span class="error-message"></span>
+                    </div>
                 </div>
-                <div class="field"><label for="location">Location</label>
-                    <input id="location" name="location" type="text" list="location-options" placeholder="Type or select city" required>
-                    <datalist id="location-options">
-                        <option value="Colombo"></option>
-                        <option value="Gampaha"></option>
-                        <option value="Negombo"></option>
-                        <option value="Chilaw"></option>
-                        <option value="Kurunegala"></option>
-                        <option value="Kandy"></option>
-                        <option value="Matara"></option>
-                        <option value="Galle"></option>
-                        <option value="Anuradhapura"></option>
-                        <option value="Jaffna"></option>
-                        <option value="Batticaloa"></option>
-                        <option value="Trincomalee"></option>
-                        <option value="Ratnapura"></option>
-                        <option value="Badulla"></option>
-                        <option value="Kalutara"></option>
-                    </datalist>
+            </section>
+
+            <section class="section-card">
+                <h2>Vehicle Info</h2>
+                <p>Choose the right category and enter the core vehicle details.</p>
+                <div class="form-grid two">
+                    <div class="field" data-required>
+                        <label for="vehicleType">Vehicle Type</label>
+                        <select id="vehicleType" name="vehicleType" required>
+                            <option value="" disabled selected>Select vehicle type</option>
+                            <option value="car">Car</option>
+                            <option value="van">Van</option>
+                            <option value="bus">Bus</option>
+                            <option value="bike">Bike</option>
+                            <option value="tractor">Tractor</option>
+                        </select>
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="field" data-required>
+                        <label for="condition">Condition</label>
+                        <select id="condition" name="condition" required>
+                            <option value="" disabled selected>Select condition</option>
+                            <option value="antique">Antique</option>
+                            <option value="brand new">Brand New</option>
+                            <option value="used (registered)">Used (Registered)</option>
+                            <option value="recondition (unregistered)">Recondition (Unregistered)</option>
+                        </select>
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="field custom-select" data-required>
+                        <label for="make">Make</label>
+                        <input id="make" name="make" type="text" placeholder="Search or type make" autocomplete="off" required>
+                        <div class="dropdown-list" id="makeDropdown"></div>
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="field" data-required>
+                        <label for="model">Model</label>
+                        <input id="model" name="model" type="text" placeholder="Vehicle model" required>
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="field" data-required>
+                        <label for="year">Manufactured Year</label>
+                        <input id="year" name="year" type="number" min="1900" max="2099" placeholder="e.g. 2018" required>
+                        <span class="error-message"></span>
+                    </div>
                 </div>
-                <div class="field"><label for="image">Photos (multiple allowed)</label><input id="image" name="images" type="file" accept="image/*" multiple required></div>
-                <div id="image-preview" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:6px;"></div>
-                <button type="submit" class="btn primary">Publish Vehicle</button>
-            </form>
-        </article>
+            </section>
+
+            <section class="section-card">
+                <h2>Details</h2>
+                <p>Enter the specifications buyers look for most.</p>
+                <div class="form-grid two">
+                    <div class="field" data-required>
+                        <label for="price">Price (Rs.)</label>
+                        <input id="price" name="price" type="number" min="0" placeholder="Vehicle price" required>
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="field" data-required>
+                        <label for="transmission">Transmission</label>
+                        <select id="transmission" name="transmission" required>
+                            <option value="" disabled selected>Select transmission</option>
+                            <option value="manual">Manual</option>
+                            <option value="automatic">Automatic</option>
+                        </select>
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="field" data-required>
+                        <label for="fuelType">Fuel Type</label>
+                        <select id="fuelType" name="fuelType" required>
+                            <option value="" disabled selected>Select fuel type</option>
+                            <option value="petrol">Petrol</option>
+                            <option value="diesel">Diesel</option>
+                            <option value="ev">EV</option>
+                        </select>
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="field">
+                        <label for="engineCapacity">Engine Capacity (cc)</label>
+                        <input id="engineCapacity" name="engineCapacity" type="number" min="0" placeholder="Optional">
+                        <span class="error-message"></span>
+                    </div>
+                    <div class="field" data-required>
+                        <label for="mileage">Mileage (km)</label>
+                        <input id="mileage" name="mileage" type="number" min="0" placeholder="Distance travelled" required>
+                        <span class="error-message"></span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section-card">
+                <h2>Features</h2>
+                <p>Select the key features included with this vehicle.</p>
+                <div class="features-grid">
+                    <label class="feature-card"><input type="checkbox" name="features" value="Air Conditioned"><span>Air Conditioned</span></label>
+                    <label class="feature-card"><input type="checkbox" name="features" value="Power Steering"><span>Power Steering</span></label>
+                    <label class="feature-card"><input type="checkbox" name="features" value="Power Mirror"><span>Power Mirror</span></label>
+                    <label class="feature-card"><input type="checkbox" name="features" value="Power Window"><span>Power Window</span></label>
+                    <label class="feature-card"><input type="checkbox" name="features" value="Self Parking"><span>Self Parking</span></label>
+                    <label class="feature-card"><input type="checkbox" name="features" value="Inbuilt Display + Audio"><span>Inbuilt Display + Audio</span></label>
+                </div>
+            </section>
+
+            <section class="section-card">
+                <h2>Description</h2>
+                <p>Add a helpful description so buyers understand the vehicle condition and story.</p>
+                <div class="field">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" placeholder="Add more details about your vehicle…"></textarea>
+                    <span class="error-message"></span>
+                </div>
+            </section>
+
+            <section class="section-card">
+                <h2>Photos</h2>
+                <p>Upload up to 10 images. The first image will be shown as the main image.</p>
+                <div class="upload-dropzone" id="dropzone">
+                    <div class="upload-copy">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 9 12 4 17 9"/><line x1="12" y1="4" x2="12" y2="16"/></svg>
+                        <strong>Drag & drop your images here</strong>
+                        <span>Upload up to 10 images. First image will be main image.</span>
+                    </div>
+                    <input id="photos" name="photos" type="file" accept="image/*" multiple>
+                </div>
+                <div class="preview-grid" id="previewContainer"></div>
+            </section>
+
+            <div class="sticky-submit">
+                <div class="submit-row">
+                    <button type="submit" class="btn primary">Post Vehicle</button>
+                </div>
+                <p class="footer-note">All required fields are marked with an asterisk in the form.</p>
+            </div>
+        </form>
     </div>
 
     <script src="config.js"></script>
     <script>
-        console.log('📡 Using API URL:', API_BASE_URL);
         const API_URL = API_BASE_URL;
-        
-        function getToken() { const t = localStorage.getItem('token'); if(!t) return null; try{return JSON.parse(atob(t.split('.')[1]));}catch{return null;} }
-        const data = getToken();
+        const form = document.getElementById('vehicleForm');
+        const dropzone = document.getElementById('dropzone');
+        const photoInput = document.getElementById('photos');
+        const previewContainer = document.getElementById('previewContainer');
+        const makeInput = document.getElementById('make');
+        const makeDropdown = document.getElementById('makeDropdown');
+        const makeOptions = [
+            'Toyota','Nissan','Honda','Suzuki','Mitsubishi','Ford','Isuzu','Mahindra','Hyundai','Kia','BMW','Mercedes','Audi','Volvo','Tata','Jeep','Bajaj','TVS','Yamaha','Hero'
+        ];
+
+        function getToken() {
+            const token = localStorage.getItem('token');
+            if (!token) return null;
+            try {
+                return JSON.parse(atob(token.split('.')[1]));
+            } catch (error) {
+                return null;
+            }
+        }
+
+        const authData = getToken();
         const adminLink = document.getElementById('admin-link');
         const authLink = document.getElementById('auth-link');
 
-        if(data?.role === 'admin') { adminLink.style.display='inline-flex'; }
-        if(data) {
-            document.getElementById('mylistings-link').style.display='inline-flex';
-            authLink.textContent='Logout';
-            authLink.href='#';
-            authLink.onclick = function() { localStorage.removeItem('token'); location.reload(); };
+        if (authData?.role === 'admin') {
+            adminLink.style.display = 'inline-flex';
         }
 
-        if(!data) { alert('Login required'); location.href='login.html'; }
+        if (authData) {
+            document.getElementById('mylistings-link').style.display = 'inline-flex';
+            authLink.textContent = 'Logout';
+            authLink.href = '#';
+            authLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.removeItem('token');
+                location.reload();
+            });
+        }
 
-        const imageInput = document.getElementById('image');
-        const previewContainer = document.getElementById('image-preview');
+        if (!authData) {
+            alert('Login required');
+            location.href = 'login.html';
+        }
 
-        imageInput.addEventListener('change', function() {
-            const selectedCount = Array.from(this.files).filter(file => file.type.startsWith('image/')).length;
-            console.log('Image input changed:', { totalSelected: this.files.length, validImages: selectedCount, names: Array.from(this.files).map(f => f.name) });
+        function renderMakeDropdown(filter = '') {
+            const normalized = filter.trim().toLowerCase();
+            const items = makeOptions
+                .filter(option => option.toLowerCase().includes(normalized))
+                .slice(0, 8);
+
+            if (!items.length) {
+                makeDropdown.innerHTML = '<div class="dropdown-item">No results found</div>';
+                makeDropdown.style.display = 'block';
+                return;
+            }
+
+            makeDropdown.innerHTML = items
+                .map(option => `<div class="dropdown-item" role="button" tabindex="0">${option}</div>`)
+                .join('');
+            makeDropdown.style.display = 'block';
+        }
+
+        makeInput.addEventListener('focus', () => renderMakeDropdown(makeInput.value));
+        makeInput.addEventListener('input', () => renderMakeDropdown(makeInput.value));
+        makeInput.addEventListener('blur', () => setTimeout(() => { makeDropdown.style.display = 'none'; }, 150));
+
+        makeDropdown.addEventListener('click', (event) => {
+            const option = event.target.closest('.dropdown-item');
+            if (!option) return;
+            makeInput.value = option.textContent.trim();
+            makeDropdown.style.display = 'none';
+        });
+
+        makeDropdown.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                event.target.click();
+            }
+        });
+
+        function updatePreview(files) {
             previewContainer.innerHTML = '';
-            Array.from(this.files).forEach(file => {
-                if (!file.type.startsWith('image/')) return;
+            const validFiles = Array.from(files).filter(file => file.type.startsWith('image/')).slice(0, 10);
+
+            validFiles.forEach((file, index) => {
+                const card = document.createElement('div');
+                card.className = 'preview-card';
+
+                if (index === 0) {
+                    const badge = document.createElement('span');
+                    badge.className = 'badge';
+                    badge.textContent = 'Main Image';
+                    card.appendChild(badge);
+                }
+
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const img = document.createElement('img');
                     img.src = e.target.result;
                     img.alt = file.name;
-                    img.style.width = '100%';
-                    img.style.borderRadius = '10px';
-                    img.style.boxShadow = '0 2px 10px rgba(0,0,0,0.15)';
-                    previewContainer.appendChild(img);
+                    card.appendChild(img);
                 };
                 reader.readAsDataURL(file);
+                previewContainer.appendChild(card);
+            });
+        }
+
+        photoInput.addEventListener('change', () => updatePreview(photoInput.files));
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (event) => {
+                event.preventDefault();
+                event.stopPropagation();
             });
         });
 
-        document.getElementById('vehicleForm').addEventListener('submit', async function(e){
-            e.preventDefault();
-            
-            const formData = new FormData();
-            const files = document.getElementById('image').files;
+        dropzone.addEventListener('dragover', () => dropzone.classList.add('drag-over'));
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+        dropzone.addEventListener('drop', (event) => {
+            dropzone.classList.remove('drag-over');
+            const files = event.dataTransfer.files;
+            if (!files.length) return;
+            photoInput.files = files;
+            updatePreview(files);
+        });
 
-            for (let i = 0; i < files.length; i++) {
-                formData.append('images', files[i]);
+        function validateField(field) {
+            const input = field.querySelector('input, select, textarea');
+            const error = field.querySelector('.error-message');
+            const value = input?.value?.trim();
+            const required = field.dataset.required !== undefined;
+
+            if (required && !value) {
+                field.classList.add('invalid');
+                error.textContent = 'This field is required.';
+                return false;
             }
 
-            formData.append('title', document.getElementById('title').value);
-            formData.append('price', document.getElementById('price').value);
-            formData.append('brand', document.getElementById('brand').value);
-            formData.append('year', document.getElementById('year').value);
-            formData.append('phone', document.getElementById('phone').value);
-            formData.append('fuelType', document.getElementById('fuelType').value);
-            formData.append('location', document.getElementById('location').value);
+            field.classList.remove('invalid');
+            error.textContent = '';
+            return true;
+        }
 
-            const imagesPayload = formData.getAll('images');
-
-            console.log('🚀 FORM DATA READY');
-            console.log('Submitting vehicle form', {
-                title: formData.get('title'),
-                price: formData.get('price'),
-                brand: formData.get('brand'),
-                year: formData.get('year'),
-                phone: formData.get('phone'),
-                fuelType: formData.get('fuelType'),
-                location: formData.get('location'),
-                imagesCount: imagesPayload.length,
-                imageNames: imagesPayload.map(file => file.name)
+        function validateForm() {
+            const requiredFields = Array.from(form.querySelectorAll('[data-required]'));
+            let isValid = true;
+            requiredFields.forEach(field => {
+                if (!validateField(field)) {
+                    isValid = false;
+                }
             });
-            
+            return isValid;
+        }
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!validateForm()) {
+                return;
+            }
+
+            const files = photoInput.files;
+            if (!files.length) {
+                alert('Please upload at least one image.');
+                return;
+            }
+
+            const formData = new FormData();
+            Array.from(files).slice(0, 10).forEach(file => formData.append('images', file));
+            formData.append('sellerName', document.getElementById('sellerName').value.trim());
+            formData.append('phone', document.getElementById('phone').value.trim());
+            formData.append('city', document.getElementById('city').value.trim());
+            formData.append('vehicleType', document.getElementById('vehicleType').value);
+            formData.append('condition', document.getElementById('condition').value);
+            formData.append('make', document.getElementById('make').value.trim());
+            formData.append('model', document.getElementById('model').value.trim());
+            formData.append('year', document.getElementById('year').value);
+            formData.append('price', document.getElementById('price').value);
+            formData.append('transmission', document.getElementById('transmission').value);
+            formData.append('fuelType', document.getElementById('fuelType').value);
+            formData.append('engineCapacity', document.getElementById('engineCapacity').value);
+            formData.append('mileage', document.getElementById('mileage').value);
+            formData.append('description', document.getElementById('description').value.trim());
+
+            const features = Array.from(form.querySelectorAll('input[name="features"]:checked')).map(input => input.value);
+            formData.append('features', JSON.stringify(features));
+
             try {
-                console.log('📤 Calling API: https://muthupura-lk.onrender.com/add-vehicle');
-                console.log('Fetch options:', { method: 'POST', bodyType: 'FormData' });
-                
-                const res = await fetch(`https://muthupura-lk.onrender.com/add-vehicle`, {
+                const response = await fetch(`${API_URL}/add-vehicle`, {
                     method: 'POST',
                     body: formData
                 });
-                
-                console.log('Response status:', res.status, res.statusText);
-                
-                const data = await res.json();
-                console.log('Response data:', data);
-                
-                if(!res.ok) {
-                    throw new Error('Server error: ' + (data?.message || data?.error || res.statusText));
+
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.message || 'Unable to submit your listing.');
                 }
-                
-                console.log('✅ SUCCESS:', data);
-                alert('Vehicle posted successfully');
+
+                alert('Vehicle posted successfully.');
                 location.href = 'index.html';
-                
-            } catch(err) {
-                console.error('❌ FETCH ERROR:', err);
-                console.error('Error message:', err.message);
-                alert('Unable to post vehicle: ' + err.message);
+            } catch (error) {
+                console.error('Submission error:', error);
+                alert(error.message || 'Error posting vehicle.');
             }
         });
     </script>
