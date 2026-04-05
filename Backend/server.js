@@ -19,6 +19,45 @@ const mysql = require('mysql2');
 // Firebase Storage setup
 const bucket = require('./firebase');
 
+// Test URL parsing function (for debugging)
+function extractFilePathFromUrl(imageUrl) {
+    try {
+        if (!imageUrl || typeof imageUrl !== 'string') {
+            return null;
+        }
+
+        console.log(`🔍 Input URL: ${imageUrl.substring(0, 100)}...`);
+
+        // URL format: https://firebasestorage.googleapis.com/v0/b/{bucket}/o/{filePath}?alt=media&token={token}
+        let filePath = null;
+
+        // Method 1: Try URL parsing (most reliable)
+        const urlObj = new URL(imageUrl);
+        const pathname = urlObj.pathname;
+        console.log(`🔍 URL pathname: ${pathname}`);
+
+        // Extract path after /o/ and before any query parameters
+        const filePathMatch = pathname.match(/\/o\/(.+)$/);
+        if (filePathMatch && filePathMatch[1]) {
+            filePath = decodeURIComponent(filePathMatch[1]);
+            console.log(`✅ URL parsing method - extracted: ${filePath}`);
+        } else {
+            // Fallback: regex method for problematic URLs
+            const regexMatch = imageUrl.match(/\/o\/([^?]+)/);
+            if (regexMatch && regexMatch[1]) {
+                filePath = decodeURIComponent(regexMatch[1]);
+                console.log(`✅ Fallback regex method - extracted: ${filePath}`);
+            }
+        }
+
+        console.log(`📁 Final result: ${filePath || 'FAILED TO EXTRACT'}`);
+        return filePath;
+    } catch (error) {
+        console.warn('❌ Error extracting file path from URL:', error.message);
+        return null;
+    }
+}
+
 // Multer setup for memory storage
 const multer = require('multer');
 const upload = multer({
@@ -1244,6 +1283,7 @@ app.delete('/delete-vehicle/:id', authenticateToken, async (req, res) => {
 
         console.log(`🗑️  Delete request for vehicle ID: ${id}`);
         console.log(`📦 Images to process: ${imagesJson ? 'yes' : 'none'}`);
+        console.log(`🏺 Using Firebase Storage bucket: ${bucket.name}`);
 
         // STEP 1: Parse images from vehicle record
         let imageUrls = [];
@@ -1268,32 +1308,17 @@ app.delete('/delete-vehicle/:id', authenticateToken, async (req, res) => {
                         continue;
                     }
 
-                    // Extract file path from Firebase download URL
-                    // URL format: https://firebasestorage.googleapis.com/v0/b/{bucket}/o/{filePath}?alt=media&token={token}
-                    let filePath = null;
+                    console.log(`🔍 Processing image URL: ${imageUrl.substring(0, 80)}...`);
 
-                    // Method 1: Try regex with greedy match (handles URLs with ? in filePath)
-                    const urlObj = new URL(imageUrl);
-                    const pathname = urlObj.pathname;
-                    
-                    // Extract path after /o/ and before any query parameters
-                    const filePathMatch = pathname.match(/\/o\/(.+)$/);
-                    if (filePathMatch && filePathMatch[1]) {
-                        filePath = decodeURIComponent(filePathMatch[1]);
-                        console.log(`🔍 Method URL parsing - extracted path: ${filePath}`);
-                    } else {
-                        // Fallback: regex method for problematic URLs
-                        const regexMatch = imageUrl.match(/\/o\/([^?]+)/);
-                        if (regexMatch && regexMatch[1]) {
-                            filePath = decodeURIComponent(regexMatch[1]);
-                            console.log(`🔍 Fallback regex - extracted path: ${filePath}`);
-                        }
-                    }
+                    // Extract file path from Firebase download URL
+                    const filePath = extractFilePathFromUrl(imageUrl);
+                    console.log(`📁 Final extracted file path: ${filePath || 'FAILED TO EXTRACT'}`);
 
                     if (filePath) {
                         console.log(`🗑️  Attempting to delete from storage: ${filePath}`);
+                        console.log("Deleting:", filePath); // EXTRA DEBUG TIP
                         const file = bucket.file(filePath);
-                        
+
                         try {
                             await file.delete();
                             deletedImageCount++;
@@ -1347,9 +1372,21 @@ app.delete('/delete-vehicle/:id', authenticateToken, async (req, res) => {
     });
 });
 
-// 404 JSON fallback
-app.use((req, res) => {
-    res.status(404).json({ message: 'Not found' });
+// Test endpoint for URL parsing (for debugging)
+app.post('/test-url-parsing', (req, res) => {
+    const { url } = req.body;
+    if (!url) {
+        return res.status(400).json({ error: 'URL parameter required' });
+    }
+
+    console.log('🧪 Testing URL parsing for:', url);
+    const filePath = extractFilePathFromUrl(url);
+
+    res.json({
+        inputUrl: url,
+        extractedPath: filePath,
+        success: !!filePath
+    });
 });
 
 // Multer file upload error handler

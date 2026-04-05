@@ -806,15 +806,17 @@
         });
 
         async function fetchVehicles() {
+            console.log('🚗 Starting vehicle fetch...');
             renderSkeletons();
             hideMessages();
             await updateNavigation();
+
             try {
                 const res = await fetch(`${API_URL}/get-vehicles`, { cache: 'no-store' });
                 if (!res.ok) throw new Error('Failed to fetch vehicles');
                 const response = await res.json();
                 console.log('📥 API Response received:', response);
-                
+
                 // Handle new API response format: { success: true, data: [...] }
                 if (response.success && response.data && Array.isArray(response.data)) {
                     vehiclesData = response.data;
@@ -828,9 +830,22 @@
                     vehiclesData = [];
                     throw new Error('Invalid response format from server');
                 }
-                
+
+                // STEP 1: Populate brand chips with loaded data
                 populateBrandChips();
-                applyFilters();
+
+                // STEP 2: Ensure no filters are applied initially
+                selectedCategory = null; // Explicitly reset to null
+                console.log('🔄 Reset selectedCategory to null for initial load');
+
+                // STEP 3: Render ALL vehicles initially (no filtering)
+                console.log('🎯 Rendering all vehicles initially (no filters applied)');
+                renderVehicles(vehiclesData); // Pass full dataset directly
+
+                // STEP 4: Make grid visible
+                const grid = document.getElementById('vehicle-list');
+                grid.classList.add('visible');
+
             } catch (error) {
                 console.error('❌ Error fetching vehicles:', error);
                 showMessage('error', 'Unable to load vehicles at the moment. Please reload later.');
@@ -909,11 +924,19 @@
         }
 
         function renderVehicles(list) {
+            console.log(`🎨 Rendering ${list.length} vehicles`);
+
             const container = document.getElementById('vehicle-list');
             const featured = document.getElementById('featured-list');
             container.classList.remove('visible');
             container.innerHTML = '';
             featured.innerHTML = '';
+
+            // Safeguard: If no vehicles to show but we have data, show all vehicles
+            if ((!list || list.length === 0) && vehiclesData && vehiclesData.length > 0) {
+                console.warn('⚠️ renderVehicles called with empty list but we have vehicle data. Showing all vehicles as fallback.');
+                list = vehiclesData;
+            }
 
             if (!list.length) {
                 showMessage('empty', 'No vehicles found. Try adjusting your filters.');
@@ -939,16 +962,22 @@
 
             container.classList.add('visible');
             document.getElementById('hero').scrollIntoView({ behavior: 'smooth' });
+
+            console.log(`✅ Successfully rendered ${sorted.length} vehicles`);
         }
 
         function applyFilters() {
-            // Safety check for vehicle data
+            // STEP 1: Safety check for vehicle data
             if (!vehiclesData || !Array.isArray(vehiclesData)) {
                 console.error('❌ Invalid vehicle data:', vehiclesData);
                 showMessage('error', 'Vehicle data unavailable');
                 return;
             }
-            
+
+            console.log(`🔍 APPLYING FILTERS - Total vehicles in dataset: ${vehiclesData.length}`);
+            console.log(`🔍 Current selectedCategory: ${selectedCategory || 'null (showing all)'}`);
+
+            // STEP 2: Get filter values
             const brand = document.getElementById('filter-brand').value.trim().toLowerCase();
             const minPrice = Number(document.getElementById('filter-min-price').value);
             const maxPrice = Number(document.getElementById('filter-max-price').value);
@@ -974,7 +1003,8 @@
             const search = searchValue;
             const location = locationValue;
 
-            const filtered = vehiclesData.filter(v => {
+            // STEP 3: Apply filtering logic
+            let filtered = vehiclesData.filter(v => {
                 const title = (v.title || '').toString().toLowerCase();
                 const brandValue = (v.brand || '').toString().toLowerCase();
                 const price = Number(v.price || 0);
@@ -982,7 +1012,6 @@
                 const locationValue = (v.location || '').toString().toLowerCase();
 
                 // Category filter from hero chips - only apply if selectedCategory is set
-                // If selectedCategory is null, show ALL vehicles regardless of type
                 if (selectedCategory) {
                     const vehicleCategory = getVehicleCategory(v);
                     if (selectedCategory === 'ev') {
@@ -1004,7 +1033,37 @@
                 return true;
             });
 
-            // Debug logging
+            // STEP 4: Fallback safeguard - if filtered result is empty but we have data, show all
+            if (filtered.length === 0 && vehiclesData.length > 0) {
+                console.warn('⚠️ Filter resulted in no vehicles, but we have data. Checking if this is a bug...');
+                // Check if category filter might be too restrictive
+                if (selectedCategory) {
+                    const withoutCategoryFilter = vehiclesData.filter(v => {
+                        const title = (v.title || '').toString().toLowerCase();
+                        const brandValue = (v.brand || '').toString().toLowerCase();
+                        const price = Number(v.price || 0);
+                        const yearValue = String(v.year || '');
+                        const locationValue = (v.location || '').toString().toLowerCase();
+
+                        if (brand && !brandValue.includes(brand) && !title.includes(brand)) return false;
+                        if (location && !locationValue.includes(location)) return false;
+                        if (!Number.isNaN(minPrice) && minPrice > 0 && price < minPrice) return false;
+                        if (!Number.isNaN(maxPrice) && maxPrice > 0 && price > maxPrice) return false;
+                        if (year && yearValue !== year) return false;
+                        if (search && !title.includes(search) && !brandValue.includes(search) && !yearValue.includes(search)) return false;
+
+                        return true;
+                    });
+
+                    if (withoutCategoryFilter.length > 0) {
+                        console.warn('⚠️ Category filter was too restrictive, falling back to show all vehicles');
+                        filtered = vehiclesData; // Show all vehicles as fallback
+                        selectedCategory = null; // Reset the problematic filter
+                    }
+                }
+            }
+
+            // STEP 5: Debug logging
             const filterState = selectedCategory ? `Category: ${selectedCategory}` : 'No filter (showing all)';
             const otherFilters = [
                 brand ? `Brand: ${brand}` : null,
@@ -1014,10 +1073,11 @@
                 (maxPrice > 0) ? `Max: Rs.${maxPrice}` : null,
                 year ? `Year: ${year}` : null
             ].filter(Boolean).join(', ');
-            
+
             const fullFilterDesc = otherFilters ? `${filterState}, ${otherFilters}` : filterState;
             console.log(`🔍 Applied filters - ${fullFilterDesc} | Results: ${filtered.length}/${vehiclesData.length} vehicles`);
-            
+
+            // STEP 6: Render and show
             renderVehicles(filtered);
             const grid = document.getElementById('vehicle-list');
             grid.classList.add('visible');
@@ -1183,10 +1243,15 @@
         function setupHeroChips() {
             const chips = document.querySelectorAll('.hero-chip');
             if (!chips.length) return;
+
+            console.log('🎛️ Setting up hero chip event listeners');
+
             chips.forEach(button => {
                 button.addEventListener('click', () => {
                     const type = button.dataset.type;
                     const isAlreadyActive = button.classList.contains('active');
+
+                    console.log(`🎯 Hero chip clicked: ${type}, currently active: ${isAlreadyActive}`);
 
                     // Click on already-active chip = deselect (show all)
                     if (isAlreadyActive) {
@@ -1209,6 +1274,7 @@
                             console.log('⚡ Selected: Electric Vehicles');
                         } else {
                             selectedCategory = null;
+                            console.log('❓ Unknown chip type, showing all');
                         }
                     }
 
@@ -1223,29 +1289,32 @@
                     if (heroLocationEl) heroLocationEl.value = '';
                     if (filterLocationEl) filterLocationEl.value = '';
 
+                    console.log(`🔄 Applying filters after chip selection: selectedCategory = ${selectedCategory}`);
                     applyFilters();
                 });
             });
         }
 
-        // Initialize hero chips WITHOUT auto-selecting
-        // Allow all vehicles to show by default
+        // Initialize hero chips WITHOUT any active state
+        // Allow all vehicles to show by default - NO chips selected initially
         function initializeHeroChips() {
             const chips = document.querySelectorAll('.hero-chip');
             if (chips.length > 0) {
-                // Set first chip visual state but don't apply filter
-                chips[0].classList.add('active');
-                console.log('🎨 Hero chips initialized - no auto-filter applied');
+                // Ensure NO chips are active initially
+                chips.forEach(chip => chip.classList.remove('active'));
+                console.log('🎨 Hero chips initialized - no chips active, showing all vehicles');
             }
         }
 
         updateNavigation();
         setupEnterKey();
         setupHeroChips();
+        console.log('🚀 Starting application - initializing vehicle filtering system');
         fetchVehicles();
         // Initialize chips after a brief delay to ensure DOM is ready
         setTimeout(() => {
             initializeHeroChips();
+            console.log('✅ Application initialization complete');
         }, 100);
     </script>
 </body>
