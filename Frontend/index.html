@@ -446,18 +446,32 @@
     <div id="loader"></div>
     <div class="container">
         <nav class="navbar">
-            <a class="brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk"><span>Muthupura.lk</span></a>
+            <a class="nav-brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk"><span>Muthupura.lk</span></a>
             <div class="nav-links">
                 <a href="index.html">Home</a>
                 <a href="post.html">Post Ad</a>
                 <a href="dashboard.html" id="mylistings-link" style="display:none;">My Listings</a>
                 <a href="about.html">About Us</a>
                 <a href="contact.html">Contact Us</a>
-                <span id="user-greeting" style="display:none;font-weight:700;margin-left:8px;color:#2f4f8f;"></span>
                 <a id="auth-link" href="login.html"><button id="auth-btn" type="button">Login</button></a>
                 <a id="admin-link" href="admin.html" style="display:none;"><button type="button">Admin</button></a>
             </div>
+            <div class="hamburger" id="navbar-hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </nav>
+        
+        <div class="mobile-menu" id="mobile-menu">
+            <a href="index.html">Home</a>
+            <a href="post.html">Post Ad</a>
+            <a href="dashboard.html" id="mylistings-link-mobile" style="display:none;">My Listings</a>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact Us</a>
+            <a id="auth-link-mobile" href="login.html">Login</a>
+            <a id="admin-link-mobile" href="admin.html" style="display:none;">Admin</a>
+        </div>
 
         <section class="hero" id="hero">
             <div class="hero-content">
@@ -1260,6 +1274,59 @@
             initializeHeroChips();
             console.log('✅ Application initialization complete');
         }, 100);
+
+        // ===== HAMBURGER MENU =====
+        function setupHamburgerMenu() {
+            const hamburger = document.getElementById('navbar-hamburger');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (!hamburger || !mobileMenu) return;
+
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+            });
+
+            // Close menu when a link is clicked
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburger.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                });
+            });
+
+            // Sync mobile menu auth links with desktop
+            const syncAuthLinks = () => {
+                const desktopAuthLink = document.getElementById('auth-link');
+                const desktopAuthBtn = document.getElementById('auth-btn');
+                const mobileAuthLink = document.getElementById('auth-link-mobile');
+                
+                const desktopMyListings = document.getElementById('mylistings-link');
+                const mobileMyListings = document.getElementById('mylistings-link-mobile');
+                
+                const desktopAdmin = document.getElementById('admin-link');
+                const mobileAdmin = document.getElementById('admin-link-mobile');
+
+                if (desktopAuthBtn) {
+                    if (mobileAuthLink) {
+                        mobileAuthLink.textContent = desktopAuthBtn.textContent;
+                        mobileAuthLink.href = desktopAuthLink.href;
+                    }
+                }
+                if (desktopMyListings && mobileMyListings) {
+                    mobileMyListings.style.display = desktopMyListings.style.display;
+                }
+                if (desktopAdmin && mobileAdmin) {
+                    mobileAdmin.style.display = desktopAdmin.style.display;
+                }
+            };
+            syncAuthLinks();
+
+            // Watch for auth changes and sync
+            const observer = new MutationObserver(syncAuthLinks);
+            observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['style', 'textContent'] });
+        }
+
+        setTimeout(setupHamburgerMenu, 100);
     </script>
 </body>
 </html>

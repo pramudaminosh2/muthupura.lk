@@ -176,13 +176,24 @@
 <body>
     <div class="wrapper">
         <nav class="navbar">
-            <a class="brand" href="index.html"><img src="logo.PNG" alt="logo"><span>Muthupura.lk Admin</span></a>
+            <a class="nav-brand" href="index.html"><img src="logo.PNG" alt="logo"><span>Muthupura.lk Admin</span></a>
             <div class="nav-links">
-                <a href="index.html" class="btn secondary">Home</a>
-                <a href="post.html" class="btn secondary">Post Ad</a>
-                <button class="btn secondary" id="logout-btn">Logout</button>
+                <a href="index.html">Home</a>
+                <a href="post.html">Post Ad</a>
+                <button class="btn primary" id="logout-btn">Logout</button>
+            </div>
+            <div class="hamburger" id="navbar-hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
         </nav>
+        
+        <div class="mobile-menu" id="mobile-menu">
+            <a href="index.html">Home</a>
+            <a href="post.html">Post Ad</a>
+            <button class="btn primary" id="logout-btn-mobile">Logout</button>
+        </div>
 
         <div class="stats">
             <div class="stat"><h3>Total Ads</h3><p id="total-ads">-</p></div>
@@ -298,6 +309,33 @@
         }
 
         async function deleteAd(id){ if(!confirm('Delete this vehicle?')) return; const token = localStorage.getItem('token'); try { console.log('📤 Calling API: ' + API_URL + '/delete-vehicle/' + id); const res = await fetch(`${API_URL}/delete-vehicle/${id}`, { method:'DELETE', headers:{Authorization:`Bearer ${token}`}}); if(!res.ok) throw new Error(); await loadVehicles(); } catch(err){ console.error(err); alert('Delete failed.'); }}
+
+        // Sync mobile logout button
+        const mobileLogoutBtn = document.getElementById('logout-btn-mobile');
+        if (mobileLogoutBtn) {
+            mobileLogoutBtn.onclick = () => { localStorage.removeItem('token'); window.location.href='login.html'; };
+        }
+
+        // ===== HAMBURGER MENU =====
+        function setupHamburgerMenu() {
+            const hamburger = document.getElementById('navbar-hamburger');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (!hamburger || !mobileMenu) return;
+
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+            });
+
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburger.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                });
+            });
+        }
+
+        setTimeout(setupHamburgerMenu, 100);
 
         loadVehicles();
     </script>

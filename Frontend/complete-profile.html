@@ -112,11 +112,20 @@
 <body>
     <div class="frame">
         <nav class="navbar">
-            <a class="brand" href="index.html"><img src="logo.PNG" alt="logo"><span>Muthupura.lk</span></a>
+            <a class="nav-brand" href="index.html"><img src="logo.PNG" alt="logo"><span>Muthupura.lk</span></a>
             <div class="nav-links">
-                <a href="login.html" class="btn secondary">Back to Login</a>
+                <a href="login.html">Back to Login</a>
+            </div>
+            <div class="hamburger" id="navbar-hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
         </nav>
+        
+        <div class="mobile-menu" id="mobile-menu">
+            <a href="login.html">Back to Login</a>
+        </div>
 
         <div class="card">
             <h1>Complete your profile</h1>
@@ -223,6 +232,27 @@
                 showAlert('Unable to complete profile. Please try again.', 'error');
             }
         });
+
+        // ===== HAMBURGER MENU =====
+        function setupHamburgerMenu() {
+            const hamburger = document.getElementById('navbar-hamburger');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (!hamburger || !mobileMenu) return;
+
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+            });
+
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburger.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                });
+            });
+        }
+
+        setTimeout(setupHamburgerMenu, 100);
     </script>
 </body>
 </html>

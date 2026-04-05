@@ -147,13 +147,24 @@
 <body>
     <div class="container">
         <nav class="navbar">
-            <a class="brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk" style="width:40px; height:40px; border-radius:12px;"><span style="font-size:1.1rem;">Muthupura.lk</span></a>
+            <a class="nav-brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk" style="width:40px; height:40px; border-radius:12px;"><span style="font-size:1.1rem;">Muthupura.lk</span></a>
             <div class="nav-links">
-                <a href="index.html" class="btn secondary">Home</a>
-                <a href="post.html" class="btn secondary">Post Ad</a>
-                <a href="about.html" class="btn secondary">About</a>
+                <a href="index.html">Home</a>
+                <a href="post.html">Post Ad</a>
+                <a href="about.html">About</a>
+            </div>
+            <div class="hamburger" id="navbar-hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
         </nav>
+        
+        <div class="mobile-menu" id="mobile-menu">
+            <a href="index.html">Home</a>
+            <a href="post.html">Post Ad</a>
+            <a href="about.html">About</a>
+        </div>
 
         <h1>Contact Us</h1>
         <p class="desc">Have questions? We’re here to help. Fill the form and we'll get back to you quickly.</p>
@@ -196,6 +207,27 @@
             alert('Thank you! Your message has been sent.');
             document.getElementById('contactForm').reset();
         }
+
+        // ===== HAMBURGER MENU =====
+        function setupHamburgerMenu() {
+            const hamburger = document.getElementById('navbar-hamburger');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (!hamburger || !mobileMenu) return;
+
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+            });
+
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburger.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                });
+            });
+        }
+
+        setTimeout(setupHamburgerMenu, 100);
     </script>
 </body>
 </html>

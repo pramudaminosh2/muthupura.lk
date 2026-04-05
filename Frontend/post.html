@@ -794,14 +794,26 @@
 </head>
 <body>
     <div class="page-shell">
-        <div class="topbar">
-            <a class="brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk logo"><span>Muthupura.lk</span></a>
+        <div class="topbar" style="background: linear-gradient(135deg, rgba(58,111,248,0.9), rgba(142,82,248,0.9)); border: none;">
+            <a class="brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk logo"><span style="color: white;">Muthupura.lk</span></a>
             <div class="nav-links">
-                <a class="action-pill secondary" href="index.html">Home</a>
-                <a class="action-pill secondary" id="mylistings-link" href="dashboard.html" style="display:none;">My Listings</a>
-                <a class="action-pill secondary" id="auth-link" href="login.html">Login</a>
-                <a class="action-pill secondary" id="admin-link" href="admin.html" style="display:none;">Admin</a>
+                <a class="action-pill secondary" href="index.html" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">Home</a>
+                <a class="action-pill secondary" id="mylistings-link" href="dashboard.html" style="display:none; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">My Listings</a>
+                <a class="action-pill secondary" id="auth-link" href="login.html" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">Login</a>
+                <a class="action-pill secondary" id="admin-link" href="admin.html" style="display:none; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">Admin</a>
             </div>
+            <div class="hamburger" id="navbar-hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="mobile-menu" id="mobile-menu" style="top: 60px;">
+            <a href="index.html">Home</a>
+            <a id="mylistings-link-mobile" href="dashboard.html" style="display:none;">My Listings</a>
+            <a id="auth-link-mobile" href="login.html">Login</a>
+            <a id="admin-link-mobile" href="admin.html" style="display:none;">Admin</a>
         </div>
 
         <section class="header-copy">
@@ -1184,6 +1196,45 @@
                 alert(error.message || 'Error posting vehicle.');
             }
         });
+
+        // ===== HAMBURGER MENU =====
+        function setupHamburgerMenu() {
+            const hamburger = document.getElementById('navbar-hamburger');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (!hamburger || !mobileMenu) return;
+
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+            });
+
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburger.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                });
+            });
+        }
+
+        setTimeout(setupHamburgerMenu, 100);
+
+        // Sync mobile auth links with desktop
+        function syncAuthLinks() {
+            const desktopMyListings = document.getElementById('mylistings-link');
+            const mobileMyListings = document.getElementById('mylistings-link-mobile');
+            const desktopAuthLink = document.getElementById('auth-link');
+            const mobileAuthLink = document.getElementById('auth-link-mobile');
+            const desktopAdmin = document.getElementById('admin-link');
+            const mobileAdmin = document.getElementById('admin-link-mobile');
+
+            if (desktopMyListings && mobileMyListings) {
+                mobileMyListings.style.display = desktopMyListings.style.display;
+            }
+            if (desktopAdmin && mobileAdmin) {
+                mobileAdmin.style.display = desktopAdmin.style.display;
+            }
+        }
+        syncAuthLinks();
     </script>
 </body>
 </html>

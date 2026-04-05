@@ -207,14 +207,26 @@
 <body>
     <div class="container">
         <nav class="navbar">
-            <a class="brand" href="index.html"><img src="logo.PNG" alt="logo"><span>Muthupura.lk</span></a>
+            <a class="nav-brand" href="index.html"><img src="logo.PNG" alt="logo"><span>Muthupura.lk</span></a>
             <div class="nav-links">
-                <a href="index.html" class="btn secondary">Home</a>
-                <a href="post.html" class="btn secondary">Post Ad</a>
-                <a href="dashboard.html" class="btn secondary">My Listings</a>
-                <a href="about.html" class="btn secondary">About</a>
+                <a href="index.html">Home</a>
+                <a href="post.html">Post Ad</a>
+                <a href="dashboard.html">My Listings</a>
+                <a href="about.html">About</a>
+            </div>
+            <div class="hamburger" id="navbar-hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
         </nav>
+        
+        <div class="mobile-menu" id="mobile-menu">
+            <a href="index.html">Home</a>
+            <a href="post.html">Post Ad</a>
+            <a href="dashboard.html">My Listings</a>
+            <a href="about.html">About</a>
+        </div>
 
         <div id="error-message" class="card" style="display:none;color:#a13636;background:#fff1f1;border-color:#ecbcbc;"></div>
 
@@ -443,6 +455,27 @@
         }
 
         fetchVehicle();
+
+        // ===== HAMBURGER MENU =====
+        function setupHamburgerMenu() {
+            const hamburger = document.getElementById('navbar-hamburger');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (!hamburger || !mobileMenu) return;
+
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+            });
+
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburger.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                });
+            });
+        }
+
+        setTimeout(setupHamburgerMenu, 100);
     </script>
 </body>
 </html>

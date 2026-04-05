@@ -231,14 +231,26 @@
 <body>
     <div class="container">
         <nav class="navbar">
-            <a class="brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk"><span>Muthupura.lk</span></a>
+            <a class="nav-brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk"><span>Muthupura.lk</span></a>
             <div class="nav-links">
-                <a href="index.html" class="btn secondary">Home</a>
-                <a href="post.html" class="btn secondary">Post Ad</a>
-                <a href="dashboard.html" class="btn secondary">My Listings</a>
-                <button id="logoutBtn" class="btn secondary">Logout</button>
+                <a href="index.html">Home</a>
+                <a href="post.html">Post Ad</a>
+                <a href="dashboard.html">My Listings</a>
+                <button class="btn primary" id="logoutBtn">Logout</button>
+            </div>
+            <div class="hamburger" id="navbar-hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
         </nav>
+        
+        <div class="mobile-menu" id="mobile-menu">
+            <a href="index.html">Home</a>
+            <a href="post.html">Post Ad</a>
+            <a href="dashboard.html">My Listings</a>
+            <button class="btn primary" id="logoutBtn-mobile">Logout</button>
+        </div>
 
         <section class="section-head">
             <div>
@@ -456,7 +468,35 @@
         }
 
         document.getElementById('logoutBtn').onclick = () => { localStorage.removeItem('token'); window.location.href = 'login.html'; };
+
+        // Sync mobile logout button
+        const mobileLogoutBtn = document.getElementById('logoutBtn-mobile');
+        if (mobileLogoutBtn) {
+            mobileLogoutBtn.onclick = () => { localStorage.removeItem('token'); window.location.href = 'login.html'; };
+        }
+
         document.getElementById('refreshBtn').onclick = fetchListings;
+
+        // ===== HAMBURGER MENU =====
+        function setupHamburgerMenu() {
+            const hamburger = document.getElementById('navbar-hamburger');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (!hamburger || !mobileMenu) return;
+
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+            });
+
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburger.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                });
+            });
+        }
+
+        setTimeout(setupHamburgerMenu, 100);
 
         fetchListings();
     </script>

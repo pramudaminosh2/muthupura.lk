@@ -156,14 +156,26 @@
 <body>
     <div class="container">
         <nav class="navbar">
-            <a class="brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk" style="width:40px; height:40px; border-radius:12px;"><span style="font-size:1.1rem;">Muthupura.lk</span></a>
+            <a class="nav-brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk" style="width:40px; height:40px; border-radius:12px;"><span style="font-size:1.1rem;">Muthupura.lk</span></a>
             <div class="nav-links">
-                <a href="index.html" class="btn secondary">Home</a>
-                <a href="post.html" class="btn secondary">Post Ad</a>
-                <a href="dashboard.html" class="btn secondary">My Listings</a>
-                <a href="contact.html" class="btn secondary">Contact</a>
+                <a href="index.html">Home</a>
+                <a href="post.html">Post Ad</a>
+                <a href="dashboard.html">My Listings</a>
+                <a href="contact.html">Contact</a>
+            </div>
+            <div class="hamburger" id="navbar-hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
         </nav>
+        
+        <div class="mobile-menu" id="mobile-menu">
+            <a href="index.html">Home</a>
+            <a href="post.html">Post Ad</a>
+            <a href="dashboard.html">My Listings</a>
+            <a href="contact.html">Contact</a>
+        </div>
 
         <section class="hero">
             <h1>About Muthupura.lk</h1>
@@ -191,5 +203,27 @@
 
         <div class="footer">© 2026 Muthupura.lk – All rights reserved</div>
     </div>
+    <script>
+        // ===== HAMBURGER MENU =====
+        function setupHamburgerMenu() {
+            const hamburger = document.getElementById('navbar-hamburger');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (!hamburger || !mobileMenu) return;
+
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+            });
+
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburger.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                });
+            });
+        }
+
+        setTimeout(setupHamburgerMenu, 100);
+    </script>
 </body>
 </html>
