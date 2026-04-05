@@ -10,26 +10,13 @@ const app = express();
 
 // Enable CORS - FIRST middleware after app creation
 app.use(cors({
-    origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
-
-        const allowedOrigins = [
-            "https://muthupuralk.web.app",
-            "http://localhost:8000",
-            "http://127.0.0.1:8000",
-            "http://localhost:3000",
-            "http://127.0.0.1:3000"
-        ];
-
-        if (allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
+    origin: "https://muthupuralk.web.app",
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
 }));
+
+// Handle preflight requests
+app.options('*', cors());
 
 const mysql = require('mysql2');
 
