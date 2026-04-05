@@ -112,7 +112,7 @@ const upload = multer({
 // Google OAuth settings
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID';
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || 'YOUR_GOOGLE_CLIENT_SECRET';
-const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/google/callback';
+const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || (process.env.NODE_ENV === 'production' ? 'https://muthupura-backend.onrender.com/auth/google/callback' : 'http://localhost:3000/auth/google/callback');
 const GOOGLE_OAUTH2_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v3/userinfo';
@@ -120,7 +120,7 @@ const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v3/userinfo';
 // Facebook OAuth settings
 const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID || 'YOUR_FACEBOOK_APP_ID';
 const FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET || 'YOUR_FACEBOOK_APP_SECRET';
-const FACEBOOK_REDIRECT_URI = process.env.FACEBOOK_REDIRECT_URI || 'http://localhost:3000/auth/facebook/callback';
+const FACEBOOK_REDIRECT_URI = process.env.FACEBOOK_REDIRECT_URI || (process.env.NODE_ENV === 'production' ? 'https://muthupura-backend.onrender.com/auth/facebook/callback' : 'http://localhost:3000/auth/facebook/callback');
 const FACEBOOK_OAUTH_URL = 'https://www.facebook.com/v16.0/dialog/oauth';
 const FACEBOOK_TOKEN_URL = 'https://graph.facebook.com/v16.0/oauth/access_token';
 const FACEBOOK_USERINFO_URL = 'https://graph.facebook.com/v16.0/me';
