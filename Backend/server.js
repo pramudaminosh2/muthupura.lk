@@ -1242,46 +1242,91 @@ app.delete('/delete-vehicle/:id', authenticateToken, async (req, res) => {
             return res.status(403).json({ message: 'You are not allowed to delete this vehicle' });
         }
 
-        console.log("🗑️  Delete request for vehicle ID:", id);
+        console.log(`🗑️  Delete request for vehicle ID: ${id}`);
+        console.log(`📦 Images to process: ${imagesJson ? 'yes' : 'none'}`);
 
-        // Step 1: Delete images from Firebase Storage
-        let deletedImageCount = 0;
+        // STEP 1: Parse images from vehicle record
+        let imageUrls = [];
         try {
             if (imagesJson) {
-                let imageUrls = [];
-                try {
-                    imageUrls = typeof imagesJson === 'string' ? JSON.parse(imagesJson) : imageUrls;
-                } catch (parseErr) {
-                    console.warn('⚠️  Could not parse images JSON:', parseErr.message);
-                }
-
-                for (const imageUrl of imageUrls) {
-                    try {
-                        // Extract file path from Firebase URL
-                        // URL format: https://firebasestorage.googleapis.com/v0/b/{bucket}/o/{filePath}?alt=media&token=...
-                        const filePathMatch = imageUrl.match(/\/o\/(.+?)\?/);
-                        if (filePathMatch && filePathMatch[1]) {
-                            const filePath = decodeURIComponent(filePathMatch[1]);
-                            console.log('🔍 Extracted file path:', filePath);
-
-                            // Delete from Firebase Storage
-                            const file = bucket.file(filePath);
-                            await file.delete();
-                            deletedImageCount++;
-                            console.log(`✅ Deleted image from storage: ${filePath}`);
-                        }
-                    } catch (imgDeleteErr) {
-                        console.warn(`⚠️  Failed to delete image ${imageUrl}:`, imgDeleteErr.message);
-                        // Continue with next image even if one fails
-                    }
-                }
+                imageUrls = typeof imagesJson === 'string' ? JSON.parse(imagesJson) : (Array.isArray(imagesJson) ? imagesJson : []);
+                console.log(`📸 Found ${imageUrls.length} images in database`);
             }
-        } catch (storageErr) {
-            console.warn('⚠️  Storage cleanup encountered issues:', storageErr.message);
-            // Don't block vehicle deletion if image cleanup fails
+        } catch (parseErr) {
+            console.warn('⚠️  Could not parse images JSON:', parseErr.message);
         }
 
-        // Step 2: Delete database record
+        // STEP 2: Delete images from Firebase Storage
+        let deletedImageCount = 0;
+        const deletionResults = [];
+        
+        if (imageUrls.length > 0) {
+            for (const imageUrl of imageUrls) {
+                try {
+                    if (!imageUrl || typeof imageUrl !== 'string') {
+                        console.warn('⚠️  Skip invalid image URL:', imageUrl);
+                        continue;
+                    }
+
+                    // Extract file path from Firebase download URL
+                    // URL format: https://firebasestorage.googleapis.com/v0/b/{bucket}/o/{filePath}?alt=media&token={token}
+                    let filePath = null;
+
+                    // Method 1: Try regex with greedy match (handles URLs with ? in filePath)
+                    const urlObj = new URL(imageUrl);
+                    const pathname = urlObj.pathname;
+                    
+                    // Extract path after /o/ and before any query parameters
+                    const filePathMatch = pathname.match(/\/o\/(.+)$/);
+                    if (filePathMatch && filePathMatch[1]) {
+                        filePath = decodeURIComponent(filePathMatch[1]);
+                        console.log(`🔍 Method URL parsing - extracted path: ${filePath}`);
+                    } else {
+                        // Fallback: regex method for problematic URLs
+                        const regexMatch = imageUrl.match(/\/o\/([^?]+)/);
+                        if (regexMatch && regexMatch[1]) {
+                            filePath = decodeURIComponent(regexMatch[1]);
+                            console.log(`🔍 Fallback regex - extracted path: ${filePath}`);
+                        }
+                    }
+
+                    if (filePath) {
+                        console.log(`🗑️  Attempting to delete from storage: ${filePath}`);
+                        const file = bucket.file(filePath);
+                        
+                        try {
+                            await file.delete();
+                            deletedImageCount++;
+                            deletionResults.push({ filePath, status: 'success' });
+                            console.log(`✅ Successfully deleted: ${filePath}`);
+                        } catch (deleteErr) {
+                            // Check if file doesn't exist (error code 404) - still consider it success
+                            if (deleteErr.code === 404 || deleteErr.message.includes('404') || deleteErr.message.includes('not found')) {
+                                deletedImageCount++;
+                                deletionResults.push({ filePath, status: 'success (not found)', message: 'File not found in storage, marked as removed' });
+                                console.log(`ℹ️  File not found in storage (already deleted): ${filePath}`);
+                            } else {
+                                deletionResults.push({ filePath, status: 'failed', error: deleteErr.message });
+                                console.warn(`⚠️  Failed to delete ${filePath}: ${deleteErr.message}`);
+                            }
+                        }
+                    } else {
+                        deletionResults.push({ url: imageUrl, status: 'failed', error: 'Could not extract file path' });
+                        console.warn(`⚠️  Could not extract file path from URL: ${imageUrl}`);
+                    }
+                } catch (imgProcessErr) {
+                    deletionResults.push({ url: imageUrl, status: 'failed', error: imgProcessErr.message });
+                    console.warn(`⚠️  Error processing image ${imageUrl}: ${imgProcessErr.message}`);
+                }
+            }
+        }
+
+        console.log(`📊 Image deletion summary: ${deletedImageCount}/${imageUrls.length} files removed`);
+        if (deletionResults.length > 0) {
+            console.log('📋 Deletion details:', JSON.stringify(deletionResults, null, 2));
+        }
+
+        // STEP 3: Delete database record after image cleanup attempts
         const deleteSql = "DELETE FROM vehicles WHERE id = ?";
         db.query(deleteSql, [id], (err, result) => {
             if (err) {
@@ -1289,8 +1334,15 @@ app.delete('/delete-vehicle/:id', authenticateToken, async (req, res) => {
                 return res.status(500).json({ message: 'Error deleting vehicle' });
             }
 
-            console.log(`✅ Vehicle ${id} deleted - Removed ${deletedImageCount} images from storage`);
-            res.json({ message: 'Vehicle deleted', imagesRemoved: deletedImageCount });
+            console.log(`✅ Vehicle ${id} deleted successfully from database`);
+            console.log(`🎯 Final result: Vehicle deleted with ${deletedImageCount}/${imageUrls.length} images removed from storage`);
+            
+            res.json({ 
+                message: 'Vehicle deleted successfully',
+                imagesRemoved: deletedImageCount,
+                totalImages: imageUrls.length,
+                deletionDetails: deletionResults
+            });
         });
     });
 });

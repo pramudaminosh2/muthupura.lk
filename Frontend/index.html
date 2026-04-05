@@ -981,7 +981,8 @@
                 const yearValue = String(v.year || '');
                 const locationValue = (v.location || '').toString().toLowerCase();
 
-                // Category filter from hero chips
+                // Category filter from hero chips - only apply if selectedCategory is set
+                // If selectedCategory is null, show ALL vehicles regardless of type
                 if (selectedCategory) {
                     const vehicleCategory = getVehicleCategory(v);
                     if (selectedCategory === 'ev') {
@@ -1003,7 +1004,20 @@
                 return true;
             });
 
-            console.log(`🔍 Applied filters - Category: ${selectedCategory}, Results: ${filtered.length}/${vehiclesData.length}`);
+            // Debug logging
+            const filterState = selectedCategory ? `Category: ${selectedCategory}` : 'No filter (showing all)';
+            const otherFilters = [
+                brand ? `Brand: ${brand}` : null,
+                search ? `Search: ${search}` : null,
+                location ? `Location: ${location}` : null,
+                (minPrice > 0) ? `Min: Rs.${minPrice}` : null,
+                (maxPrice > 0) ? `Max: Rs.${maxPrice}` : null,
+                year ? `Year: ${year}` : null
+            ].filter(Boolean).join(', ');
+            
+            const fullFilterDesc = otherFilters ? `${filterState}, ${otherFilters}` : filterState;
+            console.log(`🔍 Applied filters - ${fullFilterDesc} | Results: ${filtered.length}/${vehiclesData.length} vehicles`);
+            
             renderVehicles(filtered);
             const grid = document.getElementById('vehicle-list');
             grid.classList.add('visible');
@@ -1014,10 +1028,14 @@
                 const el = document.getElementById(id);
                 if (el) el.value = '';
             });
+            // Remove active state from all chips (including hero chips)
             document.querySelectorAll('.chip.active').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.hero-chip.active').forEach(el => el.classList.remove('active'));
             document.getElementById('location-suggestions').classList.add('hidden');
-            selectedCategory = null; // Reset category filter
-            console.log('🗑️ All filters cleared');
+            
+            // Reset category filter to null - this shows ALL vehicles
+            selectedCategory = null;
+            console.log('🗑️ All filters cleared - showing all vehicles');
             applyFilters();
         }
 
@@ -1083,17 +1101,56 @@
 
         function deleteVehicle(id) {
             const token = localStorage.getItem('token');
-            if (!token) { alert('Admin required to delete'); return; }
-            fetch(`${API_URL}/delete-vehicle/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } })
-                .then(res => res.json())
-                .then(data => {
+            if (!token) { 
+                alert('❌ Authentication required to delete vehicles');
+                return; 
+            }
+
+            // Ask for confirmation before deletion
+            if (!confirm('🗑️ Are you sure? This will delete the vehicle and all associated images from storage.')) {
+                return;
+            }
+
+            showLoader(true);
+            
+            fetch(`${API_URL}/delete-vehicle/${id}`, { 
+                method: 'DELETE', 
+                headers: { Authorization: `Bearer ${token}` } 
+            })
+            .then(res => res.json())
+            .then(data => {
+                showLoader(false);
+                
+                if (data?.message) {
+                    console.log('📦 Delete response:', data);
+                    
+                    // Log deletion details for debugging
+                    if (data.deletionDetails && Array.isArray(data.deletionDetails)) {
+                        console.log(`📊 Image deletion summary:`);
+                        console.log(`   Total images: ${data.totalImages}`);
+                        console.log(`   Successfully removed: ${data.imagesRemoved}`);
+                        data.deletionDetails.forEach((detail, idx) => {
+                            const status = detail.status === 'success' ? '✅' : detail.status === 'success (not found)' ? 'ℹ️' : '⚠️';
+                            console.log(`   ${status} Image ${idx + 1}: ${detail.filePath || detail.url} - ${detail.status}`);
+                        });
+                    }
+                    
                     if (data?.message?.toLowerCase().includes('success')) {
+                        alert(`✅ Vehicle deleted successfully!\n\nImages removed: ${data.imagesRemoved}/${data.totalImages}`);
                         fetchVehicles();
                     } else {
-                        alert(data?.message || 'Unable to delete');
+                        alert(`❌ ${data.message || 'Unable to delete vehicle'}`);
                     }
-                })
-                .catch(() => alert('Unable to delete'));        }
+                } else {
+                    alert('❌ Server returned invalid response');
+                }
+            })
+            .catch(err => {
+                showLoader(false);
+                console.error('❌ Delete error:', err);
+                alert('❌ Failed to delete vehicle. Please try again.');
+            });
+        }
 
         function incrementView(id) {
             fetch(`${API_URL}/vehicle/${id}/view`, { method: 'POST' }).catch(() => {});
@@ -1128,41 +1185,57 @@
             if (!chips.length) return;
             chips.forEach(button => {
                 button.addEventListener('click', () => {
-                    chips.forEach(el => el.classList.remove('active'));
-                    button.classList.add('active');
-
                     const type = button.dataset.type;
-                    const heroSearchEl = document.getElementById('search');
-                    const filterSearchEl = document.getElementById('filter-search');
-                    const heroLocationEl = document.getElementById('hero-location');
+                    const isAlreadyActive = button.classList.contains('active');
 
-                    // Set selected category and clear search
-                    if (type === 'cars') {
-                        selectedCategory = 'cars';
-                    } else if (type === 'bikes') {
-                        selectedCategory = 'bikes';
-                    } else if (type === 'ev') {
-                        selectedCategory = 'ev';
-                    } else {
+                    // Click on already-active chip = deselect (show all)
+                    if (isAlreadyActive) {
+                        chips.forEach(el => el.classList.remove('active'));
                         selectedCategory = null;
+                        console.log('🎯 Deselected category - showing all vehicles');
+                    } else {
+                        // Click on inactive chip = select it
+                        chips.forEach(el => el.classList.remove('active'));
+                        button.classList.add('active');
+
+                        if (type === 'cars') {
+                            selectedCategory = 'cars';
+                            console.log('🚗 Selected: Cars');
+                        } else if (type === 'bikes') {
+                            selectedCategory = 'bikes';
+                            console.log('🏍️ Selected: Bikes');
+                        } else if (type === 'ev') {
+                            selectedCategory = 'ev';
+                            console.log('⚡ Selected: Electric Vehicles');
+                        } else {
+                            selectedCategory = null;
+                        }
                     }
 
                     // Clear search fields to avoid conflicting filters
+                    const heroSearchEl = document.getElementById('search');
+                    const filterSearchEl = document.getElementById('filter-search');
+                    const heroLocationEl = document.getElementById('hero-location');
+                    const filterLocationEl = document.getElementById('filter-location');
+
                     if (heroSearchEl) heroSearchEl.value = '';
                     if (filterSearchEl) filterSearchEl.value = '';
                     if (heroLocationEl) heroLocationEl.value = '';
+                    if (filterLocationEl) filterLocationEl.value = '';
 
-                    console.log(`🏷️ Selected category chip: ${selectedCategory}`);
                     applyFilters();
                 });
             });
         }
 
-        // Initialize and set first chip to active (Cars)
+        // Initialize hero chips WITHOUT auto-selecting
+        // Allow all vehicles to show by default
         function initializeHeroChips() {
             const chips = document.querySelectorAll('.hero-chip');
             if (chips.length > 0) {
-                chips[0].click(); // Auto-select first chip (Cars)
+                // Set first chip visual state but don't apply filter
+                chips[0].classList.add('active');
+                console.log('🎨 Hero chips initialized - no auto-filter applied');
             }
         }
 
