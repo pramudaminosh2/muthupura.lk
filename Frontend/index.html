@@ -682,14 +682,24 @@
         /**
          * Get image URL from vehicle data
          * Images are now stored as Firebase Storage URLs directly
-         * @param {string|array} images - JSON string or array of image URLs
+         * @param {string|array} images - JSON string array, plain string URL, or array
          * @returns {string} - First image URL or fallback
          */
         function getImageUrl(images) {
             try {
                 let imageArray = [];
                 if (typeof images === 'string') {
-                    imageArray = JSON.parse(images || '[]');
+                    // Try to parse as JSON array first
+                    try {
+                        imageArray = JSON.parse(images);
+                        // Ensure it's actually an array
+                        if (!Array.isArray(imageArray)) {
+                            imageArray = [images]; // Treat as single image
+                        }
+                    } catch (parseError) {
+                        // If JSON.parse fails, treat as single image URL
+                        imageArray = [images];
+                    }
                 } else if (Array.isArray(images)) {
                     imageArray = images;
                 }
@@ -831,20 +841,28 @@
                     throw new Error('Invalid response format from server');
                 }
 
-                // STEP 1: Populate brand chips with loaded data
-                populateBrandChips();
+                // STEP 1: Populate brand chips with loaded data (optional - won't crash if fails)
+                try {
+                    populateBrandChips();
+                    console.log('✅ Brand chips populated successfully');
+                } catch (chipError) {
+                    console.warn('⚠️ Brand chips population failed (non-critical):', chipError.message);
+                    console.log('🔄 Continuing with vehicle rendering...');
+                }
 
                 // STEP 2: Ensure no filters are applied initially
                 selectedCategory = null; // Explicitly reset to null
                 console.log('🔄 Reset selectedCategory to null for initial load');
 
-                // STEP 3: Render ALL vehicles initially (no filtering)
+                // STEP 3: Render ALL vehicles initially (no filtering) - THIS MUST ALWAYS RUN
                 console.log('🎯 Rendering all vehicles initially (no filters applied)');
                 renderVehicles(vehiclesData); // Pass full dataset directly
 
                 // STEP 4: Make grid visible
                 const grid = document.getElementById('vehicle-list');
                 grid.classList.add('visible');
+                console.log('✅ Vehicle grid made visible');
+                console.log('🎉 Vehicle fetch and render completed successfully!');
 
             } catch (error) {
                 console.error('❌ Error fetching vehicles:', error);
@@ -928,9 +946,19 @@
 
             const container = document.getElementById('vehicle-list');
             const featured = document.getElementById('featured-list');
+
+            // SAFETY CHECK: Ensure containers exist
+            if (!container) {
+                console.error('❌ Vehicle list container (#vehicle-list) not found!');
+                return;
+            }
+            if (!featured) {
+                console.warn('⚠️ Featured list container (#featured-list) not found - skipping featured vehicles');
+            }
+
             container.classList.remove('visible');
             container.innerHTML = '';
-            featured.innerHTML = '';
+            if (featured) featured.innerHTML = '';
 
             // Safeguard: If no vehicles to show but we have data, show all vehicles
             if ((!list || list.length === 0) && vehiclesData && vehiclesData.length > 0) {
@@ -1119,9 +1147,17 @@
                 console.warn('⚠️ No vehicle data available for brand chips');
                 return;
             }
-            
-            const brandSet = [...new Set(vehiclesData.map(v => (v.brand || '').toString().trim()).filter(Boolean))].slice(0, 12);
+
+            // SAFETY CHECK: Ensure container exists before using it
             const container = document.getElementById('brand-buttons');
+            if (!container) {
+                console.warn('⚠️ Brand chips container (#brand-buttons) not found in HTML - skipping brand chips population');
+                return;
+            }
+
+            console.log('🔧 Populating brand chips...');
+
+            const brandSet = [...new Set(vehiclesData.map(v => (v.brand || '').toString().trim()).filter(Boolean))].slice(0, 12);
             container.innerHTML = '';
 
             brandSet.forEach(brand => {
@@ -1157,6 +1193,8 @@
                 };
                 container.appendChild(chip);
             });
+
+            console.log(`✅ Brand chips populated: ${brandSet.length} brands + ${presets.length} presets`);
         }
 
         function deleteVehicle(id) {

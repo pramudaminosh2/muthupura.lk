@@ -88,7 +88,17 @@
             try {
                 let imageArray = [];
                 if (typeof images === 'string') {
-                    imageArray = JSON.parse(images || '[]');
+                    // Try to parse as JSON array first
+                    try {
+                        imageArray = JSON.parse(images);
+                        // Ensure it's actually an array
+                        if (!Array.isArray(imageArray)) {
+                            imageArray = [images]; // Treat as single image
+                        }
+                    } catch (parseError) {
+                        // If JSON.parse fails, treat as single image URL
+                        imageArray = [images];
+                    }
                 } else if (Array.isArray(images)) {
                     imageArray = images;
                 }

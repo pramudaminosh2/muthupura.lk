@@ -28,6 +28,26 @@ function extractFilePathFromUrl(imageUrl) {
 
         console.log(`🔍 Input URL: ${imageUrl.substring(0, 100)}...`);
 
+        // NEW LOGIC: Handle Google Cloud Storage URLs
+        // Format: https://storage.googleapis.com/muthupuralk.firebasestorage.app/vehicles/filename.jpg
+
+        const bucketPrefix = 'https://storage.googleapis.com/muthupuralk.firebasestorage.app/';
+
+        if (imageUrl.startsWith(bucketPrefix)) {
+            // Remove the bucket prefix to get the file path
+            const filePath = imageUrl.substring(bucketPrefix.length);
+
+            // Decode URL encoding (%20 → space, etc.)
+            const decodedPath = decodeURIComponent(filePath);
+
+            console.log(`✅ GCS extraction - extracted: ${decodedPath}`);
+            console.log(`📁 Final result: ${decodedPath}`);
+            return decodedPath;
+        }
+
+        // Fallback: Try old Firebase /o/ format for backward compatibility
+        console.log('⚠️  URL does not match GCS format, trying legacy Firebase format...');
+
         // URL format: https://firebasestorage.googleapis.com/v0/b/{bucket}/o/{filePath}?alt=media&token={token}
         let filePath = null;
 
@@ -40,13 +60,13 @@ function extractFilePathFromUrl(imageUrl) {
         const filePathMatch = pathname.match(/\/o\/(.+)$/);
         if (filePathMatch && filePathMatch[1]) {
             filePath = decodeURIComponent(filePathMatch[1]);
-            console.log(`✅ URL parsing method - extracted: ${filePath}`);
+            console.log(`✅ Legacy URL parsing method - extracted: ${filePath}`);
         } else {
             // Fallback: regex method for problematic URLs
             const regexMatch = imageUrl.match(/\/o\/([^?]+)/);
             if (regexMatch && regexMatch[1]) {
                 filePath = decodeURIComponent(regexMatch[1]);
-                console.log(`✅ Fallback regex method - extracted: ${filePath}`);
+                console.log(`✅ Legacy fallback regex method - extracted: ${filePath}`);
             }
         }
 
@@ -99,6 +119,9 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Serve static files from Frontend directory
+app.use(express.static('../Frontend'));
 
 passport.serializeUser((user, done) => {
     done(null, user.id);

@@ -94,7 +94,17 @@
             try {
                 let imageArray = [];
                 if (typeof images === 'string') {
-                    imageArray = JSON.parse(images || '[]');
+                    // Try to parse as JSON array first
+                    try {
+                        imageArray = JSON.parse(images);
+                        // Ensure it's actually an array
+                        if (!Array.isArray(imageArray)) {
+                            imageArray = [images]; // Treat as single image
+                        }
+                    } catch (parseError) {
+                        // If JSON.parse fails, treat as single image URL
+                        imageArray = [images];
+                    }
                 } else if (Array.isArray(images)) {
                     imageArray = images;
                 }
@@ -172,9 +182,16 @@
             if (typeof v.images === 'string' && v.images.trim()) {
                 try {
                     const parsed = JSON.parse(v.images);
-                    detailImagesArray = Array.isArray(parsed) ? parsed : [];
-                } catch (e) {
-                    console.warn('⚠️ Failed to parse images JSON:', e.message);
+                    // Ensure it's actually an array
+                    if (Array.isArray(parsed)) {
+                        detailImagesArray = parsed;
+                    } else {
+                        // If parsed but not an array, treat as single image
+                        detailImagesArray = [v.images];
+                    }
+                } catch (parseError) {
+                    // If JSON.parse fails, treat as single image URL
+                    detailImagesArray = [v.images];
                 }
             } else if (Array.isArray(v.images)) {
                 detailImagesArray = v.images;
