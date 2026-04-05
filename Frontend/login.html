@@ -397,28 +397,30 @@
         let confirmationResult = null;
 
         function initRecaptcha() {
-            if (recaptchaVerifier) {
+            if (window.recaptchaVerifier) {
                 console.log('✅ RecaptchaVerifier already initialized');
+                recaptchaVerifier = window.recaptchaVerifier;
                 return;
             }
 
             try {
                 console.log('🔏 Initializing RecaptchaVerifier...');
-                recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+                window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
                     size: 'normal',
                     callback: (response) => {
                         console.log('✅ Recaptcha verified successfully');
                     },
                     onExpired: () => {
                         console.warn('⚠️ Recaptcha expired, will re-initialize on next OTP attempt');
-                        recaptchaVerifier = null;
-                    }
+                        window.recaptchaVerifier = null;                        window.recaptchaVerifier = null;                    }
                 }, auth);
+                recaptchaVerifier = window.recaptchaVerifier;
 
                 console.log('✅ RecaptchaVerifier initialized successfully');
             } catch (err) {
                 console.error('❌ RecaptchaVerifier initialization failed:', err);
                 recaptchaVerifier = null;
+                window.recaptchaVerifier = null;
                 throw err;
             }
         }
@@ -595,7 +597,7 @@
                     try {
                         console.log('📱 Sending OTP for phone:', rawPhone);
 
-                        if (!recaptchaVerifier) {
+                        if (!recaptchaVerifier || !window.recaptchaVerifier) {
                             console.log('🔏 RecaptchaVerifier not ready, reinitializing...');
                             initRecaptcha();
                         }
@@ -615,6 +617,7 @@
                         console.error('Error message:', err.message);
 
                         recaptchaVerifier = null;
+                        window.recaptchaVerifier = null;
                         confirmationResult = null;
 
                         let errorMsg = 'Unable to send OTP. Please try again.';
@@ -647,6 +650,7 @@
                         const otpVerificationEl = getEl('otp-verification');
                         if (otpVerificationEl) otpVerificationEl.style.display = 'none';
                         recaptchaVerifier = null;
+                        window.recaptchaVerifier = null;
                         return;
                     }
 
