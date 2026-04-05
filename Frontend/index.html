@@ -445,7 +445,7 @@
 <body>
     <div id="loader"></div>
     <div class="container">
-        <nav class="navbar">
+        <nav class="navbar" id="navbar">
             <a class="nav-brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk"><span>Muthupura.lk</span></a>
             <div class="nav-links">
                 <a href="index.html">Home</a>
@@ -455,6 +455,7 @@
                 <a href="contact.html">Contact Us</a>
                 <a id="auth-link" href="login.html"><button id="auth-btn" type="button">Login</button></a>
                 <a id="admin-link" href="admin.html" style="display:none;"><button type="button">Admin</button></a>
+                <span id="user-greeting" style="display:none; color:#fff; font-weight:700; margin-left:12px;"></span>
             </div>
             <div class="hamburger" id="navbar-hamburger">
                 <span></span>
@@ -637,92 +638,114 @@
             try { return JSON.parse(atob(token.split('.')[1])); } catch { return null; }
         }
 
+        const getEl = (id) => document.getElementById(id);
+
         async function updateNavigation() {
-            let payload = getTokenPayload();
-            const authLink = document.getElementById('auth-link');
-            const authBtn = document.getElementById('auth-btn');
-            const adminLink = document.getElementById('admin-link');
-            const myListings = document.getElementById('mylistings-link');
-            const userGreeting = document.getElementById('user-greeting');
+            try {
+                let payload = getTokenPayload();
+                const authLink = getEl('auth-link');
+                const authBtn = getEl('auth-btn');
+                const adminLink = getEl('admin-link');
+                const myListings = getEl('mylistings-link');
+                const userGreeting = getEl('user-greeting');
 
-            if (!payload || (payload.exp && Date.now() >= payload.exp * 1000)) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('userName');
-                if (userGreeting) userGreeting.style.display = 'none';
-                payload = null;
-            }
-
-            if (payload && !payload.name) {
-                try {
-                    const res = await fetch(`${API_URL}/profile`, {
-                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                    });
-                    if (res.ok) {
-                        const profile = await res.json();
-                        if (profile.name) {
-                            payload.name = profile.name;
-                        }
-                    }
-                } catch (err) {
-                    console.warn('Failed to fetch profile', err);
+                if (!payload || (payload.exp && Date.now() >= payload.exp * 1000)) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('userName');
+                    if (userGreeting) userGreeting.style.display = 'none';
+                    payload = null;
                 }
-            }
 
-            if (payload?.role === 'admin') {
-                adminLink.style.display = 'inline-flex';
-            } else {
-                adminLink.style.display = 'none';
-            }
+                if (payload && !payload.name) {
+                    try {
+                        const res = await fetch(`${API_URL}/profile`, {
+                            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                        });
+                        if (res.ok) {
+                            const profile = await res.json();
+                            if (profile.name) {
+                                payload.name = profile.name;
+                            }
+                        }
+                    } catch (err) {
+                        console.warn('Failed to fetch profile', err);
+                    }
+                }
 
-            if (payload) {
-                myListings.style.display = 'inline-flex';
-                const displayName = payload.name || localStorage.getItem('userName') || payload.email || '';
-                userGreeting.textContent = displayName ? `Hi, ${displayName}` : 'Hi';
-                userGreeting.style.display = 'inline-flex';
+                if (adminLink) {
+                    adminLink.style.display = payload?.role === 'admin' ? 'inline-flex' : 'none';
+                }
 
-                authBtn.textContent = 'Logout';
-                authLink.href = '#';
-                authBtn.onclick = () => { localStorage.removeItem('token'); location.reload(); };
-            } else {
-                myListings.style.display = 'none';
-                userGreeting.style.display = 'none';
+                if (payload) {
+                    if (myListings) myListings.style.display = 'inline-flex';
+                    const displayName = payload.name || localStorage.getItem('userName') || payload.email || '';
+                    if (userGreeting) {
+                        userGreeting.textContent = displayName ? `Hi, ${displayName}` : 'Hi';
+                        userGreeting.style.display = 'inline-flex';
+                    }
 
-                authBtn.textContent = 'Login';
-                authLink.href = 'login.html';
-                authBtn.onclick = null;
+                    if (authBtn) {
+                        authBtn.textContent = 'Logout';
+                        authBtn.onclick = () => { localStorage.removeItem('token'); location.reload(); };
+                    }
+                    if (authLink) authLink.href = '#';
+                } else {
+                    if (myListings) myListings.style.display = 'none';
+                    if (userGreeting) userGreeting.style.display = 'none';
+                    if (authBtn) {
+                        authBtn.textContent = 'Login';
+                        authBtn.onclick = null;
+                    }
+                    if (authLink) authLink.href = 'login.html';
+                }
+            } catch (err) {
+                console.error('Navigation error:', err);
             }
         }
 
-        function showLoader(show) { document.getElementById('loader').style.display = show ? 'block' : 'none'; }
+        function showLoader(show) {
+            const loader = getEl('loader');
+            if (loader) loader.style.display = show ? 'block' : 'none';
+        }
+
         function showMessage(type, message) {
-            const el = document.getElementById(type === 'error' ? 'error-message' : 'empty-message');
+            const el = getEl(type === 'error' ? 'error-message' : 'empty-message');
+            if (!el) return;
             el.textContent = message;
             el.classList.remove('hidden');
         }
+
         function hideMessages() {
-            document.getElementById('error-message').classList.add('hidden');
-            document.getElementById('empty-message').classList.add('hidden');
+            const errorEl = getEl('error-message');
+            const emptyEl = getEl('empty-message');
+            if (errorEl) errorEl.classList.add('hidden');
+            if (emptyEl) emptyEl.classList.add('hidden');
         }
 
         function updateLocationSuggestions() {
-            const query = document.getElementById('filter-location').value.trim().toLowerCase();
-            const list = document.getElementById('location-suggestions');
+            const locationInput = getEl('filter-location');
+            const list = getEl('location-suggestions');
+            if (!locationInput || !list) return;
+
+            const query = locationInput.value.trim().toLowerCase();
             if (!query) {
                 list.classList.add('hidden');
                 list.innerHTML = '';
                 return;
             }
+
             const matches = LOCATION_OPTIONS.filter(loc => loc.toLowerCase().includes(query));
             if (!matches.length) {
                 list.classList.add('hidden');
                 list.innerHTML = '';
                 return;
             }
+
             list.innerHTML = matches.map(loc => `<li data-loc="${loc}">${loc}</li>`).join('');
             list.classList.remove('hidden');
             list.querySelectorAll('li').forEach(li => {
                 li.addEventListener('click', () => {
-                    document.getElementById('filter-location').value = li.dataset.loc;
+                    if (locationInput) locationInput.value = li.dataset.loc;
                     list.classList.add('hidden');
                     applyFilters();
                 });
@@ -731,7 +754,8 @@
 
         document.addEventListener('click', (event) => {
             if (!event.target.closest('.filter-field')) {
-                document.getElementById('location-suggestions').classList.add('hidden');
+                const suggestions = getEl('location-suggestions');
+                if (suggestions) suggestions.classList.add('hidden');
             }
         });
 
@@ -779,8 +803,8 @@
                 renderVehicles(vehiclesData); // Pass full dataset directly
 
                 // STEP 4: Make grid visible
-                const grid = document.getElementById('vehicle-list');
-                grid.classList.add('visible');
+                const grid = getEl('vehicle-list');
+                if (grid) grid.classList.add('visible');
                 console.log('✅ Vehicle grid made visible');
                 console.log('🎉 Vehicle fetch and render completed successfully!');
 
@@ -864,8 +888,8 @@
         function renderVehicles(list) {
             console.log(`🎨 Rendering ${list.length} vehicles`);
 
-            const container = document.getElementById('vehicle-list');
-            const featured = document.getElementById('featured-list');
+            const container = getEl('vehicle-list');
+            const featured = getEl('featured-list');
 
             // SAFETY CHECK: Ensure containers exist
             if (!container) {
@@ -909,7 +933,8 @@
             }
 
             container.classList.add('visible');
-            document.getElementById('hero').scrollIntoView({ behavior: 'smooth' });
+            const hero = getEl('hero');
+            if (hero) hero.scrollIntoView({ behavior: 'smooth' });
 
             console.log(`✅ Successfully rendered ${sorted.length} vehicles`);
         }
@@ -926,18 +951,21 @@
             console.log(`🔍 Current selectedCategory: ${selectedCategory || 'null (showing all)'}`);
 
             // STEP 2: Get filter values
-            const brand = document.getElementById('filter-brand').value.trim().toLowerCase();
-            const minPrice = Number(document.getElementById('filter-min-price').value);
-            const maxPrice = Number(document.getElementById('filter-max-price').value);
-            const year = document.getElementById('filter-year').value.trim();
+            const brandEl = getEl('filter-brand');
+            const minPriceEl = getEl('filter-min-price');
+            const maxPriceEl = getEl('filter-max-price');
+            const yearEl = getEl('filter-year');
+            const heroSearchEl = getEl('search');
+            const filterSearchEl = getEl('filter-search');
+            const heroLocationEl = getEl('hero-location');
+            const filterLocationEl = getEl('filter-location');
 
-            const heroSearchEl = document.getElementById('search');
-            const filterSearchEl = document.getElementById('filter-search');
-            const heroLocationEl = document.getElementById('hero-location');
-            const filterLocationEl = document.getElementById('filter-location');
-
-            const searchValue = ((heroSearchEl && heroSearchEl.value.trim()) || (filterSearchEl && filterSearchEl.value.trim()) || '').toLowerCase();
-            const locationValue = ((heroLocationEl && heroLocationEl.value.trim()) || (filterLocationEl && filterLocationEl.value.trim()) || '').toLowerCase();
+            const brand = (brandEl?.value || '').trim().toLowerCase();
+            const minPrice = Number(minPriceEl?.value || 0);
+            const maxPrice = Number(maxPriceEl?.value || 0);
+            const year = (yearEl?.value || '').trim();
+            const searchValue = ((heroSearchEl?.value || '').trim() || (filterSearchEl?.value || '').trim()).toLowerCase();
+            const locationValue = ((heroLocationEl?.value || '').trim() || (filterLocationEl?.value || '').trim()).toLowerCase();
 
             if (heroSearchEl && filterSearchEl && heroSearchEl.value !== filterSearchEl.value) {
                 heroSearchEl.value = searchValue;
@@ -1027,19 +1055,20 @@
 
             // STEP 6: Render and show
             renderVehicles(filtered);
-            const grid = document.getElementById('vehicle-list');
-            grid.classList.add('visible');
+            const grid = getEl('vehicle-list');
+            if (grid) grid.classList.add('visible');
         }
 
         function clearFilters() {
             ['filter-brand','filter-min-price','filter-max-price','filter-year','search','filter-search','hero-location','filter-location'].forEach(id => {
-                const el = document.getElementById(id);
+                const el = getEl(id);
                 if (el) el.value = '';
             });
             // Remove active state from all chips (including hero chips)
             document.querySelectorAll('.chip.active').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.hero-chip.active').forEach(el => el.classList.remove('active'));
-            document.getElementById('location-suggestions').classList.add('hidden');
+            const suggestions = getEl('location-suggestions');
+            if (suggestions) suggestions.classList.add('hidden');
             
             // Reset category filter to null - this shows ALL vehicles
             selectedCategory = null;
@@ -1048,10 +1077,10 @@
         }
 
         function renderSkeletons(count = 8) {
-            const container = document.getElementById('vehicle-list');
-            const featured = document.getElementById('featured-list');
-            container.innerHTML = '';
-            featured.innerHTML = '';
+            const container = getEl('vehicle-list');
+            const featured = getEl('featured-list');
+            if (container) container.innerHTML = '';
+            if (featured) featured.innerHTML = '';
 
             for (let i = 0; i < count; i++) {
                 const skeleton = document.createElement('div');
@@ -1069,7 +1098,7 @@
             }
 
             // SAFETY CHECK: Ensure container exists before using it
-            const container = document.getElementById('brand-buttons');
+            const container = getEl('brand-buttons');
             if (!container) {
                 console.warn('⚠️ Brand chips container (#brand-buttons) not found in HTML - skipping brand chips population');
                 return;
@@ -1086,7 +1115,8 @@
                 chip.className = 'chip';
                 chip.textContent = brand;
                 chip.onclick = () => {
-                    document.getElementById('filter-brand').value = brand;
+                    const filterBrand = getEl('filter-brand');
+                    if (filterBrand) filterBrand.value = brand;
                     document.querySelectorAll('.chip.active').forEach(el => el.classList.remove('active'));
                     chip.classList.add('active');
                     applyFilters();
@@ -1101,14 +1131,14 @@
                 chip.className = 'chip';
                 chip.textContent = set;
                 chip.onclick = () => {
-                    const min = document.getElementById('filter-min-price');
-                    const max = document.getElementById('filter-max-price');
+                    const min = getEl('filter-min-price');
+                    const max = getEl('filter-max-price');
+                    const filterBrand = getEl('filter-brand');
                     document.querySelectorAll('.chip.active').forEach(el => el.classList.remove('active'));
                     chip.classList.add('active');
-                    document.getElementById('filter-brand').value = '';
-                    if (set === '<30k') { min.value = 0; max.value = 30000; }
-                    else if (set === '30k-70k') { min.value = 30000; max.value = 70000; }
-                    else { min.value = 70000; max.value = 0; }
+                    if (filterBrand) filterBrand.value = '';
+                    if (min) min.value = 0;
+                    if (max) max.value = set === '<30k' ? 30000 : set === '30k-70k' ? 70000 : 0;
                     applyFilters();
                 };
                 container.appendChild(chip);
@@ -1176,19 +1206,20 @@
 
         function setupEnterKey() {
             ['filter-brand','filter-location','filter-min-price','filter-max-price','filter-year','search','filter-search','hero-location'].forEach(id => {
-                const el = document.getElementById(id);
+                const el = getEl(id);
                 if (!el) return;
                 el.addEventListener('keypress', e => {
                     if (e.key === 'Enter') { 
                         e.preventDefault();
                         selectedCategory = null; // Reset category when using other filters
                         applyFilters();
-                        document.getElementById('location-suggestions').classList.add('hidden');
+                        const suggestions = getEl('location-suggestions');
+                        if (suggestions) suggestions.classList.add('hidden');
                     }
                 });
             });
 
-            const locationEl = document.getElementById('filter-location');
+            const locationEl = getEl('filter-location');
             if (locationEl) {
                 locationEl.addEventListener('input', () => {
                     selectedCategory = null; // Reset category when using location filter
@@ -1237,10 +1268,10 @@
                     }
 
                     // Clear search fields to avoid conflicting filters
-                    const heroSearchEl = document.getElementById('search');
-                    const filterSearchEl = document.getElementById('filter-search');
-                    const heroLocationEl = document.getElementById('hero-location');
-                    const filterLocationEl = document.getElementById('filter-location');
+                    const heroSearchEl = getEl('search');
+                    const filterSearchEl = getEl('filter-search');
+                    const heroLocationEl = getEl('hero-location');
+                    const filterLocationEl = getEl('filter-location');
 
                     if (heroSearchEl) heroSearchEl.value = '';
                     if (filterSearchEl) filterSearchEl.value = '';
@@ -1264,21 +1295,24 @@
             }
         }
 
-        updateNavigation();
-        setupEnterKey();
-        setupHeroChips();
-        console.log('🚀 Starting application - initializing vehicle filtering system');
-        fetchVehicles();
-        // Initialize chips after a brief delay to ensure DOM is ready
-        setTimeout(() => {
-            initializeHeroChips();
-            console.log('✅ Application initialization complete');
-        }, 100);
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Navbar element:', getEl('navbar'));
+            updateNavigation();
+            setupEnterKey();
+            setupHeroChips();
+            console.log('🚀 Starting application - initializing vehicle filtering system');
+            fetchVehicles();
+            // Initialize chips after a brief delay to ensure DOM is ready
+            setTimeout(() => {
+                initializeHeroChips();
+                console.log('✅ Application initialization complete');
+            }, 100);
+        });
 
         // ===== HAMBURGER MENU =====
         function setupHamburgerMenu() {
-            const hamburger = document.getElementById('navbar-hamburger');
-            const mobileMenu = document.getElementById('mobile-menu');
+            const hamburger = getEl('navbar-hamburger');
+            const mobileMenu = getEl('mobile-menu');
             if (!hamburger || !mobileMenu) return;
 
             hamburger.addEventListener('click', () => {
@@ -1296,15 +1330,15 @@
 
             // Sync mobile menu auth links with desktop
             const syncAuthLinks = () => {
-                const desktopAuthLink = document.getElementById('auth-link');
-                const desktopAuthBtn = document.getElementById('auth-btn');
-                const mobileAuthLink = document.getElementById('auth-link-mobile');
+                const desktopAuthLink = getEl('auth-link');
+                const desktopAuthBtn = getEl('auth-btn');
+                const mobileAuthLink = getEl('auth-link-mobile');
                 
-                const desktopMyListings = document.getElementById('mylistings-link');
-                const mobileMyListings = document.getElementById('mylistings-link-mobile');
+                const desktopMyListings = getEl('mylistings-link');
+                const mobileMyListings = getEl('mylistings-link-mobile');
                 
-                const desktopAdmin = document.getElementById('admin-link');
-                const mobileAdmin = document.getElementById('admin-link-mobile');
+                const desktopAdmin = getEl('admin-link');
+                const mobileAdmin = getEl('admin-link-mobile');
 
                 if (desktopAuthBtn) {
                     if (mobileAuthLink) {

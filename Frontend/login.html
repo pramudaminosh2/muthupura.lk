@@ -260,7 +260,7 @@
 </head>
 <body>
     <div class="frame">
-        <nav class="navbar">
+        <nav class="navbar" id="navbar">
             <a class="nav-brand" href="index.html"><img src="logo.PNG" alt="logo"><span>Muthupura.lk</span></a>
             <div class="nav-links">
                 <a href="index.html">Home</a>
@@ -414,6 +414,7 @@
         }
 
         const API_URL = API_BASE_URL;
+        const getEl = (id) => document.getElementById(id);
 
         function getToken() {
             return localStorage.getItem('token');
@@ -434,19 +435,21 @@
         }
 
         function updateNav(user) {
-            const adminLink = document.getElementById('admin-link');
-            const userGreeting = document.getElementById('user-greeting');
-            const logoutBtn = document.getElementById('logout-btn');
+            const adminLink = getEl('admin-link');
+            const userGreeting = getEl('user-greeting');
+            const logoutBtn = getEl('logout-btn');
 
             if (user) {
-                userGreeting.textContent = `Hello, ${user.name || user.email}`;
-                userGreeting.style.display = 'inline-flex';
-                logoutBtn.style.display = 'inline-flex';
-                adminLink.style.display = user.role === 'admin' ? 'inline-flex' : 'none';
+                if (userGreeting) {
+                    userGreeting.textContent = `Hello, ${user.name || user.email}`;
+                    userGreeting.style.display = 'inline-flex';
+                }
+                if (logoutBtn) logoutBtn.style.display = 'inline-flex';
+                if (adminLink) adminLink.style.display = user.role === 'admin' ? 'inline-flex' : 'none';
             } else {
-                userGreeting.style.display = 'none';
-                logoutBtn.style.display = 'none';
-                adminLink.style.display = 'none';
+                if (userGreeting) userGreeting.style.display = 'none';
+                if (logoutBtn) logoutBtn.style.display = 'none';
+                if (adminLink) adminLink.style.display = 'none';
             }
         }
 
@@ -455,7 +458,7 @@
         }
 
         function showFieldError(id, message) {
-            const el = document.getElementById(id);
+            const el = getEl(id);
             if (el) {
                 el.textContent = message;
                 el.style.display = message ? 'block' : 'none';
@@ -470,38 +473,39 @@
         }
 
         function showAlert(message, type = 'error') {
-            const alertBox = document.getElementById('alert-box');
+            const alertBox = getEl('alert-box');
+            if (!alertBox) return;
             alertBox.textContent = message;
             alertBox.className = `alert ${type}`;
             alertBox.style.display = 'block';
         }
 
         function hideAlert() {
-            const alertBox = document.getElementById('alert-box');
-            alertBox.style.display = 'none';
+            const alertBox = getEl('alert-box');
+            if (alertBox) alertBox.style.display = 'none';
         }
 
         function setMode(mode) {
             const isLogin = mode === 'login';
-            const loginPanel = document.getElementById('login-panel');
-            const registerPanel = document.getElementById('register-panel');
-            const loginBtn = document.getElementById('login-mode-btn');
-            const registerBtn = document.getElementById('register-mode-btn');
+            const loginPanel = getEl('login-panel');
+            const registerPanel = getEl('register-panel');
+            const loginBtn = getEl('login-mode-btn');
+            const registerBtn = getEl('register-mode-btn');
             
             if (isLogin) {
-                loginPanel.classList.add('active');
-                loginPanel.classList.remove('hidden');
-                registerPanel.classList.remove('active');
-                registerPanel.classList.add('hidden');
-                loginBtn.classList.add('active');
-                registerBtn.classList.remove('active');
+                if (loginPanel) loginPanel.classList.add('active');
+                if (loginPanel) loginPanel.classList.remove('hidden');
+                if (registerPanel) registerPanel.classList.remove('active');
+                if (registerPanel) registerPanel.classList.add('hidden');
+                if (loginBtn) loginBtn.classList.add('active');
+                if (registerBtn) registerBtn.classList.remove('active');
             } else {
-                registerPanel.classList.add('active');
-                registerPanel.classList.remove('hidden');
-                loginPanel.classList.remove('active');
-                loginPanel.classList.add('hidden');
-                registerBtn.classList.add('active');
-                loginBtn.classList.remove('active');
+                if (registerPanel) registerPanel.classList.add('active');
+                if (registerPanel) registerPanel.classList.remove('hidden');
+                if (loginPanel) loginPanel.classList.remove('active');
+                if (loginPanel) loginPanel.classList.add('hidden');
+                if (registerBtn) registerBtn.classList.add('active');
+                if (loginBtn) loginBtn.classList.remove('active');
             }
             hideAlert();
             clearFieldErrors();
@@ -544,140 +548,282 @@
             }
         }
 
-        document.getElementById('google-login-btn').addEventListener('click', () => {
-            window.open(`${API_URL}/auth/google`, 'GoogleAuth', 'width=500,height=650');
-        });
-
-        document.getElementById('facebook-login-btn').addEventListener('click', () => {
-            window.open(`${API_URL}/auth/facebook`, 'FacebookAuth', 'width=500,height=650');
-        });
-
-        document.getElementById('send-otp-btn').addEventListener('click', async () => {
-            const phoneEl = document.getElementById('otp-phone');
-            const rawPhone = phoneEl?.value.trim() || '';
-            
-            if (!rawPhone || !/^\+?[0-9]{7,15}$/.test(rawPhone)) {
-                showAlert('Please enter a valid phone number including country code (e.g., +94712345678)', 'error');
-                return;
-            }
-
-            try {
-                console.log('📱 Sending OTP for phone:', rawPhone);
-                
-                // Initialize or reinitialize recaptcha if needed
-                if (!recaptchaVerifier) {
-                    console.log('🔏 RecaptchaVerifier not ready, reinitializing...');
-                    initRecaptcha();
-                }
-
-                showAlert('Sending OTP...', 'success');
-                console.log('📤 Calling signInWithPhoneNumber...');
-                
-                confirmationResult = await signInWithPhoneNumber(auth, rawPhone, recaptchaVerifier);
-                
-                console.log('✅ OTP sent successfully');
-                showAlert('✅ OTP sent via Firebase. Check your phone.', 'success');
-                document.getElementById('otp-verification').style.display = 'block';
-                
-            } catch (err) {
-                console.error('❌ Firebase OTP error:', err);
-                console.error('Error code:', err.code);
-                console.error('Error message:', err.message);
-                
-                // Clear recaptcha on error so it can be reinitialized
-                recaptchaVerifier = null;
-                confirmationResult = null;
-                
-                let errorMsg = 'Unable to send OTP. Please try again.';
-                if (err.code === 'auth/invalid-phone-number') {
-                    errorMsg = 'Invalid phone number. Please include country code (e.g., +94712345678)';
-                } else if (err.code === 'auth/quota-exceeded') {
-                    errorMsg = 'Too many attempts. Please try again later.';
-                } else if (err.code === 'auth/internal-error') {
-                    errorMsg = 'Firebase service error. Please check your phone number and try again.';
-                }
-                
-                showAlert(errorMsg, 'error');
-            }
-        });
-
-        document.getElementById('verify-otp-btn').addEventListener('click', async () => {
-            const otp = document.getElementById('otp-code').value.trim();
-            
-            if (!otp || otp.length < 6) {
-                showAlert('Please enter the 6-digit OTP code', 'error');
-                return;
-            }
-
-            if (!confirmationResult) {
-                showAlert('⚠️ OTP session expired. Press Send OTP again.', 'error');
-                document.getElementById('otp-verification').style.display = 'none';
-                recaptchaVerifier = null;
-                return;
-            }
-
-            try {
-                console.log('🔐 Verifying OTP...');
-                const result = await confirmationResult.confirm(otp);
-                const firebasePhone = result.user?.phoneNumber;
-                
-                console.log('✅ OTP verified successfully');
-                console.log('Firebase phone:', firebasePhone);
-
-                if (!firebasePhone) {
-                    console.error('❌ No phone number from Firebase');
-                    showAlert('Could not determine phone from Firebase account', 'error');
-                    return;
-                }
-
-                console.log('📤 Logging in with phone:', firebasePhone);
-                const res = await fetch(`${API_URL}/otp-login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone: firebasePhone })
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Navbar element:', getEl('navbar'));
+            const googleBtn = getEl('google-login-btn');
+            if (googleBtn) {
+                googleBtn.addEventListener('click', () => {
+                    window.open(`${API_URL}/auth/google`, 'GoogleAuth', 'width=500,height=650');
                 });
-
-                const data = await res.json();
-                if (!res.ok) {
-                    showAlert(data.message || 'OTP login failed', 'error');
-                    return;
-                }
-
-                if (data.isNewUser) {
-                    console.log('📋 New user detected, redirecting to complete profile');
-                    localStorage.setItem('pendingPhone', data.phone || firebasePhone.replace(/\D/g, ''));
-                    showAlert('Phone verified. Complete profile to continue.', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'complete-profile.html';
-                    }, 700);
-                    return;
-                }
-
-                console.log('✅ OTP login successful');
-                setToken(data.token, data.user?.name || '');
-                updateNav(data.user || { role: data.role || 'user' });
-                showAlert('Login successful! Redirecting...', 'success');
-                setTimeout(() => {
-                    if (data.role === 'admin') {
-                        window.location.href = 'admin.html';
-                    } else {
-                        window.location.href = 'index.html';
-                    }
-                }, 700);
-            } catch (err) {
-                console.error('❌ OTP verification failed:', err);
-                console.error('Error code:', err.code);
-                console.error('Error message:', err.message);
-                
-                let errorMsg = 'OTP verification failed. Check code and try again.';
-                if (err.code === 'auth/invalid-verification-code') {
-                    errorMsg = 'Invalid OTP code. Please check and try again.';
-                } else if (err.code === 'auth/code-expired') {
-                    errorMsg = 'OTP has expired. Press Send OTP to get a new code.';
-                }
-                
-                showAlert(errorMsg, 'error');
             }
+
+            const facebookBtn = getEl('facebook-login-btn');
+            if (facebookBtn) {
+                facebookBtn.addEventListener('click', () => {
+                    window.open(`${API_URL}/auth/facebook`, 'FacebookAuth', 'width=500,height=650');
+                });
+            }
+
+            const sendOtpBtn = getEl('send-otp-btn');
+            if (sendOtpBtn) {
+                sendOtpBtn.addEventListener('click', async () => {
+                    const phoneEl = getEl('otp-phone');
+                    const rawPhone = phoneEl?.value.trim() || '';
+
+                    if (!rawPhone || !/^\+?[0-9]{7,15}$/.test(rawPhone)) {
+                        showAlert('Please enter a valid phone number including country code (e.g., +94712345678)', 'error');
+                        return;
+                    }
+
+                    try {
+                        console.log('📱 Sending OTP for phone:', rawPhone);
+
+                        if (!recaptchaVerifier) {
+                            console.log('🔏 RecaptchaVerifier not ready, reinitializing...');
+                            initRecaptcha();
+                        }
+
+                        showAlert('Sending OTP...', 'success');
+                        console.log('📤 Calling signInWithPhoneNumber...');
+
+                        confirmationResult = await signInWithPhoneNumber(auth, rawPhone, recaptchaVerifier);
+
+                        console.log('✅ OTP sent successfully');
+                        showAlert('✅ OTP sent via Firebase. Check your phone.', 'success');
+                        const otpVerificationEl = getEl('otp-verification');
+                        if (otpVerificationEl) otpVerificationEl.style.display = 'block';
+                    } catch (err) {
+                        console.error('❌ Firebase OTP error:', err);
+                        console.error('Error code:', err.code);
+                        console.error('Error message:', err.message);
+
+                        recaptchaVerifier = null;
+                        confirmationResult = null;
+
+                        let errorMsg = 'Unable to send OTP. Please try again.';
+                        if (err.code === 'auth/invalid-phone-number') {
+                            errorMsg = 'Invalid phone number. Please include country code (e.g., +94712345678)';
+                        } else if (err.code === 'auth/quota-exceeded') {
+                            errorMsg = 'Too many attempts. Please try again later.';
+                        } else if (err.code === 'auth/internal-error') {
+                            errorMsg = 'Firebase service error. Please check your phone number and try again.';
+                        }
+
+                        showAlert(errorMsg, 'error');
+                    }
+                });
+            }
+
+            const verifyOtpBtn = getEl('verify-otp-btn');
+            if (verifyOtpBtn) {
+                verifyOtpBtn.addEventListener('click', async () => {
+                    const otpInput = getEl('otp-code');
+                    const otp = otpInput?.value.trim() || '';
+
+                    if (!otp || otp.length < 6) {
+                        showAlert('Please enter the 6-digit OTP code', 'error');
+                        return;
+                    }
+
+                    if (!confirmationResult) {
+                        showAlert('⚠️ OTP session expired. Press Send OTP again.', 'error');
+                        const otpVerificationEl = getEl('otp-verification');
+                        if (otpVerificationEl) otpVerificationEl.style.display = 'none';
+                        recaptchaVerifier = null;
+                        return;
+                    }
+
+                    try {
+                        console.log('🔐 Verifying OTP...');
+                        const result = await confirmationResult.confirm(otp);
+                        const firebasePhone = result.user?.phoneNumber;
+
+                        console.log('✅ OTP verified successfully');
+                        console.log('Firebase phone:', firebasePhone);
+
+                        if (!firebasePhone) {
+                            console.error('❌ No phone number from Firebase');
+                            showAlert('Could not determine phone from Firebase account', 'error');
+                            return;
+                        }
+
+                        console.log('📤 Logging in with phone:', firebasePhone);
+                        const res = await fetch(`${API_URL}/otp-login`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ phone: firebasePhone })
+                        });
+
+                        const data = await res.json();
+                        if (!res.ok) {
+                            showAlert(data.message || 'OTP login failed', 'error');
+                            return;
+                        }
+
+                        if (data.isNewUser) {
+                            console.log('📋 New user detected, redirecting to complete profile');
+                            localStorage.setItem('pendingPhone', data.phone || firebasePhone.replace(/\D/g, ''));
+                            showAlert('Phone verified. Complete profile to continue.', 'success');
+                            setTimeout(() => {
+                                window.location.href = 'complete-profile.html';
+                            }, 700);
+                            return;
+                        }
+
+                        console.log('✅ OTP login successful');
+                        setToken(data.token, data.user?.name || '');
+                        updateNav(data.user || { role: data.role || 'user' });
+                        showAlert('Login successful! Redirecting...', 'success');
+                        setTimeout(() => {
+                            if (data.role === 'admin') {
+                                window.location.href = 'admin.html';
+                            } else {
+                                window.location.href = 'index.html';
+                            }
+                        }, 700);
+                    } catch (err) {
+                        console.error('❌ OTP verification failed:', err);
+                        console.error('Error code:', err.code);
+                        console.error('Error message:', err.message);
+
+                        let errorMsg = 'OTP verification failed. Check code and try again.';
+                        if (err.code === 'auth/invalid-verification-code') {
+                            errorMsg = 'Invalid OTP code. Please check and try again.';
+                        } else if (err.code === 'auth/code-expired') {
+                            errorMsg = 'OTP has expired. Press Send OTP to get a new code.';
+                        }
+
+                        showAlert(errorMsg, 'error');
+                    }
+                });
+            }
+
+            const loginModeBtn = getEl('login-mode-btn');
+            if (loginModeBtn) loginModeBtn.addEventListener('click', () => setMode('login'));
+            const registerModeBtn = getEl('register-mode-btn');
+            if (registerModeBtn) registerModeBtn.addEventListener('click', () => setMode('register'));
+            const switchToRegister = getEl('switch-to-register');
+            if (switchToRegister) switchToRegister.addEventListener('click', () => setMode('register'));
+            const switchToLogin = getEl('switch-to-login');
+            if (switchToLogin) switchToLogin.addEventListener('click', () => setMode('login'));
+
+            const loginSubmit = getEl('login-submit');
+            if (loginSubmit) {
+                loginSubmit.addEventListener('click', async () => {
+                    const email = (getEl('login-email')?.value || '').trim();
+                    const password = getEl('login-password')?.value || '';
+
+                    hideAlert();
+                    clearFieldErrors();
+
+                    let isValid = true;
+                    if (!email || !isValidEmail(email)) {
+                        showFieldError('login-email-error', 'Invalid email format');
+                        isValid = false;
+                    }
+                    if (!password) {
+                        showFieldError('login-password-error', 'Password is required');
+                        isValid = false;
+                    }
+
+                    if (!isValid) {
+                        return showAlert('Please correct the highlighted fields', 'error');
+                    }
+
+                    await performLogin(email, password, true);
+                });
+            }
+
+            const registerSubmit = getEl('register-submit');
+            if (registerSubmit) {
+                registerSubmit.addEventListener('click', async () => {
+                    const name = (getEl('register-name')?.value || '').trim();
+                    const email = (getEl('register-email')?.value || '').trim();
+                    const password = getEl('register-password')?.value || '';
+                    const confirm = getEl('register-confirm')?.value || '';
+
+                    hideAlert();
+                    clearFieldErrors();
+
+                    let isValid = true;
+                    if (!name) {
+                        showFieldError('register-name-error', 'Name is required');
+                        isValid = false;
+                    }
+                    if (!email || !isValidEmail(email)) {
+                        showFieldError('register-email-error', 'Invalid email format');
+                        isValid = false;
+                    }
+                    if (!password || password.length < 8) {
+                        showFieldError('register-password-error', 'Password must be at least 8 characters');
+                        isValid = false;
+                    }
+                    if (password !== confirm) {
+                        showFieldError('register-confirm-error', 'Passwords do not match');
+                        isValid = false;
+                    }
+
+                    if (!isValid) {
+                        return showAlert('Please fix errors before continuing', 'error');
+                    }
+
+                    try {
+                        const res = await fetch(`${API_URL}/register`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name, email, password })
+                        });
+
+                        const data = await res.json();
+                        if (!res.ok) {
+                            showAlert(data.message || 'Registration failed', 'error');
+                            return;
+                        }
+
+                        showAlert('Registration successful! Logging in...', 'success');
+                        const loggedIn = await performLogin(email, password, true);
+                        if (!loggedIn) {
+                            setMode('login');
+                        }
+                    } catch (error) {
+                        console.error('Register request error:', error);
+                        showAlert('Unable to register now.', 'error');
+                    }
+                });
+            }
+
+            document.querySelectorAll('.toggle-password').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetId = btn.dataset.target;
+                    const input = getEl(targetId);
+                    if (!input) return;
+                    const hidden = input.type === 'password';
+                    input.type = hidden ? 'text' : 'password';
+                    btn.textContent = hidden ? '🙈' : '👁️';
+                });
+            });
+
+            const logoutBtn = getEl('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    clearToken();
+                    updateNav(null);
+                    window.location.href = 'index.html';
+                });
+            }
+
+            const mobileLogoutBtn = getEl('logout-btn-mobile');
+            if (mobileLogoutBtn) {
+                mobileLogoutBtn.addEventListener('click', () => {
+                    clearToken();
+                    updateNav(null);
+                    window.location.href = 'index.html';
+                });
+            }
+
+            setMode('login');
+            checkSession();
+            setTimeout(setupHamburgerMenu, 100);
         });
 
         window.addEventListener('message', (event) => {
@@ -689,101 +835,6 @@
             } else {
                 window.location.href = 'index.html';
             }
-        });
-
-        document.getElementById('login-mode-btn').addEventListener('click', () => setMode('login'));
-        document.getElementById('register-mode-btn').addEventListener('click', () => setMode('register'));
-        document.getElementById('switch-to-register').addEventListener('click', () => setMode('register'));
-        document.getElementById('switch-to-login').addEventListener('click', () => setMode('login'));
-
-        document.getElementById('login-submit').addEventListener('click', async () => {
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value;
-
-            hideAlert();
-            clearFieldErrors();
-
-            let isValid = true;
-            if (!email || !isValidEmail(email)) {
-                showFieldError('login-email-error', 'Invalid email format');
-                isValid = false;
-            }
-            if (!password) {
-                showFieldError('login-password-error', 'Password is required');
-                isValid = false;
-            }
-
-            if (!isValid) {
-                return showAlert('Please correct the highlighted fields', 'error');
-            }
-
-            await performLogin(email, password, true);
-        });
-
-        document.getElementById('register-submit').addEventListener('click', async () => {
-            const name = document.getElementById('register-name').value.trim();
-            const email = document.getElementById('register-email').value.trim();
-            const password = document.getElementById('register-password').value;
-            const confirm = document.getElementById('register-confirm').value;
-
-            hideAlert();
-            clearFieldErrors();
-
-            let isValid = true;
-            if (!name) {
-                showFieldError('register-name-error', 'Name is required');
-                isValid = false;
-            }
-            if (!email || !isValidEmail(email)) {
-                showFieldError('register-email-error', 'Invalid email format');
-                isValid = false;
-            }
-            if (!password || password.length < 8) {
-                showFieldError('register-password-error', 'Password must be at least 8 characters');
-                isValid = false;
-            }
-            if (password !== confirm) {
-                showFieldError('register-confirm-error', 'Passwords do not match');
-                isValid = false;
-            }
-
-            if (!isValid) {
-                return showAlert('Please fix errors before continuing', 'error');
-            }
-
-            try {
-                const res = await fetch(`${API_URL}/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, password })
-                });
-
-                const data = await res.json();
-                if (!res.ok) {
-                    showAlert(data.message || 'Registration failed', 'error');
-                    return;
-                }
-
-                showAlert('Registration successful! Logging in...', 'success');
-                const loggedIn = await performLogin(email, password, true);
-                if (!loggedIn) {
-                    setMode('login');
-                }
-            } catch (error) {
-                console.error('Register request error:', error);
-                showAlert('Unable to register now.', 'error');
-            }
-        });
-
-        document.querySelectorAll('.toggle-password').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const targetId = btn.dataset.target;
-                const input = document.getElementById(targetId);
-                if (!input) return;
-                const hidden = input.type === 'password';
-                input.type = hidden ? 'text' : 'password';
-                btn.textContent = hidden ? '🙈' : '👁️';
-            });
         });
 
         async function checkSession() {
@@ -824,29 +875,34 @@
             }
         }
 
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            clearToken();
-            updateNav(null);
-            window.location.href = 'index.html';
+        document.addEventListener('DOMContentLoaded', () => {
+            const logoutBtn = getEl('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    clearToken();
+                    updateNav(null);
+                    window.location.href = 'index.html';
+                });
+            }
+
+            const mobileLogoutBtn = getEl('logout-btn-mobile');
+            if (mobileLogoutBtn) {
+                mobileLogoutBtn.addEventListener('click', () => {
+                    clearToken();
+                    updateNav(null);
+                    window.location.href = 'index.html';
+                });
+            }
+
+            setMode('login');
+            checkSession();
+            setTimeout(setupHamburgerMenu, 100);
         });
-
-        // Mobile logout button
-        const mobileLogoutBtn = document.getElementById('logout-btn-mobile');
-        if (mobileLogoutBtn) {
-            mobileLogoutBtn.addEventListener('click', () => {
-                clearToken();
-                updateNav(null);
-                window.location.href = 'index.html';
-            });
-        }
-
-        setMode('login');
-        checkSession();
 
         // ===== HAMBURGER MENU =====
         function setupHamburgerMenu() {
-            const hamburger = document.getElementById('navbar-hamburger');
-            const mobileMenu = document.getElementById('mobile-menu');
+            const hamburger = getEl('navbar-hamburger');
+            const mobileMenu = getEl('mobile-menu');
             if (!hamburger || !mobileMenu) return;
 
             hamburger.addEventListener('click', () => {

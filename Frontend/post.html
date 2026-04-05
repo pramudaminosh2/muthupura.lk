@@ -794,7 +794,7 @@
 </head>
 <body>
     <div class="page-shell">
-        <div class="topbar" style="background: linear-gradient(135deg, rgba(58,111,248,0.9), rgba(142,82,248,0.9)); border: none;">
+        <div class="topbar" id="navbar" style="background: linear-gradient(135deg, rgba(58,111,248,0.9), rgba(142,82,248,0.9)); border: none;">
             <a class="brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk logo"><span style="color: white;">Muthupura.lk</span></a>
             <div class="nav-links">
                 <a class="action-pill secondary" href="index.html" style="background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2);">Home</a>
@@ -992,12 +992,13 @@
     <script src="config.js"></script>
     <script>
         const API_URL = API_BASE_URL;
-        const form = document.getElementById('vehicleForm');
-        const dropzone = document.getElementById('dropzone');
-        const photoInput = document.getElementById('photos');
-        const previewContainer = document.getElementById('previewContainer');
-        const makeInput = document.getElementById('make');
-        const makeDropdown = document.getElementById('makeDropdown');
+        const getEl = (id) => document.getElementById(id);
+        let form;
+        let dropzone;
+        let photoInput;
+        let previewContainer;
+        let makeInput;
+        let makeDropdown;
         const makeOptions = [
             'Toyota','Nissan','Honda','Suzuki','Mitsubishi','Ford','Isuzu','Mahindra','Hyundai','Kia','BMW','Mercedes','Audi','Volvo','Tata','Jeep','Bajaj','TVS','Yamaha','Hero'
         ];
@@ -1013,30 +1014,45 @@
         }
 
         const authData = getToken();
-        const adminLink = document.getElementById('admin-link');
-        const authLink = document.getElementById('auth-link');
 
-        if (authData?.role === 'admin') {
-            adminLink.style.display = 'inline-flex';
-        }
+        document.addEventListener('DOMContentLoaded', () => {
+            form = getEl('vehicleForm');
+            dropzone = getEl('dropzone');
+            photoInput = getEl('photos');
+            previewContainer = getEl('previewContainer');
+            makeInput = getEl('make');
+            makeDropdown = getEl('makeDropdown');
 
-        if (authData) {
-            document.getElementById('mylistings-link').style.display = 'inline-flex';
-            authLink.textContent = 'Logout';
-            authLink.href = '#';
-            authLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                localStorage.removeItem('token');
-                location.reload();
-            });
-        }
+            const adminLink = getEl('admin-link');
+            const authLink = getEl('auth-link');
+            const myListingsLink = getEl('mylistings-link');
 
-        if (!authData) {
-            alert('Login required');
-            location.href = 'login.html';
-        }
+            if (authData?.role === 'admin' && adminLink) {
+                adminLink.style.display = 'inline-flex';
+            }
+
+            if (authData) {
+                if (myListingsLink) myListingsLink.style.display = 'inline-flex';
+                if (authLink) {
+                    authLink.textContent = 'Logout';
+                    authLink.href = '#';
+                    authLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        localStorage.removeItem('token');
+                        location.reload();
+                    });
+                }
+            }
+
+            if (!authData) {
+                alert('Login required');
+                location.href = 'login.html';
+                return;
+            }
+        });
 
         function renderMakeDropdown(filter = '') {
+            if (!makeInput || !makeDropdown) return;
             const normalized = filter.trim().toLowerCase();
             const items = makeOptions
                 .filter(option => option.toLowerCase().includes(normalized))
@@ -1054,22 +1070,111 @@
             makeDropdown.style.display = 'block';
         }
 
-        makeInput.addEventListener('focus', () => renderMakeDropdown(makeInput.value));
-        makeInput.addEventListener('input', () => renderMakeDropdown(makeInput.value));
-        makeInput.addEventListener('blur', () => setTimeout(() => { makeDropdown.style.display = 'none'; }, 150));
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Navbar element:', getEl('navbar'));
 
-        makeDropdown.addEventListener('click', (event) => {
-            const option = event.target.closest('.dropdown-item');
-            if (!option) return;
-            makeInput.value = option.textContent.trim();
-            makeDropdown.style.display = 'none';
-        });
+            makeInput = getEl('make');
+            makeDropdown = getEl('makeDropdown');
+            if (makeInput && makeDropdown) {
+                makeInput.addEventListener('focus', () => renderMakeDropdown(makeInput.value));
+                makeInput.addEventListener('input', () => renderMakeDropdown(makeInput.value));
+                makeInput.addEventListener('blur', () => setTimeout(() => { if (makeDropdown) makeDropdown.style.display = 'none'; }, 150));
 
-        makeDropdown.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                event.target.click();
+                makeDropdown.addEventListener('click', (event) => {
+                    const option = event.target.closest('.dropdown-item');
+                    if (!option || !makeInput || !makeDropdown) return;
+                    makeInput.value = option.textContent.trim();
+                    makeDropdown.style.display = 'none';
+                });
+
+                makeDropdown.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter' && event.target) {
+                        event.preventDefault();
+                        event.target.click();
+                    }
+                });
             }
+
+            previewContainer = getEl('previewContainer');
+            photoInput = getEl('photos');
+            if (photoInput) photoInput.addEventListener('change', () => updatePreview(photoInput.files));
+
+            dropzone = getEl('dropzone');
+            if (dropzone) {
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    dropzone.addEventListener(eventName, (event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    });
+                });
+
+                dropzone.addEventListener('dragover', () => dropzone.classList.add('drag-over'));
+                dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+                dropzone.addEventListener('drop', (event) => {
+                    dropzone.classList.remove('drag-over');
+                    const files = event.dataTransfer?.files;
+                    if (!files?.length || !photoInput) return;
+                    photoInput.files = files;
+                    updatePreview(files);
+                });
+            }
+
+            form = getEl('vehicleForm');
+            if (form) {
+                form.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    if (!validateForm()) {
+                        return;
+                    }
+
+                    const files = photoInput?.files || [];
+                    if (!files.length) {
+                        alert('Please upload at least one image.');
+                        return;
+                    }
+
+                    const formData = new FormData();
+                    Array.from(files).slice(0, 10).forEach(file => formData.append('images', file));
+                    formData.append('sellerName', (getEl('sellerName')?.value || '').trim());
+                    formData.append('phone', (getEl('phone')?.value || '').trim());
+                    formData.append('city', (getEl('city')?.value || '').trim());
+                    formData.append('vehicleType', (getEl('vehicleType')?.value || ''));
+                    formData.append('condition', (getEl('condition')?.value || ''));
+                    formData.append('make', (getEl('make')?.value || '').trim());
+                    formData.append('model', (getEl('model')?.value || '').trim());
+                    formData.append('year', (getEl('year')?.value || ''));
+                    formData.append('price', (getEl('price')?.value || ''));
+                    formData.append('transmission', (getEl('transmission')?.value || ''));
+                    formData.append('fuelType', (getEl('fuelType')?.value || ''));
+                    formData.append('engineCapacity', (getEl('engineCapacity')?.value || ''));
+                    formData.append('mileage', (getEl('mileage')?.value || ''));
+                    formData.append('description', (getEl('description')?.value || '').trim());
+
+                    const features = Array.from(form.querySelectorAll('input[name="features"]:checked')).map(input => input.value);
+                    formData.append('features', JSON.stringify(features));
+
+                    try {
+                        const response = await fetch(`${API_URL}/add-vehicle`, {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        const result = await response.json();
+                        if (!response.ok) {
+                            throw new Error(result.message || 'Unable to submit your listing.');
+                        }
+
+                        alert('Vehicle posted successfully.');
+                        location.href = 'index.html';
+                    } catch (error) {
+                        console.error('Submission error:', error);
+                        alert(error.message || 'Error posting vehicle.');
+                    }
+                });
+            }
+
+            setTimeout(setupHamburgerMenu, 100);
+            syncAuthLinks();
         });
 
         function updatePreview(files) {
@@ -1099,108 +1204,10 @@
             });
         }
 
-        photoInput.addEventListener('change', () => updatePreview(photoInput.files));
-
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropzone.addEventListener(eventName, (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-            });
-        });
-
-        dropzone.addEventListener('dragover', () => dropzone.classList.add('drag-over'));
-        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
-        dropzone.addEventListener('drop', (event) => {
-            dropzone.classList.remove('drag-over');
-            const files = event.dataTransfer.files;
-            if (!files.length) return;
-            photoInput.files = files;
-            updatePreview(files);
-        });
-
-        function validateField(field) {
-            const input = field.querySelector('input, select, textarea');
-            const error = field.querySelector('.error-message');
-            const value = input?.value?.trim();
-            const required = field.dataset.required !== undefined;
-
-            if (required && !value) {
-                field.classList.add('invalid');
-                error.textContent = 'This field is required.';
-                return false;
-            }
-
-            field.classList.remove('invalid');
-            error.textContent = '';
-            return true;
-        }
-
-        function validateForm() {
-            const requiredFields = Array.from(form.querySelectorAll('[data-required]'));
-            let isValid = true;
-            requiredFields.forEach(field => {
-                if (!validateField(field)) {
-                    isValid = false;
-                }
-            });
-            return isValid;
-        }
-
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            if (!validateForm()) {
-                return;
-            }
-
-            const files = photoInput.files;
-            if (!files.length) {
-                alert('Please upload at least one image.');
-                return;
-            }
-
-            const formData = new FormData();
-            Array.from(files).slice(0, 10).forEach(file => formData.append('images', file));
-            formData.append('sellerName', document.getElementById('sellerName').value.trim());
-            formData.append('phone', document.getElementById('phone').value.trim());
-            formData.append('city', document.getElementById('city').value.trim());
-            formData.append('vehicleType', document.getElementById('vehicleType').value);
-            formData.append('condition', document.getElementById('condition').value);
-            formData.append('make', document.getElementById('make').value.trim());
-            formData.append('model', document.getElementById('model').value.trim());
-            formData.append('year', document.getElementById('year').value);
-            formData.append('price', document.getElementById('price').value);
-            formData.append('transmission', document.getElementById('transmission').value);
-            formData.append('fuelType', document.getElementById('fuelType').value);
-            formData.append('engineCapacity', document.getElementById('engineCapacity').value);
-            formData.append('mileage', document.getElementById('mileage').value);
-            formData.append('description', document.getElementById('description').value.trim());
-
-            const features = Array.from(form.querySelectorAll('input[name="features"]:checked')).map(input => input.value);
-            formData.append('features', JSON.stringify(features));
-
-            try {
-                const response = await fetch(`${API_URL}/add-vehicle`, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const result = await response.json();
-                if (!response.ok) {
-                    throw new Error(result.message || 'Unable to submit your listing.');
-                }
-
-                alert('Vehicle posted successfully.');
-                location.href = 'index.html';
-            } catch (error) {
-                console.error('Submission error:', error);
-                alert(error.message || 'Error posting vehicle.');
-            }
-        });
-
         // ===== HAMBURGER MENU =====
         function setupHamburgerMenu() {
-            const hamburger = document.getElementById('navbar-hamburger');
-            const mobileMenu = document.getElementById('mobile-menu');
+            const hamburger = getEl('navbar-hamburger');
+            const mobileMenu = getEl('mobile-menu');
             if (!hamburger || !mobileMenu) return;
 
             hamburger.addEventListener('click', () => {
@@ -1220,13 +1227,17 @@
 
         // Sync mobile auth links with desktop
         function syncAuthLinks() {
-            const desktopMyListings = document.getElementById('mylistings-link');
-            const mobileMyListings = document.getElementById('mylistings-link-mobile');
-            const desktopAuthLink = document.getElementById('auth-link');
-            const mobileAuthLink = document.getElementById('auth-link-mobile');
-            const desktopAdmin = document.getElementById('admin-link');
-            const mobileAdmin = document.getElementById('admin-link-mobile');
+            const desktopMyListings = getEl('mylistings-link');
+            const mobileMyListings = getEl('mylistings-link-mobile');
+            const desktopAuthLink = getEl('auth-link');
+            const mobileAuthLink = getEl('auth-link-mobile');
+            const desktopAdmin = getEl('admin-link');
+            const mobileAdmin = getEl('admin-link-mobile');
 
+            if (desktopAuthLink && mobileAuthLink) {
+                mobileAuthLink.textContent = desktopAuthLink.textContent;
+                mobileAuthLink.href = desktopAuthLink.href;
+            }
             if (desktopMyListings && mobileMyListings) {
                 mobileMyListings.style.display = desktopMyListings.style.display;
             }
