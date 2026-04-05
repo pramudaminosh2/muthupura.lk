@@ -8,28 +8,9 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const app = express();
 
-// Enable CORS - FIRST middleware after app creation
+// Enable CORS - reflect request origin and always include CORS headers
 app.use(cors({
-    origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
-
-        const allowedOrigins = [
-            "https://muthupuralk.web.app",
-            "https://muthupuralk.firebaseapp.com",
-            "http://localhost:8000",
-            "http://127.0.0.1:8000",
-            "http://localhost:3000",
-            "http://127.0.0.1:3000"
-        ];
-
-        if (allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            console.log('CORS blocked origin:', origin);
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
+    origin: true, // reflect the request origin
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
     optionsSuccessStatus: 200 // Some legacy browsers choke on 204
