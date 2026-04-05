@@ -15,9 +15,6 @@ app.use(cors({
     credentials: true
 }));
 
-// Handle preflight requests
-app.options('*', cors());
-
 const mysql = require('mysql2');
 
 // Firebase Storage setup
