@@ -7,34 +7,151 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
     <style>
-        :root { --bg:#f8fbff; --surface:#ffffff; --text:#1f3250; --muted:#60728f; --accent:#3a6ff8; --shadow:0 12px 28px rgba(34,62,102,0.11); }
-        *{box-sizing:border-box;}
-        body{margin:0;font-family:'Inter','Poppins',system-ui,sans-serif;background:linear-gradient(145deg,#f6f9ff,#edf3ff);color:var(--text);}
-        .container{max-width:1040px;margin:0 auto;padding:20px;}
-        .navbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 0;border-bottom:1px solid rgba(146,167,205,0.3);background:rgba(255,255,255,0.75);backdrop-filter:blur(10px);}
-        .navbar a{color:#2d4f8f;text-decoration:none;font-weight:600;padding:7px 10px;border-radius:8px;transition:.2s;} .navbar a:hover{background:rgba(58,111,248,0.13);}
-        .card{background:var(--surface);padding:20px;border-radius:16px;box-shadow:var(--shadow);border:1px solid rgba(153,179,215,0.28);margin-top:16px;}
-        h1{margin:0 0 12px;font-size:2rem;}.desc{color:var(--muted);line-height:1.6;}
-        .form{display:grid;gap:12px;}
-        .form input,.form textarea{border:1px solid rgba(131,147,181,0.35);border-radius:10px;padding:11px 12px;font-size:0.95rem;outline:none;}
-        .form textarea{min-height:120px;resize:vertical;}
-        .btn{background:linear-gradient(110deg,var(--accent),#8e52f8);color:#fff;border:none;border-radius:10px;padding:11px 15px;font-weight:700;cursor:pointer;transition:.2s;}
-        .btn:hover{transform:translateY(-1px);box-shadow:0 9px 18px rgba(58,111,248,0.3);}
-        .info{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;}
-        .info div{background:#f1f5ff;border-radius:10px;padding:12px;border:1px solid rgba(137, 161, 204, 0.35);}
-        .info strong{display:block;margin-bottom:6px;color:#2e4f8f;}
-        .footer{margin-top:22px;padding:12px 0;color:#6a7f9e;text-align:center;font-size:0.9rem;}
+        :root { 
+            --bg: #eef2f8; 
+            --surface: #ffffff; 
+            --text: #1f2f4f; 
+            --muted: #5b6d8a; 
+            --accent: #3a6ff8; 
+            --shadow-strong: 0 32px 90px rgba(25, 73, 145, 0.14);
+        }
+        
+        .container {
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            margin: 24px 0 12px;
+            font-size: 2rem;
+            background: linear-gradient(135deg, #1f2f4f 0%, #3a6ff8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+        }
+
+        .desc {
+            color: var(--muted);
+            line-height: 1.75;
+            max-width: 600px;
+            margin-bottom: 24px;
+        }
+
+        .section-card,
+        .card {
+            margin-top: 16px;
+            padding: 28px;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 0.93rem;
+            color: #4f648c;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: -0.01em;
+        }
+
+        .form input,
+        .form textarea {
+            width: 100%;
+        }
+
+        .info {
+            margin-top: 32px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.96) 100%);
+            border: 1.2px solid rgba(74,99,142,0.18);
+            border-radius: 18px;
+            padding: 20px;
+            box-shadow: 0 10px 28px rgba(58,111,248,0.09);
+            animation: fadeInUp 0.45s ease both;
+        }
+
+        .info-card strong {
+            display: block;
+            margin-bottom: 10px;
+            color: #2e4f8f;
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .info-card a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .info-card a:hover {
+            color: #8e52f8;
+            text-decoration: underline;
+        }
+
+        .footer {
+            margin-top: 32px;
+            padding: 20px 0;
+            color: var(--muted);
+            text-align: center;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(74,99,142,0.18);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 16px;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            .section-card,
+            .card {
+                padding: 20px;
+            }
+
+            input,
+            textarea {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <nav class="navbar">
-            <a href="index.html"><strong>Muthupura.lk</strong></a>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <a href="index.html">Home</a>
-                <a href="post.html">Post Ad</a>
-                <a href="about.html">About</a>
+            <a class="brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk" style="width:40px; height:40px; border-radius:12px;"><span style="font-size:1.1rem;">Muthupura.lk</span></a>
+            <div class="nav-links">
+                <a href="index.html" class="btn secondary">Home</a>
+                <a href="post.html" class="btn secondary">Post Ad</a>
+                <a href="about.html" class="btn secondary">About</a>
             </div>
         </nav>
 
@@ -42,18 +159,27 @@
         <p class="desc">Have questions? We’re here to help. Fill the form and we'll get back to you quickly.</p>
 
         <div class="card">
-            <form class="form" id="contactForm" onsubmit="event.preventDefault(); handleSubmit();">
-                <input type="text" id="name" placeholder="Your Name" required>
-                <input type="email" id="email" placeholder="Your Email" required>
-                <textarea id="message" placeholder="Your Message" required></textarea>
-                <button class="btn" type="submit">Send Message</button>
+            <form class="form-grid" id="contactForm" onsubmit="event.preventDefault(); handleSubmit();">
+                <div class="field" data-required>
+                    <label for="name">Name</label>
+                    <input type="text" id="name" placeholder="Your full name" required>
+                </div>
+                <div class="field" data-required>
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="you@example.com" required>
+                </div>
+                <div class="field" data-required>
+                    <label for="message">Message</label>
+                    <textarea id="message" placeholder="Your message..." required></textarea>
+                </div>
+                <button class="btn primary" type="submit" style="padding: 11px 26px; min-height: 44px; align-self: flex-start;">Send Message</button>
             </form>
         </div>
 
         <div class="info">
-            <div><strong>Phone</strong>+94 777 150 660</div>
-            <div><strong>WhatsApp</strong><a href="https://wa.me/94777150660" style="color:#3a6ff8;text-decoration:none;">Message Us</a></div>
-            <div><strong>Email</strong><a href="mailto:support@muthupura.lk" style="color:#3a6ff8;text-decoration:none;">support@muthupura.lk</a></div>
+            <div class="info-card"><strong>Phone</strong>+94 777 150 660</div>
+            <div class="info-card"><strong>WhatsApp</strong><a href="https://wa.me/94777150660">Message Us</a></div>
+            <div class="info-card"><strong>Email</strong><a href="mailto:support@muthupura.lk">support@muthupura.lk</a></div>
         </div>
 
         <div class="footer">© 2026 Muthupura.lk – All rights reserved</div>
