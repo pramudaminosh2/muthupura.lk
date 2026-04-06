@@ -995,9 +995,10 @@
                         <label for="fuelType">Fuel Type</label>
                         <select id="fuelType" name="fuelType" required>
                             <option value="" disabled selected>Select fuel type</option>
-                            <option value="petrol">Petrol</option>
-                            <option value="diesel">Diesel</option>
-                            <option value="ev">EV</option>
+                            <option value="Petrol">Petrol</option>
+                            <option value="Diesel">Diesel</option>
+                            <option value="Electric">EV</option>
+                            <option value="Hybrid">Hybrid</option>
                         </select>
                         <span class="error-message"></span>
                     </div>
@@ -1105,6 +1106,27 @@
             });
         }
 
+        // Sync mobile auth links with desktop
+        function syncAuthLinks() {
+            const desktopMyListings = getEl('mylistings-link');
+            const mobileMyListings = getEl('mylistings-link-mobile');
+            const desktopAuthLink = getEl('auth-link');
+            const mobileAuthLink = getEl('auth-link-mobile');
+            const desktopAdmin = getEl('admin-link');
+            const mobileAdmin = getEl('admin-link-mobile');
+
+            if (desktopAuthLink && mobileAuthLink) {
+                mobileAuthLink.textContent = desktopAuthLink.textContent;
+                mobileAuthLink.href = desktopAuthLink.href;
+            }
+            if (desktopMyListings && mobileMyListings) {
+                mobileMyListings.style.display = desktopMyListings.style.display;
+            }
+            if (desktopAdmin && mobileAdmin) {
+                mobileAdmin.style.display = desktopAdmin.style.display;
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             form = getEl('vehicleForm');
             dropzone = getEl('dropzone');
@@ -1133,6 +1155,8 @@
                     });
                 }
             }
+
+            syncAuthLinks();
 
             if (!authData) {
                 alert('Login required');
@@ -1265,7 +1289,6 @@
             }
 
             setTimeout(setupHamburgerMenu, 100);
-            syncAuthLinks();
         });
 
         function updatePreview(files) {
@@ -1292,28 +1315,10 @@
                 };
                 reader.readAsDataURL(file);
                 previewContainer.appendChild(card);
+        });
         }
 
-        // Sync mobile auth links with desktop
-        function syncAuthLinks() {
-            const desktopMyListings = getEl('mylistings-link');
-            const mobileMyListings = getEl('mylistings-link-mobile');
-            const desktopAuthLink = getEl('auth-link');
-            const mobileAuthLink = getEl('auth-link-mobile');
-            const desktopAdmin = getEl('admin-link');
-            const mobileAdmin = getEl('admin-link-mobile');
-
-            if (desktopAuthLink && mobileAuthLink) {
-                mobileAuthLink.textContent = desktopAuthLink.textContent;
-                mobileAuthLink.href = desktopAuthLink.href;
-            }
-            if (desktopMyListings && mobileMyListings) {
-                mobileMyListings.style.display = desktopMyListings.style.display;
-            }
-            if (desktopAdmin && mobileAdmin) {
-                mobileAdmin.style.display = desktopAdmin.style.display;
-            }
-        }
+        setTimeout(setupHamburgerMenu, 100);
         syncAuthLinks();
     </script>
 </body>
