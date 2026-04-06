@@ -733,10 +733,14 @@
                 grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             }
 
+            .sticky-submit {
+                padding: 16px 0 12px;
+            }
+
             .submit-row .btn.primary {
                 width: 100%;
-                padding: 14px 20px;
-                font-size: 1rem;
+                padding: 16px 24px;
+                font-size: 1.1rem;
             }
         }
 
@@ -847,6 +851,8 @@
             z-index: 5;
             background: rgba(238,242,248,0.95);
             backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(58,111,248,0.15);
+            box-shadow: 0 -4px 20px rgba(58,111,248,0.08);
             padding: 14px 0 8px;
         }
     </style>
@@ -1080,6 +1086,25 @@
 
         const authData = getToken();
 
+        // ===== HAMBURGER MENU =====
+        function setupHamburgerMenu() {
+            const hamburger = getEl('navbar-hamburger');
+            const mobileMenu = getEl('mobile-menu');
+            if (!hamburger || !mobileMenu) return;
+
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+            });
+
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburger.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                });
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             form = getEl('vehicleForm');
             dropzone = getEl('dropzone');
@@ -1267,29 +1292,7 @@
                 };
                 reader.readAsDataURL(file);
                 previewContainer.appendChild(card);
-            });
         }
-
-        // ===== HAMBURGER MENU =====
-        function setupHamburgerMenu() {
-            const hamburger = getEl('navbar-hamburger');
-            const mobileMenu = getEl('mobile-menu');
-            if (!hamburger || !mobileMenu) return;
-
-            hamburger.addEventListener('click', () => {
-                hamburger.classList.toggle('active');
-                mobileMenu.classList.toggle('active');
-            });
-
-            mobileMenu.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', () => {
-                    hamburger.classList.remove('active');
-                    mobileMenu.classList.remove('active');
-                });
-            });
-        }
-
-        setTimeout(setupHamburgerMenu, 100);
 
         // Sync mobile auth links with desktop
         function syncAuthLinks() {
