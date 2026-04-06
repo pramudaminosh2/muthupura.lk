@@ -439,6 +439,7 @@
             if (!id) { setError('Vehicle identifier missing.'); return; }
 
             try {
+                console.log('Calling API:', API_BASE_URL);
                 const res = await fetch(`${API_URL}/vehicle/${id}`);
                 if (!res.ok) {
                     if (res.status === 404) { setError('Vehicle not found.'); } else { setError('Failed to load vehicle details.'); }
@@ -447,6 +448,7 @@
                 const data = await res.json();
                 renderVehicle(data);
 
+                console.log('Calling API:', API_BASE_URL);
                 fetch(`${API_URL}/vehicle/${id}/view`, { method: 'POST' }).catch(() => {});
             } catch (e) {
                 console.error(e);

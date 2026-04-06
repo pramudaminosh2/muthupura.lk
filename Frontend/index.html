@@ -595,10 +595,6 @@
     <script>
         const API_URL = API_BASE_URL;
         console.log('📡 Using API URL:', API_URL);
-        const CORS_PROXY_URLS = [
-            'https://corsproxy.io/?',
-            'https://api.allorigins.win/raw?url='
-        ];
         let vehiclesData = [];
         let selectedCategory = null; // Track selected category chip: 'cars', 'bikes', 'ev', or null
         const FALLBACK_IMAGE = '/logo.PNG';
@@ -662,6 +658,7 @@
 
                 if (payload && !payload.name) {
                     try {
+                        console.log('Calling API:', API_BASE_URL);
                         const res = await fetch(`${API_URL}/profile`, {
                             headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                         });
@@ -763,39 +760,7 @@
             }
         });
 
-        async function fetchVehiclesWithCorsFallback() {
-            const endpoint = `${API_URL}/get-vehicles`;
-            const requestOptions = { cache: 'no-store' };
-
-            // 1) Try direct backend call first
-            try {
-                console.log('🌐 Attempting direct vehicle fetch...');
-                const directResponse = await fetch(endpoint, requestOptions);
-                if (!directResponse.ok) {
-                    throw new Error(`Direct fetch failed with status ${directResponse.status}`);
-                }
-                return directResponse.json();
-            } catch (directError) {
-                console.warn('⚠️ Direct vehicle fetch failed. Possible CORS/network issue:', directError.message);
-            }
-
-            // 2) Fallback through public CORS proxies
-            for (const proxyBase of CORS_PROXY_URLS) {
-                try {
-                    const proxiedUrl = `${proxyBase}${encodeURIComponent(endpoint)}`;
-                    console.log(`🔁 Trying CORS fallback proxy: ${proxyBase}`);
-                    const proxiedResponse = await fetch(proxiedUrl, requestOptions);
-                    if (!proxiedResponse.ok) {
-                        throw new Error(`Proxy status ${proxiedResponse.status}`);
-                    }
-                    return proxiedResponse.json();
-                } catch (proxyError) {
-                    console.warn(`⚠️ CORS proxy failed (${proxyBase}):`, proxyError.message);
-                }
-            }
-
-            throw new Error('All fetch methods failed (direct + proxy fallbacks)');
-        }
+        // CORS proxy fallback removed — using direct fetch to API_BASE_URL only
 
         async function fetchVehicles() {
             console.log('🚗 Starting vehicle fetch...');
@@ -804,7 +769,10 @@
             await updateNavigation();
 
             try {
-                const response = await fetchVehiclesWithCorsFallback();
+                console.log('Calling API:', API_BASE_URL);
+                const directRes = await fetch(`${API_BASE_URL}/get-vehicles`, { cache: 'no-store' });
+                if (!directRes.ok) throw new Error(`Request failed with status ${directRes.status}`);
+                const response = await directRes.json();
                 console.log('📥 API Response received:', response);
 
                 // Handle new API response format: { success: true, data: [...] }
@@ -1197,6 +1165,7 @@
 
             showLoader(true);
             
+            console.log('Calling API:', API_BASE_URL);
             fetch(`${API_URL}/delete-vehicle/${id}`, { 
                 method: 'DELETE', 
                 headers: { Authorization: `Bearer ${token}` } 
@@ -1237,6 +1206,7 @@
         }
 
         function incrementView(id) {
+            console.log('Calling API:', API_BASE_URL);
             fetch(`${API_URL}/vehicle/${id}/view`, { method: 'POST' }).catch(() => {});
         }
 

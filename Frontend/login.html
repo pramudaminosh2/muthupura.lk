@@ -532,6 +532,7 @@
 
         async function performLogin(email, password, redirect = true) {
             try {
+                console.log('Calling API:', API_BASE_URL);
                 const res = await fetch(`${API_URL}/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -669,6 +670,7 @@
                         }
 
                         console.log('📤 Logging in with phone:', firebasePhone);
+                        console.log('Calling API:', API_BASE_URL);
                         const res = await fetch(`${API_URL}/otp-login`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -789,6 +791,7 @@
                     }
 
                     try {
+                        console.log('Calling API:', API_BASE_URL);
                         const res = await fetch(`${API_URL}/register`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -865,6 +868,7 @@
             }
 
             try {
+                console.log('Calling API:', API_BASE_URL);
                 const res = await fetch(`${API_URL}/me`, {
                     headers: {
                         'Content-Type': 'application/json',

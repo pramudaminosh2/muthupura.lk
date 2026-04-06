@@ -260,6 +260,7 @@
         async function loadVehicles(){
             const token = localStorage.getItem('token');
             try {
+                console.log('Calling API:', API_BASE_URL);
                 console.log('📤 Calling API: ' + API_URL + '/admin/vehicles');
                 const response = await fetch(`${API_URL}/admin/vehicles`, { headers: { Authorization: `Bearer ${token}` } });
                 if(!response.ok) throw new Error('Failed to load');
@@ -301,6 +302,7 @@
         async function toggleFeature(id, current){
             const token = localStorage.getItem('token');
             try {
+                console.log('Calling API:', API_BASE_URL);
                 console.log('📤 Calling API: ' + API_URL + '/toggle-feature/' + id);
                 const res = await fetch(`${API_URL}/toggle-feature/${id}`, { method:'PUT', headers:{'Content-Type':'application/json', Authorization:`Bearer ${token}`}});
                 if(!res.ok) throw new Error();
@@ -308,7 +310,7 @@
             } catch(err){ console.error(err); alert('Feature toggle failed.'); }
         }
 
-        async function deleteAd(id){ if(!confirm('Delete this vehicle?')) return; const token = localStorage.getItem('token'); try { console.log('📤 Calling API: ' + API_URL + '/delete-vehicle/' + id); const res = await fetch(`${API_URL}/delete-vehicle/${id}`, { method:'DELETE', headers:{Authorization:`Bearer ${token}`}}); if(!res.ok) throw new Error(); await loadVehicles(); } catch(err){ console.error(err); alert('Delete failed.'); }}
+        async function deleteAd(id){ if(!confirm('Delete this vehicle?')) return; const token = localStorage.getItem('token'); try { console.log('Calling API:', API_BASE_URL); console.log('📤 Calling API: ' + API_URL + '/delete-vehicle/' + id); const res = await fetch(`${API_URL}/delete-vehicle/${id}`, { method:'DELETE', headers:{Authorization:`Bearer ${token}`}}); if(!res.ok) throw new Error(); await loadVehicles(); } catch(err){ console.error(err); alert('Delete failed.'); }}
 
         // Sync mobile logout button
         const mobileLogoutBtn = document.getElementById('logout-btn-mobile');

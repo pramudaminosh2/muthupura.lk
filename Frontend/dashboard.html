@@ -384,6 +384,7 @@
             }
 
             try {
+                console.log('Calling API:', API_BASE_URL);
                 const res = await fetch(`${API_URL}/my-vehicles`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
@@ -421,6 +422,7 @@
             if (!confirm('Delete this vehicle?')) return;
             const token = localStorage.getItem('token');
             try {
+                console.log('Calling API:', API_BASE_URL);
                 const res = await fetch(`${API_URL}/delete-vehicle/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
                 if (!res.ok) throw new Error('Failed to delete');
                 await fetchListings();
@@ -450,6 +452,7 @@
 
             const token = localStorage.getItem('token');
             try {
+                console.log('Calling API:', API_BASE_URL);
                 const res = await fetch(`${API_URL}/update-vehicle/${id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
