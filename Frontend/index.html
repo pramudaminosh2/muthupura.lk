@@ -24,9 +24,11 @@
         .container {
             position: relative;
             z-index: 2;
-            max-width: 1180px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 0 14px 36px;
+            padding: 0 16px;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         a { color: inherit; text-decoration: none; }
@@ -149,38 +151,40 @@
             100% { opacity: 1; transform: translateY(0); }
         }
 
+        /* Remove duplicate hero styles */
         .hero-eyebrow {
             display: inline-flex;
-            margin-bottom: 18px;
-            padding: 8px 16px;
+            margin-bottom: 12px;
+            padding: 8px 14px;
             border-radius: 999px;
-            background: rgba(58, 111, 248, 0.14);
-            color: var(--accent1);
-            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 0.85rem;
             font-weight: 700;
             letter-spacing: 0.02em;
-            box-shadow: 0 8px 20px rgba(58, 111, 248, 0.12);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.08);
         }
 
         .hero-title {
             margin: 0;
-            font-size: clamp(2.4rem, 5vw, 4rem);
+            font-size: clamp(2rem, 5vw, 3.5rem);
             font-weight: 900;
-            line-height: 1.08;
-            letter-spacing: -0.04em;
-            color: #15203f;
-            background: linear-gradient(135deg, #1f2f4f 0%, #3a6ff8 50%, #8e52f8 100%);
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #3a6ff8 0%, #8e52f8 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            color: transparent;
         }
 
         .hero-subtitle {
-            margin: 18px auto 0;
+            margin: 8px auto 0;
             max-width: 700px;
-            color: #4d607f;
-            font-size: 1.05rem;
-            line-height: 1.75;
+            color: rgba(255, 255, 255, 0.88);
+            font-size: clamp(0.95rem, 2vw, 1.15rem);
+            line-height: 1.6;
+            font-weight: 500;
         }
 
         .hero-search-panel {
@@ -284,8 +288,7 @@
             letter-spacing: 0.02em;
         }
 
-        .hero-title { margin: 0; font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 900; line-height: 1.02; letter-spacing: -0.04em; color: #15203f; }
-        .hero-subtitle { margin: 18px auto 0; max-width: 700px; color: #4d607f; font-size: 1.05rem; line-height: 1.75; }
+        /* Remove duplicate title/subtitle definitions */
 
         .hero-chips {
             margin-top: 28px;
@@ -357,18 +360,32 @@
             }
         }
 
+        /* ===== SECTION SPACING SYSTEM ===== */
+        .filter-shell,
+        .featured-scroll,
+        .vehicle-grid,
+        .section-head,
+        footer {
+            margin-bottom: 40px;
+        }
+
         .filter-shell {
             background: linear-gradient(to right, rgba(255,255,255,0.78), rgba(245,250,255,0.95));
             border: 1px solid rgba(129, 153, 215, 0.25);
             border-radius: 18px;
             box-shadow: 0 14px 28px rgba(29, 79, 160, 0.15);
-            padding: 14px;
-            margin-bottom: 18px;
+            padding: 20px;
             backdrop-filter: blur(8px);
+            width: 100%;
         }
 
         .filter-card { display: grid; gap: 12px; }
-        .filter-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; align-items: center; }
+        .filter-row { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px; 
+            align-items: center; 
+        }
 
         .filter-field { position: relative; }
         .filter-field input,
@@ -390,8 +407,41 @@
         .suggestions li { list-style: none; padding: 8px 10px; cursor: pointer; }
         .suggestions li:hover, .suggestions li.active { background: rgba(58,111,248,0.14); }
 
-        .vehicle-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; opacity: 0; transform: translateY(16px); transition: opacity 0.3s ease, transform 0.3s ease; }
-        .vehicle-grid.visible { opacity: 1; transform: translateY(0); }
+        /* ===== RESPONSIVE GRID SYSTEM ===== */
+        .vehicle-grid { 
+            display: grid; 
+            grid-template-columns: 1fr;
+            gap: 20px;
+            opacity: 0; 
+            transform: translateY(16px); 
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            width: 100%;
+        }
+        
+        .vehicle-grid.visible { 
+            opacity: 1; 
+            transform: translateY(0); 
+        }
+        
+        /* Tablet (2 columns) */
+        @media (min-width: 640px) {
+            .vehicle-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        /* Desktop (3-4 columns) */
+        @media (min-width: 1024px) {
+            .vehicle-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (min-width: 1400px) {
+            .vehicle-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
 
         .quick-filters {
             margin-top: 14px;
@@ -418,12 +468,31 @@
             color: #1f3254;
         }
 
-        .section-head { display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px; }
+        .section-head { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin: 40px 0 20px; 
+            padding: 0 4px;
+        }
+        .section-head h2 { 
+            margin: 0; 
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+        .section-head small { 
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
 
-        .section-head h2 { margin: 0; font-size: 1.32rem; }
-        .section-head small { color: var(--muted); }
-
-        .featured-scroll { display: flex; gap: 14px; overflow-x: auto; scroll-behavior: smooth; padding-bottom: 6px; }
+        .featured-scroll { 
+            display: flex; 
+            gap: 16px; 
+            overflow-x: auto; 
+            scroll-behavior: smooth; 
+            padding-bottom: 8px;
+            width: 100%;
+        }
         html { scroll-behavior: smooth; }
 
         .featured-scroll::-webkit-scrollbar,
@@ -431,8 +500,6 @@
 
         .featured-scroll::-webkit-scrollbar-thumb,
         .vehicle-grid::-webkit-scrollbar-thumb { background: rgba(58,111,248,0.35); border-radius: 999px; }
-
-        .vehicle-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
 
         .card {
             background: var(--card-bg);
@@ -567,18 +634,37 @@
 
         @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
 
-        @media (max-width: 900px) {
-            .hero-search-panel { justify-content: stretch; }
-            .nav-links { gap: 5px; }
-            .hero-content { padding: 20px; }
+        /* ===== MOBILE RESPONSIVE LAYOUT ===== */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hamburger { display: flex; }
+            .container {
+                padding: 0 12px;
+            }
+            .section-head {
+                margin: 32px 0 16px;
+            }
+            .section-head h2 {
+                font-size: 1.25rem;
+            }
+            .vehicle-grid {
+                gap: 16px;
+            }
+            .filter-shell {
+                padding: 16px;
+            }
         }
 
         @media (max-width: 620px) {
-            .navbar { flex-direction: column; align-items: flex-start; gap: 10px; }
-            .brand span { font-size: 1rem; }
             .vehicle-grid { grid-template-columns: 1fr; }
             .card-actions { grid-template-columns: 1fr; }
             .card { min-width: 100%; }
+            .container {
+                padding: 0 12px;
+            }
+            .section-head h2 {
+                font-size: 1.15rem;
+            }
         }
     </style>
 </head>
