@@ -27,12 +27,27 @@
             box-sizing: border-box;
         }
 
+        /* ===== HERO WRAPPER (Premium Card Style) ===== */
+        .hero-wrapper {
+            position: relative;
+            width: calc(100% - 48px);
+            max-width: 1400px;
+            margin: 32px auto;
+            margin-top: 115px;
+            height: auto;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+        }
+
         /* ===== FULL-WIDTH HERO (Premium Marketplace Style) ===== */
         .hero {
             position: relative;
             width: 100%;
-            height: 85vh;
-            margin-top: 80px;
+            height: 70vh;
             background-image: url('hero-cover.png');
             background-size: cover;
             background-position: center;
@@ -46,32 +61,35 @@
             overflow: hidden;
         }
 
-        /* Minimal light overlay */
+        /* Premium dark overlay */
         .hero::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: rgba(0, 0, 0, 0.15);
+            background: rgba(0, 0, 0, 0.07);
             z-index: 1;
             pointer-events: none;
         }
 
         /* Hero content container */
         .hero-content {
-            max-width: 520px;
+            max-width: 560px;
             width: 100%;
             z-index: 2;
-            margin-bottom: 40px;
+            margin-bottom: 48px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
 
         /* Glassmorphism filter box */
         .hero-filter-box {
-            margin-top: 20px;
-            padding: 18px;
+            margin-top: 0;
+            padding: 24px;
             border-radius: 18px;
             background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.25);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
@@ -81,57 +99,60 @@
             width: 100%;
             display: grid;
             grid-template-columns: 1fr 1fr 140px;
-            gap: 12px;
-            align-items: center;
+            gap: 14px;
+            align-items: stretch;
             background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.8);
             border-radius: 14px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            padding: 12px 16px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            padding: 14px;
             transition: all 0.3s ease;
         }
 
         .hero-search-field {
             position: relative;
             min-width: 0;
+            display: flex;
+            flex-direction: column;
         }
 
         .hero-search-field .input-icon {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1rem;
+            display: none;
         }
 
         .hero-search-field input,
         .hero-search-field select {
             width: 100%;
-            border: 1px solid rgba(150, 150, 150, 0.2);
-            border-radius: 10px;
-            padding: 10px 12px 10px 38px;
-            font-size: 0.9rem;
+            border: 1px solid rgba(100, 120, 160, 0.2);
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 0.95rem;
             color: #1f2d52;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             outline: none;
             transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
         }
 
         .hero-search-field select { appearance: none; padding-right: 30px; }
 
+        .hero-search-field input::placeholder {
+            color: #8a9ab8;
+        }
+
         .hero-search-field input:focus,
         .hero-search-field select:focus {
-            border-color: rgba(58, 111, 248, 0.5);
+            border-color: rgba(58, 111, 248, 0.6);
             background: #fff;
-            box-shadow: 0 0 0 2px rgba(58, 111, 248, 0.1);
+            box-shadow: 0 0 0 3px rgba(58, 111, 248, 0.12);
         }
 
         .hero-search-btn {
             border: none;
-            border-radius: 10px;
-            padding: 10px 16px;
-            font-size: 0.9rem;
+            border-radius: 12px;
+            padding: 12px 18px;
+            font-size: 0.95rem;
             font-weight: 700;
             color: #ffffff;
             background: linear-gradient(135deg, #3a6ff8, #8e52f8);
@@ -139,40 +160,56 @@
             cursor: pointer;
             transition: all 0.3s ease;
             white-space: nowrap;
+            align-self: flex-start;
         }
 
         .hero-search-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(58, 111, 248, 0.35);
+            box-shadow: 0 6px 18px rgba(58, 111, 248, 0.35);
+        }
+
+        .hero-search-btn:active {
+            transform: translateY(0);
         }
 
         /* Mobile hero adjustments */
         @media (max-width: 768px) {
+            .hero-wrapper {
+                width: calc(100% - 24px);
+                margin: 20px auto;
+                margin-top: 70px;
+                border-radius: 20px;
+            }
+
             .hero {
-                height: 70vh;
+                height: 60vh;
                 padding: 0 16px;
                 align-items: flex-end;
-                margin-top: 70px;
             }
 
             .hero-content {
                 width: 100%;
-                margin-bottom: 30px;
+                margin-bottom: 32px;
+            }
+
+            .hero-content h1 {
+                font-size: 1.4rem;
             }
 
             .hero-filter-box {
                 width: 100%;
-                padding: 14px;
+                padding: 0;
             }
 
             .hero-search-panel {
                 grid-template-columns: 1fr;
-                gap: 8px;
-                padding: 10px 12px;
+                gap: 10px;
+                padding: 12px;
             }
 
             .hero-search-btn {
                 width: 100%;
+                align-self: stretch;
             }
         }
 
@@ -217,11 +254,12 @@
         .vehicle-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 20px;
+            gap: 24px;
             opacity: 0;
             transform: translateY(16px);
             transition: opacity 0.3s ease, transform 0.3s ease;
             width: 100%;
+            margin-top: 40px;
         }
 
         .vehicle-grid.visible {
@@ -232,103 +270,337 @@
         @media (min-width: 640px) {
             .vehicle-grid {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
             }
         }
 
         @media (min-width: 1024px) {
             .vehicle-grid {
                 grid-template-columns: repeat(3, 1fr);
+                gap: 24px;
             }
         }
 
         @media (min-width: 1400px) {
             .vehicle-grid {
                 grid-template-columns: repeat(4, 1fr);
+                gap: 24px;
             }
         }
 
+        /* ===== VEHICLE CARDS (Premium Design) ===== */
+        .card {
+            background: #ffffff;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(40, 80, 140, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 28px rgba(40, 80, 140, 0.14);
+        }
+
+        .card.featured {
+            border: 1.5px solid rgba(58, 111, 248, 0.2);
+        }
+
+        .card-image {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            background: #f0f4ff;
+            overflow: hidden;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: linear-gradient(135deg, #3a6ff8, #5580ff);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(58, 111, 248, 0.25);
+        }
+
+        .card-badge.ev-badge {
+            top: 12px;
+            right: 12px;
+            left: auto;
+            background: linear-gradient(135deg, #10b981, #34d399);
+        }
+
+        .card-save-btn {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.95);
+            color: #ef4444;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-save-btn:hover {
+            transform: scale(1.1);
+            background: #fff;
+        }
+
+        .card-save-btn.active {
+            color: #ef4444;
+            background: #fff;
+        }
+
+        .card-save-btn.pulse {
+            animation: heart-pulse 0.3s ease;
+        }
+
+        @keyframes heart-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            gap: 10px;
+        }
+
+        .card-title {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1f2d52;
+            line-height: 1.3;
+        }
+
+        .card-price {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .card-details {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin: 6px 0;
+        }
+
+        .detail-item {
+            font-size: 0.85rem;
+            color: #5f7a9f;
+            line-height: 1.4;
+        }
+
+        .card-view-btn {
+            margin-top: auto;
+            padding: 11px 14px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(110deg, #3a6ff8, #8e52f8);
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(58, 111, 248, 0.15);
+        }
+
+        .card-view-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(58, 111, 248, 0.25);
+        }
+
+        .card-view-btn:active {
+            transform: translateY(0);
+        }
+
         /* Scrollbar styling */
-        .featured-scroll::-webkit-scrollbar,
-        .vehicle-grid::-webkit-scrollbar { height: 8px; }
+
+        .featured-scroll {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding: 0 0 12px 0;
+            width: 100%;
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+
+        .featured-scroll .card {
+            flex: 0 0 calc(25% - 15px);
+            min-width: 220px;
+        }
+
+        @media (max-width: 1400px) {
+            .featured-scroll .card {
+                flex: 0 0 calc(33.333% - 14px);
+                min-width: 200px;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .featured-scroll .card {
+                flex: 0 0 calc(50% - 10px);
+                min-width: 180px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .featured-scroll .card {
+                flex: 0 0 calc(75% - 15px);
+                min-width: 160px;
+            }
+        }
+
+        .featured-scroll::-webkit-scrollbar { 
+            height: 6px; 
+        }
         
-        .featured-scroll::-webkit-scrollbar-thumb,
-        .vehicle-grid::-webkit-scrollbar-thumb { 
-            background: rgba(58,111,248,0.35); 
-            border-radius: 999px; 
+        .featured-scroll::-webkit-scrollbar-thumb { 
+            background: rgba(58, 111, 248, 0.3); 
+            border-radius: 3px;
+        }
+
+        .featured-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(58, 111, 248, 0.5);
         }
 
         /* Filter shell styling */
         .filter-shell {
-            background: linear-gradient(to right, rgba(255,255,255,0.78), rgba(245,250,255,0.95));
-            border: 1px solid rgba(129, 153, 215, 0.25);
-            border-radius: 18px;
-            box-shadow: 0 14px 28px rgba(29, 79, 160, 0.15);
-            padding: 20px;
+            background: linear-gradient(to right, rgba(255,255,255,0.82), rgba(248,250,255,0.95));
+            border: 1px solid rgba(120, 140, 190, 0.2);
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(20, 60, 140, 0.08);
+            padding: 24px;
             backdrop-filter: blur(8px);
             width: 100%;
+            margin-top: 40px;
         }
 
-        .filter-card { display: grid; gap: 12px; }
+        .filter-card { display: grid; gap: 16px; }
         .filter-row { 
             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 12px; 
-            align-items: center; 
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px; 
+            align-items: flex-end; 
         }
 
-        .filter-field { position: relative; }
+        .filter-field { 
+            position: relative; 
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-field label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #3d5080;
+            margin-bottom: 6px;
+        }
+
         .filter-field input,
         .filter-field select { 
             width: 100%; 
-            border: 1px solid rgba(107, 129, 173, 0.35); 
+            border: 1px solid rgba(110, 140, 180, 0.25); 
             border-radius: 12px; 
             background: #fff; 
-            padding: 12px 12px 12px 35px; 
+            padding: 11px 14px; 
             font-size: 0.95rem; 
             color: #1d3161; 
             transition: all 0.2s ease; 
-            box-shadow: 0 4px 14px rgba(73, 104, 168, 0.08); 
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 2px 8px rgba(60, 90, 160, 0.05); 
         }
+
+        .filter-field input::placeholder {
+            color: #8fa3c8;
+        }
+
         .filter-field input:focus,
         .filter-field select:focus { 
             outline: none; 
             border-color: var(--accent1, #3a6ff8); 
-            box-shadow: 0 0 0 3px rgba(58, 111, 248, 0.17); 
+            box-shadow: 0 0 0 3px rgba(58, 111, 248, 0.12); 
         }
+
         .filter-field .input-icon { 
-            position: absolute; 
-            top: 50%; 
-            left: 10px; 
-            transform: translateY(-50%); 
-            font-size: 0.95rem; 
-            color: #5c74a3; 
+            display: none;
         }
-        .filter-field select { padding-left: 12px; }
+
+        .filter-field select { 
+            padding-right: 14px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%233a6ff8' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
+        }
 
         .filter-actions { 
             display: flex; 
-            gap: 10px; 
-            flex-wrap: wrap; 
+            gap: 12px; 
+            flex-wrap: wrap;
+            margin-top: 8px;
         }
         .filter-actions button { 
-            padding: 10px 14px; 
+            padding: 11px 18px; 
             border: none; 
             color: #fff; 
-            border-radius: 10px; 
+            border-radius: 12px; 
             font-weight: 700; 
             cursor: pointer; 
             transition: transform .2s ease, box-shadow .2s ease; 
+            font-size: 0.95rem;
         }
         .filter-actions .apply-btn { 
             background: linear-gradient(110deg, var(--accent1, #3a6ff8), var(--accent2, #8e52f8)); 
+            box-shadow: 0 4px 12px rgba(58, 111, 248, 0.2);
         }
         .filter-actions .clear-btn { 
-            background: #cdd9f8; 
-            color: #1f3e7d; 
+            background: #e0e8f6; 
+            color: #2d4a8f;
+            box-shadow: 0 2px 8px rgba(60, 100, 180, 0.08);
         }
         .filter-actions button:hover { 
-            transform: translateY(-1px); 
-            box-shadow: 0 8px 16px rgba(56, 113, 236, 0.25); 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 16px rgba(56, 113, 236, 0.25); 
+        }
+        .filter-actions button:active {
+            transform: translateY(0);
         }
 
         .suggestions { 
@@ -337,21 +609,25 @@
             left: 0; 
             right: 0; 
             background: #fff; 
-            border: 1px solid rgba(112, 130, 160, 0.28); 
+            border: 1px solid rgba(110, 140, 180, 0.2); 
             border-top: 0; 
             border-radius: 0 0 10px 10px; 
-            max-height: 170px; 
+            max-height: 200px; 
             overflow-y: auto; 
-            z-index: 10; 
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(40, 80, 140, 0.1);
         }
         .suggestions li { 
             list-style: none; 
-            padding: 8px 10px; 
-            cursor: pointer; 
+            padding: 10px 12px; 
+            cursor: pointer;
+            color: #3d5080;
+            transition: background 0.2s ease;
         }
         .suggestions li:hover, 
         .suggestions li.active { 
-            background: rgba(58,111,248,0.14); 
+            background: rgba(58, 111, 248, 0.08); 
+            color: #3a6ff8;
         }
 
         .featured-scroll {
@@ -365,14 +641,24 @@
 
         html { scroll-behavior: smooth; }
 
-        /* Footer spacing */
-        footer {
-            margin-top: 60px;
-            padding: 40px 0;
-        }
-
         /* Hidden class */
         .hidden { display: none; }
+
+        /* Notice styling */
+        .notice {
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #dc2626;
+            font-size: 0.95rem;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .notice.hidden {
+            display: none;
+        }
 
         /* Loader */
         #loader {
@@ -395,13 +681,88 @@
         }
 
         /* Mobile responsive tweaks */
-        @media (max-width: 620px) {
-            .vehicle-grid { grid-template-columns: 1fr; }
+        @media (max-width: 640px) {
+            html, body { 
+                overflow-x: hidden;
+            }
+
+            .vehicle-grid { 
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
             .container {
                 padding: 0 12px;
             }
+
+            .section-head {
+                margin: 32px 0 18px;
+            }
+
             .section-head h2 {
-                font-size: 1.15rem;
+                font-size: 1.25rem;
+            }
+
+            .filter-shell {
+                padding: 18px;
+                border-radius: 16px;
+            }
+
+            .filter-row {
+                grid-template-columns: 1fr;
+            }
+
+            .featured-scroll {
+                gap: 16px;
+                margin: 32px 0;
+            }
+
+            .card-image {
+                height: 180px;
+            }
+
+            .card-content {
+                padding: 14px;
+            }
+
+            .hero-wrapper {
+                width: calc(100% - 16px);
+                margin: 16px auto;
+            }
+
+            .hero {
+                height: 55vh;
+                padding: 0 12px;
+            }
+
+            .hero-content {
+                margin-bottom: 24px;
+            }
+
+            .hero-content h1 {
+                font-size: 1.5rem;
+            }
+
+            .hero-content p {
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .section-head h2 {
+                font-size: 1.1rem;
+            }
+
+            .card-title {
+                font-size: 1rem;
+            }
+
+            .card-price {
+                font-size: 1.2rem;
+            }
+
+            .detail-item {
+                font-size: 0.8rem;
             }
         }
     </style>
@@ -439,73 +800,73 @@
         <a id="admin-link-mobile" href="admin.html" style="display:none;">Admin</a>
     </div>
 
-    <!-- Full-width Hero Section -->
-    <section class="hero" id="hero">
-        <div class="hero-content">
-            <div class="hero-filter-box">
-                <form class="hero-search-panel" onsubmit="event.preventDefault(); applyFilters();">
-                    <div class="hero-search-field">
-                        <span class="input-icon">🔎</span>
-                        <input id="search" type="text" placeholder="Search vehicles, brands or models" />
-                    </div>
-                    <div class="hero-search-field">
-                        <span class="input-icon">📍</span>
-                        <select id="hero-location">
-                            <option value="">All locations</option>
-                            <option>Colombo</option>
-                            <option>Gampaha</option>
-                            <option>Negombo</option>
-                            <option>Chilaw</option>
-                            <option>Kurunegala</option>
-                            <option>Kandy</option>
-                            <option>Matara</option>
-                            <option>Galle</option>
-                            <option>Anuradhapura</option>
-                            <option>Jaffna</option>
-                            <option>Batticaloa</option>
-                            <option>Trincomalee</option>
-                            <option>Ratnapura</option>
-                            <option>Badulla</option>
-                            <option>Kalutara</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="hero-search-btn">Search</button>
-                </form>
+    <!-- Full-width Hero Section with Premium Wrapper -->
+    <div class="hero-wrapper">
+        <section class="hero" id="hero">
+            <div class="hero-content">
+                <div class="hero-filter-box">
+                    <form class="hero-search-panel" onsubmit="event.preventDefault(); applyFilters();">
+                        <div class="hero-search-field">
+                            <input id="search" type="text" placeholder="Search Make" />
+                        </div>
+                        <div class="hero-search-field">
+                            <select id="hero-location">
+                                <option value="">All locations</option>
+                                <option>Colombo</option>
+                                <option>Gampaha</option>
+                                <option>Negombo</option>
+                                <option>Chilaw</option>
+                                <option>Kurunegala</option>
+                                <option>Kandy</option>
+                                <option>Matara</option>
+                                <option>Galle</option>
+                                <option>Anuradhapura</option>
+                                <option>Jaffna</option>
+                                <option>Batticaloa</option>
+                                <option>Trincomalee</option>
+                                <option>Ratnapura</option>
+                                <option>Badulla</option>
+                                <option>Kalutara</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="hero-search-btn">Search</button>
+                    </form>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 
     <!-- Content sections -->
     <div class="container">
-        <section class="section-head"><h2>Quick Filters</h2><small>Tap a button to filter fast</small></section>
+        <section class="section-head"><h2>Quick Filters</h2><small>Refine your search</small></section>
         <section class="filter-shell">
             <div class="filter-card">
                 <div class="filter-row">
                     <div class="filter-field">
-                        <span class="input-icon">🔎</span>
+                        <label>Search</label>
                         <input id="filter-search" type="text" placeholder="Search listings" />
                     </div>
                     <div class="filter-field">
-                        <span class="input-icon">🏷️</span>
-                        <input id="filter-brand" type="text" placeholder="Brand" />
+                        <label>Brand</label>
+                        <input id="filter-brand" type="text" placeholder="Vehicle brand" />
                     </div>
                     <div class="filter-field">
-                        <span class="input-icon">📍</span>
+                        <label>Location</label>
                         <input id="filter-location" type="text" placeholder="Location" autocomplete="off" />
                         <ul id="location-suggestions" class="suggestions hidden"></ul>
                     </div>
                 </div>
                 <div class="filter-row">
                     <div class="filter-field">
-                        <span class="input-icon">💰</span>
-                        <input id="filter-min-price" type="number" placeholder="Min Price" min="0" />
+                        <label>Min Price</label>
+                        <input id="filter-min-price" type="number" placeholder="Minimum price" min="0" />
                     </div>
                     <div class="filter-field">
-                        <span class="input-icon">💰</span>
-                        <input id="filter-max-price" type="number" placeholder="Max Price" min="0" />
+                        <label>Max Price</label>
+                        <input id="filter-max-price" type="number" placeholder="Maximum price" min="0" />
                     </div>
                     <div class="filter-field">
-                        <span class="input-icon">📅</span>
+                        <label>Year</label>
                         <input id="filter-year" type="number" placeholder="Year" min="1900" max="2099" />
                     </div>
                 </div>
@@ -516,43 +877,43 @@
             </div>
         </section>
 
-        <section class="section-head"><h2>Featured Vehicles</h2><small>Highlighted top listings</small></section>
+        <section class="section-head"><h2>Featured Vehicles</h2><small>Highlighted premium listings</small></section>
         <div class="featured-scroll" id="featured-list"></div>
 
-        <section class="section-head"><h2>Latest Vehicles</h2><small>Auto-sorted by featured status</small></section>
+        <section class="section-head"><h2>Latest Vehicles</h2><small>Browse all available vehicles</small></section>
 
         <div id="error-message" class="notice hidden"></div>
         <div id="empty-message" class="notice hidden">No vehicles found. Try adjusting filters.</div>
 
         <div class="vehicle-grid" id="vehicle-list"></div>
 
-        <footer style="background: linear-gradient(140deg, #f2f5ff, #f9f9ff); border: 1px solid rgba(136, 155, 187, 0.3); border-radius: 16px; box-shadow: 0 10px 24px rgba(40, 71, 123, 0.08);">
-            <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;padding:0 16px;">
-                <div style="min-width:220px;">
-                    <h3 style="margin:0 0 8px;">Muthupura.lk</h3>
-                    <p style="margin:0;color:#5a6f97;max-width:320px;">Your trusted marketplace to buy, sell and lease vehicles with transparency and speed.</p>
+        <footer style="background: linear-gradient(135deg, #f5f8ff, #fafbff); border: 1px solid rgba(100, 130, 190, 0.15); border-radius: 20px; box-shadow: 0 8px 20px rgba(30, 60, 130, 0.06); margin: 60px 0 0; padding: 40px 0;">
+            <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:32px;padding:0 20px;">
+                <div style="min-width:240px;">
+                    <h3 style="margin:0 0 12px;color:#1f2d52;font-size:1.1rem;font-weight:700;">Muthupura.lk</h3>
+                    <p style="margin:0;color:#5a7a9f;max-width:320px;line-height:1.5;font-size:0.95rem;">Your trusted marketplace to buy, sell and lease vehicles with transparency and speed.</p>
                 </div>
                 <div style="min-width:180px;">
-                    <h4 style="margin:0 0 8px;">Quick Links</h4>
-                    <a style="display:block;color:#2e4f8f;text-decoration:none;margin:4px 0;" href="index.html">Home</a>
-                    <a style="display:block;color:#2e4f8f;text-decoration:none;margin:4px 0;" href="post.html">Post Ad</a>
-                    <a style="display:block;color:#2e4f8f;text-decoration:none;margin:4px 0;" href="about.html">About</a>
-                    <a style="display:block;color:#2e4f8f;text-decoration:none;margin:4px 0;" href="contact.html">Contact</a>
+                    <h4 style="margin:0 0 12px;color:#1f2d52;font-weight:700;">Quick Links</h4>
+                    <a style="display:block;color:#3a6ff8;text-decoration:none;margin:6px 0;font-size:0.95rem;transition:color 0.2s;" href="index.html">Home</a>
+                    <a style="display:block;color:#3a6ff8;text-decoration:none;margin:6px 0;font-size:0.95rem;transition:color 0.2s;" href="post.html">Post Ad</a>
+                    <a style="display:block;color:#3a6ff8;text-decoration:none;margin:6px 0;font-size:0.95rem;transition:color 0.2s;" href="about.html">About</a>
+                    <a style="display:block;color:#3a6ff8;text-decoration:none;margin:6px 0;font-size:0.95rem;transition:color 0.2s;" href="contact.html">Contact</a>
                 </div>
                 <div style="min-width:180px;">
-                    <h4 style="margin:0 0 8px;">Contact Info</h4>
-                    <p style="margin:4px 0;color:#5a6f97;">Phone: +94 777 150 660</p>
-                    <p style="margin:4px 0;color:#5a6f97;">WhatsApp: <a href="https://wa.me/94777150660" style="color:#2e4f8f;">Message Us</a></p>
+                    <h4 style="margin:0 0 12px;color:#1f2d52;font-weight:700;">Contact Info</h4>
+                    <p style="margin:6px 0;color:#5a7a9f;font-size:0.95rem;">Phone: +94 777 150 660</p>
+                    <p style="margin:6px 0;color:#5a7a9f;font-size:0.95rem;">WhatsApp: <a href="https://wa.me/94777150660" style="color:#3a6ff8;text-decoration:none;font-weight:600;">Message Us</a></p>
                 </div>
             </div>
-            <div style="margin-top:16px;color:#6e7f9f;border-top:1px solid rgba(113,131,165,0.24);padding:12px 16px 0;font-size:0.9rem;">© 2026 Muthupura.lk – All rights reserved</div>
+            <div style="margin-top:24px;color:#7a8fa5;border-top:1px solid rgba(100,130,190,0.2);padding:16px 20px 0;font-size:0.9rem;">© 2026 Muthupura.lk – All rights reserved</div>
         </footer>
     </div>
 
     <script src="config.js"></script>
     <script>
         const API_URL = API_BASE_URL;
-        console.log('📡 Using API URL:', API_URL);
+        console.log('Using API URL:', API_URL);
         let vehiclesData = [];
         let selectedCategory = null;
         const FALLBACK_IMAGE = '/logo.PNG';
@@ -575,7 +936,7 @@
                 }
                 return (imageArray && imageArray[0]) || FALLBACK_IMAGE;
             } catch (e) {
-                console.warn('⚠️ Failed to parse images:', e.message);
+                console.warn('Failed to parse images:', e.message);
                 return FALLBACK_IMAGE;
             }
         }
@@ -674,7 +1035,7 @@
                 renderVehicles(vehiclesData);
                 renderFeatured(vehiclesData.filter(v => v.featured));
             } catch (err) {
-                console.error('❌ Fetch error:', err);
+                console.error('Fetch error:', err);
                 const errorEl = getEl('error-message');
                 if (errorEl) {
                     errorEl.textContent = 'Failed to load vehicles. Please try again.';
@@ -701,27 +1062,24 @@
 
         function createCard(v) {
             const img = getImageUrl(v.images);
-            const featured = v.featured ? ' feature' : '';
-            const evTag = v.type === 'EV' ? ' ev' : '';
+            const featured = v.featured ? ' featured' : '';
             return `
-                <div class="card" onclick="redirectToVehicle(${v.id})">
-                    <div class="card-top">
+                <div class="card${featured}">
+                    <div class="card-image">
                         <img src="${img}" alt="${v.make} ${v.model}">
-                        ${featured ? `<div class="card-badge feature">Featured</div>` : ''}
-                        ${evTag ? `<div class="card-badge ev">EV</div>` : ''}
-                        <button class="heart-icon" onclick="toggleHeart(event, ${v.id})" title="Save vehicle">♡</button>
+                        ${featured ? `<span class="card-badge">Featured</span>` : ''}
+                        ${v.type === 'EV' ? `<span class="card-badge ev-badge">EV</span>` : ''}
+                        <button class="card-save-btn" onclick="toggleHeart(event, ${v.id})" title="Save vehicle">♡</button>
                     </div>
-                    <div class="card-body">
+                    <div class="card-content">
                         <h3 class="card-title">${v.make} ${v.model}</h3>
-                        <p class="price">Rs. ${v.price.toLocaleString()}</p>
-                        <div class="card-meta">
-                            <span>📅 ${v.year}</span>
-                            <span>📍 ${v.location}</span>
-                            <span>🔧 ${v.condition}</span>
+                        <p class="card-price">Rs ${v.price.toLocaleString()}</p>
+                        <div class="card-details">
+                            <span class="detail-item">${v.year}</span>
+                            <span class="detail-item">${v.location}</span>
+                            <span class="detail-item">${v.condition}</span>
                         </div>
-                        <div class="card-actions">
-                            <button class="button button-primary" onclick="event.stopPropagation(); redirectToVehicle(${v.id})">View Details</button>
-                        </div>
+                        <button class="card-view-btn" onclick="redirectToVehicle(${v.id})">View Details</button>
                     </div>
                 </div>
             `;
