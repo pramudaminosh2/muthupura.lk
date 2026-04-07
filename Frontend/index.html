@@ -25,6 +25,318 @@
             z-index: 1000;
             width: 100%;
             box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(58, 111, 248, 0.15);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            padding: 0 16px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-container {
+            max-width: 1250px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .nav-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #1f2d52;
+            font-weight: 700;
+            font-size: 1.05rem;
+            transition: all 0.22s ease;
+            flex-shrink: 0;
+        }
+
+        .nav-brand:hover {
+            opacity: 0.85;
+            transform: translateY(-1px);
+        }
+
+        .nav-brand img {
+            height: 46px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .nav-brand span {
+            display: none;
+        }
+
+        @media (min-width: 640px) {
+            .nav-brand span {
+                display: inline;
+            }
+        }
+
+        .nav-center a {
+            text-decoration: none;
+            color: #1f2d52;
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 8px 14px;
+            border-radius: 12px;
+            transition: all 0.22s ease;
+            position: relative;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-center a:hover {
+            color: #fff;
+            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(58, 111, 248, 0.25);
+        }
+
+        #user-greeting {
+            color: #1f2d52;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 0 12px;
+            white-space: nowrap;
+        }
+
+        #auth-link {
+            padding: 9px 18px;
+            background: rgba(58, 111, 248, 0.08);
+            color: #1f2f4f;
+            border-radius: 12px;
+            border: 1px solid rgba(58, 111, 248, 0.15);
+            transition: all 0.22s ease;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+
+        #auth-link:hover {
+            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(58, 111, 248, 0.25);
+            border-color: #3a6ff8;
+        }
+
+        #auth-link.logout-btn {
+            background: rgba(209, 40, 69, 0.08);
+            color: #d12845;
+            border: 1px solid rgba(209, 40, 69, 0.2);
+        }
+
+        #auth-link.logout-btn:hover {
+            background: #d12845;
+            color: #fff;
+            border-color: #d12845;
+            box-shadow: 0 8px 20px rgba(209, 40, 69, 0.25);
+            transform: translateY(-2px);
+        }
+
+        #admin-link {
+            padding: 9px 18px;
+            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
+            color: #fff;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            box-shadow: 0 6px 20px rgba(58, 111, 248, 0.2);
+            transition: all 0.22s ease;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        #admin-link:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(142, 82, 248, 0.35);
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 8px;
+            transition: all 0.2s ease;
+        }
+
+        @media (min-width: 768px) {
+            .hamburger {
+                display: none;
+            }
+        }
+
+        .hamburger span {
+            width: 24px;
+            height: 2px;
+            background: #1f2d52;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        /* Mobile menu */
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(248, 250, 255, 0.95) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(200, 210, 230, 0.3);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            flex-direction: column;
+            padding: 16px;
+            gap: 8px;
+            z-index: 999;
+            max-height: calc(100vh - 70px);
+            overflow-y: auto;
+            animation: slideDown 0.25s ease forwards;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .mobile-menu a {
+            display: block;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: #1f2d52;
+            font-weight: 500;
+            border-radius: 12px;
+            transition: all 0.22s ease;
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(58, 111, 248, 0.1);
+        }
+
+        .mobile-menu a:hover {
+            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(58, 111, 248, 0.2);
+            border-color: #3a6ff8;
+        }
+
+        #auth-link-mobile {
+            padding: 12px 16px;
+            background: rgba(58, 111, 248, 0.08);
+            border-radius: 12px;
+            text-decoration: none;
+            color: #1f2d52;
+            font-weight: 500;
+            transition: all 0.22s ease;
+            display: block;
+            border: 1px solid rgba(58, 111, 248, 0.15);
+        }
+
+        #auth-link-mobile:hover {
+            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(58, 111, 248, 0.25);
+        }
+
+        #auth-link-mobile.logout-btn {
+            background: rgba(209, 40, 69, 0.08);
+            color: #d12845;
+            border: 1px solid rgba(209, 40, 69, 0.2);
+        }
+
+        #auth-link-mobile.logout-btn:hover {
+            background: #d12845;
+            color: #fff;
+            border-color: #d12845;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(209, 40, 69, 0.25);
+        }
+
+        #admin-link-mobile {
+            display: block;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            box-shadow: 0 6px 20px rgba(58, 111, 248, 0.15);
+            transition: all 0.22s ease;
+        }
+
+        #admin-link-mobile:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(142, 82, 248, 0.35);
+        }
+
+        @media (max-width: 768px) {
+            .nav-center {
+                display: none;
+            }
         }
 
         /* ===== HERO WRAPPER (Premium Card Style) ===== */
@@ -772,21 +1084,27 @@
 
     <!-- Fixed Navbar -->
     <nav class="navbar" id="navbar">
-        <a class="nav-brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk"><span>Muthupura.lk</span></a>
-        <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="post.html">Post Ad</a>
-            <a href="dashboard.html" id="mylistings-link" style="display:none;">My Listings</a>
-            <a href="about.html">About Us</a>
-            <a href="contact.html">Contact Us</a>
-            <a id="auth-link" href="login.html">Login</a>
-            <a id="admin-link" href="admin.html" style="display:none;">Admin</a>
-            <span id="user-greeting" style="display:none; color:var(--text); font-weight:700; margin-left:12px;"></span>
-        </div>
-        <div class="hamburger" id="navbar-hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
+        <div class="nav-container">
+            <div class="nav-left">
+                <a class="nav-brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk"><span>Muthupura.lk</span></a>
+            </div>
+            <div class="nav-center">
+                <a href="index.html">Home</a>
+                <a href="post.html">Post Ad</a>
+                <a href="dashboard.html" id="mylistings-link" style="display:none;">My Listings</a>
+                <a href="about.html">About Us</a>
+                <a href="contact.html">Contact Us</a>
+            </div>
+            <div class="nav-right">
+                <span id="user-greeting" style="display:none;"></span>
+                <a id="auth-link" href="login.html">Login</a>
+                <a id="admin-link" href="admin.html" style="display:none;">Admin</a>
+                <button class="hamburger" id="navbar-hamburger" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
         </div>
     </nav>
 
@@ -796,6 +1114,7 @@
         <a href="dashboard.html" id="mylistings-link-mobile" style="display:none;">My Listings</a>
         <a href="about.html">About Us</a>
         <a href="contact.html">Contact Us</a>
+        <hr style="border: none; border-top: 1px solid rgba(200, 210, 230, 0.3); margin: 8px 0;">
         <a id="auth-link-mobile" href="login.html">Login</a>
         <a id="admin-link-mobile" href="admin.html" style="display:none;">Admin</a>
     </div>
@@ -982,18 +1301,20 @@
                 }
 
                 if (adminLink) {
-                    adminLink.style.display = payload?.role === 'admin' ? 'inline-flex' : 'none';
+                    adminLink.style.display = payload?.role === 'admin' ? 'inline-block' : 'none';
                 }
 
                 if (payload) {
-                    if (myListings) myListings.style.display = 'inline-flex';
+                    if (myListings) myListings.style.display = 'inline-block';
                     const displayName = payload.name || localStorage.getItem('userName') || payload.email || '';
                     if (userGreeting) {
                         userGreeting.textContent = displayName ? `Hi, ${displayName}` : 'Hi';
-                        userGreeting.style.display = 'inline-flex';
+                        userGreeting.style.display = 'inline-block';
                     }
                     if (authLink) {
                         authLink.textContent = 'Logout';
+                        authLink.classList.add('logout-btn');
+                        authLink.href = '#';
                         authLink.onclick = (e) => {
                             e.preventDefault();
                             localStorage.removeItem('token');
@@ -1005,6 +1326,7 @@
                     if (myListings) myListings.style.display = 'none';
                     if (authLink) {
                         authLink.textContent = 'Login';
+                        authLink.classList.remove('logout-btn');
                         authLink.href = 'login.html';
                         authLink.onclick = null;
                     }
@@ -1022,6 +1344,13 @@
                 mobileAuthLink.textContent = desktopAuthLink.textContent;
                 mobileAuthLink.href = desktopAuthLink.href;
                 mobileAuthLink.onclick = desktopAuthLink.onclick;
+                
+                // Sync styling classes
+                if (desktopAuthLink.classList.contains('logout-btn')) {
+                    mobileAuthLink.classList.add('logout-btn');
+                } else {
+                    mobileAuthLink.classList.remove('logout-btn');
+                }
             }
         }
 
