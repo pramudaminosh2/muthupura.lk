@@ -1089,6 +1089,319 @@
                 font-size: 0.8rem;
             }
         }
+
+        /* ===== PREMIUM FOOTER STYLING ===== */
+        .premium-footer {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(248, 250, 255, 0.08) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1.2px solid rgba(58, 111, 248, 0.15);
+            border-radius: 28px;
+            margin: 80px 16px 0;
+            padding: 60px 40px 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(58, 111, 248, 0.06), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+        }
+
+        .premium-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 50%, rgba(58, 111, 248, 0.03) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(142, 82, 248, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .footer-col h3 {
+            margin: 0 0 18px 0;
+            color: #1f2d52;
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .footer-col p {
+            margin: 0 0 12px 0;
+            color: #5a7a9f;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .footer-col a {
+            display: block;
+            color: #3a6ff8;
+            text-decoration: none;
+            margin: 10px 0;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            padding-left: 0;
+        }
+
+        .footer-col a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -2px;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #3a6ff8, #8e52f8);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .footer-col a:hover::before {
+            width: 100%;
+        }
+
+        .footer-col a:hover {
+            color: #8e52f8;
+            transform: translateX(4px);
+        }
+
+        .footer-brand-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #1f2d52;
+            margin-bottom: 8px;
+        }
+
+        .footer-logo img {
+            height: 40px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .footer-description {
+            color: #5a7a9f;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            max-width: 280px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(58, 111, 248, 0.1);
+            color: #3a6ff8;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(58, 111, 248, 0.2);
+            font-size: 0.9rem;
+            margin: 0;
+            padding: 0;
+        }
+
+        .social-links a::before {
+            display: none;
+        }
+
+        .social-links a:hover {
+            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
+            color: #fff;
+            transform: translateY(-4px);
+            border-color: transparent;
+            box-shadow: 0 8px 20px rgba(58, 111, 248, 0.25);
+        }
+
+        .newsletter-section {
+            background: rgba(58, 111, 248, 0.08);
+            border: 1px solid rgba(58, 111, 248, 0.15);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 40px;
+        }
+
+        .newsletter-section h4 {
+            margin: 0 0 12px 0;
+            color: #1f2d52;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: 8px;
+        }
+
+        .newsletter-form input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid rgba(58, 111, 248, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            color: #1f2d52;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .newsletter-form input::placeholder {
+            color: #8a9ab8;
+        }
+
+        .newsletter-form input:focus {
+            outline: none;
+            border-color: #3a6ff8;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(58, 111, 248, 0.12);
+        }
+
+        .newsletter-form button {
+            padding: 10px 16px;
+            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(58, 111, 248, 0.2);
+        }
+
+        .newsletter-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(58, 111, 248, 0.3);
+        }
+
+        .footer-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(58, 111, 248, 0.2), transparent);
+            margin: 0 0 32px 0;
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            color: #7a8fa5;
+            font-size: 0.9rem;
+        }
+
+        .footer-bottom a {
+            color: #7a8fa5;
+            text-decoration: none;
+            transition: color 0.2s ease;
+            margin: 0 12px;
+            padding: 0;
+        }
+
+        .footer-bottom a::before {
+            display: none;
+        }
+
+        .footer-bottom a:hover {
+            color: #3a6ff8;
+            transform: none;
+        }
+
+        .footer-bottom-links {
+            display: flex;
+            gap: 0;
+            flex-wrap: wrap;
+        }
+
+        .footer-bottom-links a {
+            margin: 0;
+        }
+
+        .footer-bottom-links a:not(:last-child)::after {
+            content: '|';
+            margin: 0 12px;
+            color: rgba(122, 143, 165, 0.3);
+        }
+
+        @media (max-width: 1024px) {
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 32px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .premium-footer {
+                margin: 60px 12px 0;
+                padding: 40px 24px 30px;
+                border-radius: 20px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+
+            .footer-col h3 {
+                font-size: 1rem;
+            }
+
+            .footer-col p {
+                font-size: 0.9rem;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+            }
+
+            .newsletter-form button {
+                width: 100%;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-bottom-links {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .footer-bottom-links a:not(:last-child)::after {
+                content: '';
+                margin: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1218,26 +1531,78 @@
 
         <div class="vehicle-grid" id="vehicle-list"></div>
 
-        <footer style="background: linear-gradient(135deg, #f5f8ff, #fafbff); border: 1px solid rgba(100, 130, 190, 0.15); border-radius: 20px; box-shadow: 0 8px 20px rgba(30, 60, 130, 0.06); margin: 60px 0 0; padding: 40px 0;">
-            <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:32px;padding:0 20px;">
-                <div style="min-width:240px;">
-                    <h3 style="margin:0 0 12px;color:#1f2d52;font-size:1.1rem;font-weight:700;">Muthupura.lk</h3>
-                    <p style="margin:0;color:#5a7a9f;max-width:320px;line-height:1.5;font-size:0.95rem;">Your trusted marketplace to buy, sell and lease vehicles with transparency and speed.</p>
+        <!-- Premium Modern Footer -->
+        <footer class="premium-footer">
+            <div class="footer-container">
+                <!-- Newsletter Section -->
+                <div class="newsletter-section">
+                    <h4>Subscribe to Our Newsletter</h4>
+                    <p style="margin: 0 0 12px 0; color: #5a7a9f; font-size: 0.9rem;">Get the latest vehicles and exclusive deals delivered to your inbox</p>
+                    <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Thank you for subscribing!');">
+                        <input type="email" placeholder="Enter your email address" required>
+                        <button type="submit">Subscribe</button>
+                    </form>
                 </div>
-                <div style="min-width:180px;">
-                    <h4 style="margin:0 0 12px;color:#1f2d52;font-weight:700;">Quick Links</h4>
-                    <a style="display:block;color:#3a6ff8;text-decoration:none;margin:6px 0;font-size:0.95rem;transition:color 0.2s;" href="index.html">Home</a>
-                    <a style="display:block;color:#3a6ff8;text-decoration:none;margin:6px 0;font-size:0.95rem;transition:color 0.2s;" href="post.html">Post Ad</a>
-                    <a style="display:block;color:#3a6ff8;text-decoration:none;margin:6px 0;font-size:0.95rem;transition:color 0.2s;" href="about.html">About</a>
-                    <a style="display:block;color:#3a6ff8;text-decoration:none;margin:6px 0;font-size:0.95rem;transition:color 0.2s;" href="contact.html">Contact</a>
+
+                <!-- Main Footer Content -->
+                <div class="footer-content">
+                    <!-- Brand Section -->
+                    <div class="footer-col footer-brand-section">
+                        <div class="footer-logo">
+                            <img src="logo.PNG" alt="Muthupura.lk">
+                            <span>Muthupura.lk</span>
+                        </div>
+                        <p class="footer-description">Your trusted marketplace to buy, sell and lease vehicles with complete transparency, speed, and security.</p>
+                        <div class="social-links">
+                            <a href="https://facebook.com" title="Facebook" aria-label="Facebook">f</a>
+                            <a href="https://twitter.com" title="Twitter" aria-label="Twitter">𝕏</a>
+                            <a href="https://instagram.com" title="Instagram" aria-label="Instagram">📷</a>
+                            <a href="https://linkedin.com" title="LinkedIn" aria-label="LinkedIn">in</a>
+                        </div>
+                    </div>
+
+                    <!-- Quick Navigation -->
+                    <div class="footer-col">
+                        <h3>Quick Navigation</h3>
+                        <a href="index.html">Home</a>
+                        <a href="post.html">Post an Ad</a>
+                        <a href="dashboard.html">My Dashboard</a>
+                        <a href="about.html">About Us</a>
+                        <a href="contact.html">Contact Us</a>
+                    </div>
+
+                    <!-- Services -->
+                    <div class="footer-col">
+                        <h3>Services</h3>
+                        <a href="#">Buy Vehicles</a>
+                        <a href="#">Sell Vehicles</a>
+                        <a href="#">Lease Vehicles</a>
+                        <a href="#">Vehicle Inspection</a>
+                        <a href="#">Financing</a>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="footer-col">
+                        <h3>Contact Us</h3>
+                        <p>📞 Phone: <a href="tel:+94777150660" style="color: #3a6ff8; font-weight: 600;">+94 777 150 660</a></p>
+                        <p>💬 WhatsApp: <a href="https://wa.me/94777150660" style="color: #3a6ff8; font-weight: 600;">Message Us</a></p>
+                        <p>📧 Email: <a href="mailto:info@muthupura.lk" style="color: #3a6ff8; font-weight: 600;">info@muthupura.lk</a></p>
+                    </div>
                 </div>
-                <div style="min-width:180px;">
-                    <h4 style="margin:0 0 12px;color:#1f2d52;font-weight:700;">Contact Info</h4>
-                    <p style="margin:6px 0;color:#5a7a9f;font-size:0.95rem;">Phone: +94 777 150 660</p>
-                    <p style="margin:6px 0;color:#5a7a9f;font-size:0.95rem;">WhatsApp: <a href="https://wa.me/94777150660" style="color:#3a6ff8;text-decoration:none;font-weight:600;">Message Us</a></p>
+
+                <!-- Footer Divider -->
+                <div class="footer-divider"></div>
+
+                <!-- Footer Bottom -->
+                <div class="footer-bottom">
+                    <span>© 2026 Muthupura.lk – All rights reserved | Developed with ❤️</span>
+                    <div class="footer-bottom-links">
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Cookie Policy</a>
+                    </div>
                 </div>
             </div>
-            <div style="margin-top:24px;color:#7a8fa5;border-top:1px solid rgba(100,130,190,0.2);padding:16px 20px 0;font-size:0.9rem;">© 2026 Muthupura.lk – All rights reserved</div>
         </footer>
     </div>
 
