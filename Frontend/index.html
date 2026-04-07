@@ -29,15 +29,22 @@
             z-index: 1000;
             width: 81%;
             box-sizing: border-box;
-            background: rgba(255, 255, 255, 0.45);
-            backdrop-filter: blur(28px);
-            -webkit-backdrop-filter: blur(28px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 8px 32px rgba(58, 111, 248, 0.15);
+            background: linear-gradient(135deg, rgba(58,111,248,0.08) 0%, rgba(142,82,248,0.06) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1.2px solid rgba(58,111,248,0.15);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(58,111,248,0.08), inset 0 1px 1px rgba(255,255,255,0.9);
             padding: 0;
             height: 70px;
             display: flex;
             align-items: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .navbar:hover {
+            box-shadow: 0 12px 40px rgba(58,111,248,0.12), inset 0 1px 1px rgba(255,255,255,0.95);
+            border-color: rgba(58,111,248,0.22);
         }
 
         .nav-container {

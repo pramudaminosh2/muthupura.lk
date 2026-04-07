@@ -19,6 +19,261 @@
             --shadow-strong: 0 32px 90px rgba(25, 73, 145, 0.14);
         }
 
+        /* ===== NAVBAR FIXED POSITIONING ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            width: 81%;
+            box-sizing: border-box;
+            background: linear-gradient(135deg, rgba(58,111,248,0.08) 0%, rgba(142,82,248,0.06) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1.2px solid rgba(58,111,248,0.15);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(58,111,248,0.08), inset 0 1px 1px rgba(255,255,255,0.9);
+            padding: 0;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .navbar:hover {
+            box-shadow: 0 12px 40px rgba(58,111,248,0.12), inset 0 1px 1px rgba(255,255,255,0.95);
+            border-color: rgba(58,111,248,0.22);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .nav-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #1f2d52;
+            font-weight: 700;
+            font-size: 1.05rem;
+            transition: all 0.22s ease;
+            flex-shrink: 0;
+        }
+
+        .nav-brand:hover {
+            opacity: 0.85;
+            transform: translateY(-1px);
+        }
+
+        .nav-brand img {
+            height: 46px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .nav-brand span {
+            display: none;
+        }
+
+        @media (min-width: 640px) {
+            .nav-brand span {
+                display: inline;
+            }
+        }
+
+        .nav-center a {
+            text-decoration: none;
+            color: #1f2d52;
+            font-weight: 600;
+            font-size: 1.05rem;
+            letter-spacing: 0.4px;
+            padding: 10px 18px;
+            border-radius: 14px;
+            transition: all 0.22s ease;
+            position: relative;
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .nav-center a:hover {
+            color: #fff;
+            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(58, 111, 248, 0.25);
+        }
+
+        #auth-link {
+            padding: 9px 18px;
+            background: rgba(58, 111, 248, 0.08);
+            color: #1f2f4f;
+            border-radius: 12px;
+            border: 1px solid rgba(58, 111, 248, 0.15);
+            transition: all 0.22s ease;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+
+        #auth-link:hover {
+            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(58, 111, 248, 0.25);
+            border-color: #3a6ff8;
+        }
+
+        #logout-btn {
+            padding: 9px 18px;
+            background: rgba(209, 40, 69, 0.08);
+            color: #d12845;
+            border-radius: 12px;
+            border: 1px solid rgba(209, 40, 69, 0.2);
+            transition: all 0.22s ease;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+
+        #logout-btn:hover {
+            background: #d12845;
+            color: #fff;
+            border-color: #d12845;
+            box-shadow: 0 8px 20px rgba(209, 40, 69, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 8px;
+            transition: all 0.2s ease;
+        }
+
+        @media (min-width: 768px) {
+            .hamburger {
+                display: none;
+            }
+        }
+
+        .hamburger span {
+            width: 24px;
+            height: 2px;
+            background: #1f2d52;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        /* Mobile menu */
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(248, 250, 255, 0.95) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(200, 210, 230, 0.3);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            flex-direction: column;
+            padding: 16px;
+            gap: 8px;
+            z-index: 999;
+            max-height: calc(100vh - 70px);
+            overflow-y: auto;
+            animation: slideDown 0.25s ease forwards;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .mobile-menu a {
+            display: block;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: #1f2d52;
+            font-weight: 500;
+            border-radius: 12px;
+            transition: all 0.22s ease;
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(58, 111, 248, 0.1);
+        }
+
+        .mobile-menu a:hover {
+            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(58, 111, 248, 0.2);
+            border-color: #3a6ff8;
+        }
+
+        @media (max-width: 768px) {
+            .nav-center {
+                display: none;
+            }
+        }
+
         .wrapper {
             max-width: 1160px;
             margin: 0 auto;
@@ -174,26 +429,35 @@
     </style>
 </head>
 <body>
-    <div class="wrapper">
-        <nav class="navbar">
-            <a class="nav-brand" href="index.html"><img src="logo.PNG" alt="logo"><span>Muthupura.lk Admin</span></a>
-            <div class="nav-links">
+    <!-- Fixed Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a class="nav-brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk"><span>Muthupura.lk</span></a>
+            </div>
+            <div class="nav-center">
                 <a href="index.html">Home</a>
                 <a href="post.html">Post Ad</a>
-                <button class="btn primary" id="logout-btn">Logout</button>
             </div>
-            <div class="hamburger" id="navbar-hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
+            <div class="nav-right">
+                <button id="logout-btn" style="padding: 9px 18px; background: rgba(209, 40, 69, 0.08); color: #d12845; border-radius: 12px; border: 1px solid rgba(209, 40, 69, 0.2); transition: all 0.22s ease; font-weight: 500; cursor: pointer; font-size: 0.9rem; display: inline-block;">Logout</button>
+                <button class="hamburger" id="navbar-hamburger" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
             </div>
-        </nav>
-        
-        <div class="mobile-menu" id="mobile-menu">
-            <a href="index.html">Home</a>
-            <a href="post.html">Post Ad</a>
-            <button class="btn primary" id="logout-btn-mobile">Logout</button>
         </div>
+    </nav>
+
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="index.html">Home</a>
+        <a href="post.html">Post Ad</a>
+        <hr style="border: none; border-top: 1px solid rgba(200, 210, 230, 0.3); margin: 8px 0;">
+        <button id="logout-btn-mobile" style="width: 100%; padding: 12px 16px; background: rgba(209, 40, 69, 0.08); color: #d12845; border: 1px solid rgba(209, 40, 69, 0.2); border-radius: 12px; font-weight: 500; cursor: pointer; font-size: 0.9rem; display: block; transition: all 0.22s ease;">Logout</button>
+    </div>
+
+    <div class="wrapper" style="margin-top: 100px;">
 
         <div class="stats">
             <div class="stat"><h3>Total Ads</h3><p id="total-ads">-</p></div>
@@ -216,6 +480,7 @@
         <p class="note">Use features to highlight top vehicles; delete outdated listings quickly.</p>
     </div>
 
+    <script src="config.js"></script>
     <script src="config.js"></script>
     <script>
         console.log('📡 Using API URL:', API_BASE_URL);
