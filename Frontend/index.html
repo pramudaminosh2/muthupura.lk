@@ -16,20 +16,33 @@
             padding: 0;
         }
 
+        /* ===== NAVBAR FIXED POSITIONING ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
         /* ===== FULL-WIDTH HERO (Premium Marketplace Style) ===== */
         .hero {
             position: relative;
-            width: 100vw;
-            height: 75vh;
-            margin: 0;
-            margin-left: calc(-50vw + 50%);
+            width: 100%;
+            height: 85vh;
+            margin-top: 80px;
             background-image: url('hero-cover.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: scroll;
             display: flex;
-            flex-direction: column;
+            align-items: flex-end;
+            justify-content: flex-start;
+            padding: 0 5%;
+            box-sizing: border-box;
             overflow: hidden;
         }
 
@@ -43,41 +56,24 @@
             pointer-events: none;
         }
 
-        /* Navbar overlay on hero */
-        .navbar-hero {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            margin: 12px 16px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(8px);
-            border-radius: 16px;
-            width: auto;
-        }
-
-        .navbar-hero .nav-brand {
-            display: inline-flex;
-        }
-
-        /* Filter bar at bottom of hero */
-        .hero-filter-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 10;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent);
-            padding: 30px 16px 20px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .container-hero {
-            max-width: 1000px;
+        /* Hero content container */
+        .hero-content {
+            max-width: 520px;
             width: 100%;
+            z-index: 2;
+            margin-bottom: 40px;
+        }
+
+        /* Glassmorphism filter box */
+        .hero-filter-box {
+            margin-top: 20px;
+            padding: 18px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
 
         .hero-search-panel {
@@ -153,21 +149,30 @@
         /* Mobile hero adjustments */
         @media (max-width: 768px) {
             .hero {
-                height: 60vh;
+                height: 70vh;
+                padding: 0 16px;
+                align-items: flex-end;
+                margin-top: 70px;
             }
+
+            .hero-content {
+                width: 100%;
+                margin-bottom: 30px;
+            }
+
+            .hero-filter-box {
+                width: 100%;
+                padding: 14px;
+            }
+
             .hero-search-panel {
                 grid-template-columns: 1fr;
                 gap: 8px;
                 padding: 10px 12px;
             }
+
             .hero-search-btn {
                 width: 100%;
-            }
-            .navbar-hero {
-                margin: 8px 12px;
-            }
-            .hero-filter-bar {
-                padding: 20px 12px 14px;
             }
         }
 
@@ -404,39 +409,40 @@
 <body>
     <div id="loader"></div>
 
-    <!-- Full-width hero with navbar overlay and filter bar -->
-    <section class="hero" id="hero">
-        <nav class="navbar navbar-hero" id="navbar">
-            <a class="nav-brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk"><span>Muthupura.lk</span></a>
-            <div class="nav-links">
-                <a href="index.html">Home</a>
-                <a href="post.html">Post Ad</a>
-                <a href="dashboard.html" id="mylistings-link" style="display:none;">My Listings</a>
-                <a href="about.html">About Us</a>
-                <a href="contact.html">Contact Us</a>
-                <a id="auth-link" href="login.html">Login</a>
-                <a id="admin-link" href="admin.html" style="display:none;">Admin</a>
-                <span id="user-greeting" style="display:none; color:var(--text); font-weight:700; margin-left:12px;"></span>
-            </div>
-            <div class="hamburger" id="navbar-hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </nav>
-
-        <div class="mobile-menu" id="mobile-menu">
+    <!-- Fixed Navbar -->
+    <nav class="navbar" id="navbar">
+        <a class="nav-brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk"><span>Muthupura.lk</span></a>
+        <div class="nav-links">
             <a href="index.html">Home</a>
             <a href="post.html">Post Ad</a>
-            <a href="dashboard.html" id="mylistings-link-mobile" style="display:none;">My Listings</a>
+            <a href="dashboard.html" id="mylistings-link" style="display:none;">My Listings</a>
             <a href="about.html">About Us</a>
             <a href="contact.html">Contact Us</a>
-            <a id="auth-link-mobile" href="login.html">Login</a>
-            <a id="admin-link-mobile" href="admin.html" style="display:none;">Admin</a>
+            <a id="auth-link" href="login.html">Login</a>
+            <a id="admin-link" href="admin.html" style="display:none;">Admin</a>
+            <span id="user-greeting" style="display:none; color:var(--text); font-weight:700; margin-left:12px;"></span>
         </div>
+        <div class="hamburger" id="navbar-hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
 
-        <div class="hero-filter-bar">
-            <div class="container-hero">
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="index.html">Home</a>
+        <a href="post.html">Post Ad</a>
+        <a href="dashboard.html" id="mylistings-link-mobile" style="display:none;">My Listings</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact Us</a>
+        <a id="auth-link-mobile" href="login.html">Login</a>
+        <a id="admin-link-mobile" href="admin.html" style="display:none;">Admin</a>
+    </div>
+
+    <!-- Full-width Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <div class="hero-filter-box">
                 <form class="hero-search-panel" onsubmit="event.preventDefault(); applyFilters();">
                     <div class="hero-search-field">
                         <span class="input-icon">🔎</span>
