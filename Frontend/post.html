@@ -812,6 +812,7 @@
             padding: 24px;
             background: linear-gradient(135deg, rgba(58,111,248,0.06), rgba(142,82,248,0.04));
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .upload-dropzone:hover {
@@ -1370,7 +1371,7 @@
                 <div class="upload-dropzone" id="dropzone">
                     <div class="upload-copy">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><polyline points="7 9 12 4 17 9"/><line x1="12" y1="4" x2="12" y2="16"/></svg>
-                        <strong>Drag & drop your images here</strong>
+                        <strong>Drag & drop your images here, or click to select</strong>
                         <span>Upload up to 10 images. First image will be main image.</span>
                     </div>
                     <input id="photos" name="photos" type="file" accept="image/*" multiple>
@@ -1491,6 +1492,40 @@
             }
         });
 
+        // ===== FORM VALIDATION =====
+        function validateForm() {
+            let isValid = true;
+            const form = getEl('vehicleForm');
+            if (!form) return false;
+
+            // Get all fields marked as required
+            const requiredFields = form.querySelectorAll('[data-required]');
+            
+            requiredFields.forEach(fieldDiv => {
+                const input = fieldDiv.querySelector('input, select, textarea');
+                const errorSpan = fieldDiv.querySelector('.error-message');
+                
+                if (!input) return;
+
+                const value = input.value?.trim() || '';
+                const isValid_field = value.length > 0;
+
+                if (!isValid_field) {
+                    fieldDiv.classList.add('invalid');
+                    if (errorSpan) {
+                        const label = fieldDiv.querySelector('label')?.textContent || 'This field';
+                        errorSpan.textContent = `${label} is required`;
+                    }
+                    isValid = false;
+                } else {
+                    fieldDiv.classList.remove('invalid');
+                    if (errorSpan) errorSpan.textContent = '';
+                }
+            });
+
+            return isValid;
+        }
+
         function renderMakeDropdown(filter = '') {
             if (!makeInput || !makeDropdown) return;
             const normalized = filter.trim().toLowerCase();
@@ -1541,6 +1576,14 @@
 
             dropzone = getEl('dropzone');
             if (dropzone) {
+                // Allow clicking the dropzone to open file picker
+                dropzone.addEventListener('click', (event) => {
+                    // Don't trigger if clicking the file input itself
+                    if (event.target.tagName !== 'INPUT') {
+                        photoInput?.click();
+                    }
+                });
+
                 ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
                     dropzone.addEventListener(eventName, (event) => {
                         event.preventDefault();
