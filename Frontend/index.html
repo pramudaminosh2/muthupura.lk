@@ -11,9 +11,11 @@
     <style>
         /* Global overflow fix & Premium Background */
         html, body { 
-            overflow-x: hidden;
             margin: 0;
             padding: 0;
+            overflow-x: hidden;
+            width: 100%;
+            height: 100%;
             background:
               radial-gradient(circle at top, rgba(58,111,248,0.12), transparent 40%),
               linear-gradient(to bottom, #eef2f8, #ffffff);
@@ -31,9 +33,10 @@
             --accent-color-2: #8e52f8;
             --text-dark: #1f2f4f;
             --text-light: #ffffff;
-            --bg-dark: rgba(15, 23, 42, 0.85);
-            --bg-glass: rgba(255, 255, 255, 0.1);
-            --border-light: rgba(255, 255, 255, 0.2);
+            --bg-dark: rgba(5, 10, 30, 1);
+            --bg-dark-secondary: rgba(15, 25, 60, 0.97);
+            --bg-glass: rgba(255, 255, 255, 0.07);
+            --border-light: rgba(255, 255, 255, 0.15);
         }
 
         /* ===== PREMIUM NAVBAR ===== */
@@ -451,22 +454,32 @@
         /* ===== PREMIUM HERO SECTION ===== */
         .hero-wrapper {
             width: 100%;
-            padding: 0;
+            max-width: 100%;
             margin: 0;
-            margin-top: 70px;
+            padding: 0;
+            position: relative;
         }
 
         .premium-hero {
             position: relative;
             width: 100%;
-            height: 100vh;
-            max-height: 800px;
-            min-height: 600px;
+            min-height: 100vh;
+            max-width: 100%;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
-            padding-bottom: 60px;
+            padding: 0;
+            margin: 0;
+            /* Account for fixed navbar on desktop and mobile */
+            padding-top: 70px;
+        }
+
+        @media (max-width: 767px) {
+            .premium-hero {
+                padding-top: 60px;
+                min-height: calc(100vh - 60px);
+            }
         }
 
         /* Hero Background with Image & Overlay */
@@ -483,10 +496,9 @@
             background-repeat: no-repeat;
             background-attachment: fixed;
             background-color: #1a2a4a;
-            fallback: linear-gradient(135deg, #1a2a4a 0%, #2d3d5c 100%);
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 767px) {
             .hero-background {
                 background-attachment: scroll;
             }
@@ -496,20 +508,18 @@
             display: none;
         }
 
+        /* Dark Gradient Overlay - Per User Specs */
         .hero-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            inset: 0;
             background: linear-gradient(
                 135deg,
-                rgba(15, 23, 42, 0.88) 0%,
-                rgba(30, 41, 59, 0.80) 50%,
-                rgba(58, 111, 248, 0.45) 100%
+                rgba(5, 10, 30, 0.82) 0%,
+                rgba(10, 20, 50, 0.65) 50%,
+                rgba(0, 0, 0, 0.75) 100%
             );
             z-index: 1;
-            backdrop-filter: blur(1px);
+            backdrop-filter: blur(0px);
         }
 
         /* Hero Container & Content */
@@ -518,11 +528,19 @@
             z-index: 2;
             max-width: 1200px;
             width: 100%;
-            padding: 0 24px;
+            padding: 0 5px;
             margin: 0 auto;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            min-height: calc(100vh - 70px);
+        }
+
+        @media (max-width: 767px) {
+            .hero-container {
+                min-height: calc(100vh - 60px);
+            }
         }
 
         .hero-content-block {
@@ -531,14 +549,39 @@
             max-width: 700px;
         }
 
-        /* Hero Logo */
+        /* Hero Logo - Responsive Sizing */
         .hero-logo {
-            max-width: 120px;
             height: auto;
-            margin: 0 auto 24px;
+            width: 350px;
+            margin: 0 auto 10px;
             display: block;
-            filter: drop-shadow(0 8px 24px rgba(255, 255, 255, 0.2));
-            animation: heroFadeInUp 0.8s ease both -0.1s backwards;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.4))
+                    drop-shadow(0 4px 15px rgba(0, 0, 0, 0.5));
+            animation: heroLogoScale 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        @keyframes heroLogoScale {
+            from {
+                opacity: 0;
+                transform: scale(0.85);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .hero-logo {
+                width: 130px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .hero-logo {
+                width: 110px;
+                margin: 0 auto 20px;
+            }
         }
 
         /* Hero Tagline Badge */
@@ -552,13 +595,21 @@
             padding: 12px 28px;
             color: rgba(255, 255, 255, 0.95);
             font-family: 'Poppins', sans-serif;
-            font-size: 0.95rem;
+            font-size: 15px;
             font-weight: 600;
             letter-spacing: 0.5px;
             margin: 0 auto 32px;
             backdrop-filter: blur(15px);
-            animation: heroFadeInUp 0.8s ease both 0s backwards;
+            animation: heroFadeInUp 0.8s ease both 0.05s backwards;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        @media (max-width: 640px) {
+            .hero-tagline-badge {
+                font-size: 13px;
+                padding: 10px 20px;
+                margin: 0 auto 24px;
+            }
         }
 
         @keyframes heroFadeInUp {
@@ -572,30 +623,42 @@
             }
         }
 
-        /* Hero Title */
+        /* Hero Title - Responsive Typography */
         .hero-title {
             font-family: 'Poppins', sans-serif;
-            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-size: clamp(28px, 8vw, 52px);
             font-weight: 800;
             color: #ffffff;
             margin: 0 0 16px 0;
             line-height: 1.2;
             letter-spacing: -0.8px;
             text-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            animation: heroFadeInUp 0.8s ease both 0.08s backwards;
+            animation: heroFadeInUp 0.8s ease both 0.1s backwards;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 36px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 28px;
+            }
         }
 
         /* Hero Subtitle */
         .hero-subtitle {
             font-family: 'Inter', sans-serif;
-            font-size: clamp(1rem, 2.5vw, 1.25rem);
+            font-size: clamp(14px, 2.5vw, 18px);
             color: rgba(255, 255, 255, 0.92);
             margin: 0 0 40px 0;
             font-weight: 400;
             line-height: 1.6;
             letter-spacing: 0.2px;
             text-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-            animation: heroFadeInUp 0.8s ease both 0.2s backwards;
+            animation: heroFadeInUp 0.8s ease both 0.15s backwards;
         }
 
         /* CTA Buttons Container */
@@ -606,7 +669,16 @@
             align-items: center;
             margin-bottom: 50px;
             flex-wrap: wrap;
-            animation: heroFadeInUp 0.8s ease both 0.3s backwards;
+            animation: heroFadeInUp 0.8s ease both 0.2s backwards;
+        }
+
+        @media (max-width: 640px) {
+            .hero-buttons {
+                flex-direction: column;
+                width: 90%;
+                gap: 14px;
+                margin-bottom: 40px;
+            }
         }
 
         /* Hero Buttons Styling */
@@ -629,6 +701,15 @@
             letter-spacing: 0.3px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
             min-width: 200px;
+        }
+
+        @media (max-width: 640px) {
+            .hero-btn {
+                width: 100%;
+                min-width: unset;
+                padding: 14px 28px;
+                font-size: 1rem;
+            }
         }
 
         .hero-btn-primary {
@@ -686,13 +767,28 @@
             max-width: 500px;
             margin: 0 auto;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.3);
-            animation: heroFadeInUp 0.8s ease both 0.4s backwards;
+            animation: heroFadeInUp 0.8s ease both 0.25s backwards;
+        }
+
+        @media (max-width: 640px) {
+            .hero-stats-bar {
+                flex-direction: column;
+                gap: 16px;
+                padding: 20px;
+                max-width: 100%;
+            }
         }
 
         .stat-item {
             flex: 1;
             text-align: center;
             padding: 0 24px;
+        }
+
+        @media (max-width: 640px) {
+            .stat-item {
+                padding: 8px 0;
+            }
         }
 
         .stat-number {
@@ -716,6 +812,14 @@
             width: 1px;
             height: 50px;
             background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0) 100%);
+        }
+
+        @media (max-width: 640px) {
+            .stat-divider {
+                width: 80%;
+                height: 1px;
+                margin: 0 auto;
+            }
         }
 
         /* Scroll Indicator */
@@ -749,110 +853,6 @@
             50% {
                 transform: translateX(-50%) translateY(12px);
                 opacity: 1;
-            }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 900px) {
-            .premium-hero {
-                max-height: 700px;
-                min-height: 550px;
-            }
-
-            .hero-buttons {
-                flex-direction: column;
-                width: 100%;
-                gap: 16px;
-            }
-
-            .hero-btn {
-                width: 100%;
-                min-width: unset;
-                padding: 14px 28px;
-                font-size: 1rem;
-            }
-
-            .hero-stats-bar {
-                padding: 20px 24px;
-                gap: 0;
-            }
-
-            .stat-item {
-                padding: 0 16px;
-            }
-
-            .stat-number {
-                font-size: 1.3rem;
-            }
-
-            .stat-label {
-                font-size: 0.85rem;
-            }
-
-            .stat-divider {
-                height: 40px;
-            }
-        }
-
-        @media (max-width: 640px) {
-            .hero-wrapper {
-                margin-top: 70px;
-            }
-
-            .premium-hero {
-                max-height: 600px;
-                min-height: 500px;
-                padding-bottom: 40px;
-            }
-
-            .hero-content-block {
-                padding: 0 16px;
-            }
-
-            .hero-title {
-                font-size: clamp(1.8rem, 7vw, 2.5rem);
-                margin-bottom: 16px;
-            }
-
-            .hero-subtitle {
-                font-size: clamp(0.95rem, 2vw, 1.1rem);
-                margin-bottom: 32px;
-            }
-
-            .hero-buttons {
-                margin-bottom: 36px;
-            }
-
-            .hero-btn {
-                padding: 12px 24px;
-                font-size: 0.95rem;
-                gap: 8px;
-            }
-
-            .btn-icon {
-                width: 18px;
-                height: 18px;
-            }
-
-            .hero-stats-bar {
-                flex-direction: column;
-                gap: 16px;
-                padding: 20px;
-                max-width: 100%;
-            }
-
-            .stat-item {
-                padding: 8px 0;
-            }
-
-            .stat-divider {
-                width: 80%;
-                height: 1px;
-                margin: 0 auto;
-            }
-
-            .scroll-indicator {
-                bottom: 16px;
             }
         }
 
@@ -1415,13 +1415,40 @@
             background: rgba(58, 111, 248, 0.5);
         }
 
+        /* ===== FILTER SECTION BACKGROUND WRAPPER ===== */
+        .filter-section-wrapper {
+            background: linear-gradient(
+                180deg,
+                rgba(5, 10, 30, 1) 0%,
+                rgba(15, 25, 60, 0.97) 40%,
+                rgba(20, 30, 70, 0.95) 100%
+            );
+            width: 100%;
+            padding: 60px 20px 80px;
+            position: relative;
+            z-index: 5;
+        }
+
+        /* Wave Transition Divider */
+        .filter-section-wrapper::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: white;
+            clip-path: polygon(0 40%, 100% 60%, 100% 100%, 0 100%);
+            z-index: 6;
+        }
+
         /* ===== PREMIUM FILTER SECTION ===== */
         .filter-container {
-            margin: -80px auto 80px;
             position: relative;
-            z-index: 10;
+            z-index: 7;
             padding: 0 24px;
-            max-width: 1400px;
+            max-width: 1100px;
+            margin: 0 auto;
         }
 
         /* Quick Filter Pills */
@@ -1431,6 +1458,8 @@
             gap: 14px;
             margin-bottom: 40px;
             flex-wrap: wrap;
+            position: relative;
+            z-index: 8;
         }
 
         .quick-filter-btn {
@@ -1460,13 +1489,18 @@
 
         /* Premium Filter Card */
         .premium-filter-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(142, 82, 248, 0.05) 100%);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1.4px solid rgba(255, 255, 255, 0.25);
-            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4),
+                        0 0 0 1px rgba(255, 255, 255, 0.05);
             padding: 40px;
-            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 8;
         }
 
         .filter-card-header {
@@ -1476,10 +1510,10 @@
 
         .filter-card-header h3 {
             font-family: 'Poppins', sans-serif;
-            font-size: 1.8rem;
+            font-size: 28px;
             font-weight: 700;
             color: #ffffff;
-            margin: 0 0 8px 0;
+            margin: 0;
             letter-spacing: -0.3px;
         }
 
@@ -1487,8 +1521,18 @@
             font-family: 'Inter', sans-serif;
             font-size: 0.95rem;
             color: rgba(255, 255, 255, 0.75);
-            margin: 0;
+            margin: 8px 0 0 0;
             letter-spacing: 0.3px;
+        }
+
+        @media (max-width: 640px) {
+            .filter-card-header h3 {
+                font-size: 22px;
+            }
+
+            .filter-card-header p {
+                font-size: 0.85rem;
+            }
         }
 
         /* Search Bar */
@@ -1511,34 +1555,45 @@
         .filter-search-bar input {
             width: 100%;
             padding: 14px 18px 14px 48px;
-            background: rgba(255, 255, 255, 0.12);
-            border: 1.4px solid rgba(255, 255, 255, 0.18);
-            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
             font-family: 'Poppins', sans-serif;
             font-size: 1rem;
             color: #ffffff;
-            placeholder-color: rgba(255, 255, 255, 0.5);
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .filter-search-bar input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+            color: rgba(255, 255, 255, 0.45);
         }
 
         .filter-search-bar input:focus {
             outline: none;
-            background: rgba(255, 255, 255, 0.16);
+            background: rgba(255, 255, 255, 0.12);
             border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(58, 111, 248, 0.25), 0 4px 16px rgba(58, 111, 248, 0.2);
+            box-shadow: 0 0 0 3px rgba(58, 111, 248, 0.25);
         }
 
         /* Filter Grid */
         .filter-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 18px;
             margin-bottom: 28px;
+        }
+
+        @media (max-width: 900px) {
+            .filter-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .filter-group {
@@ -1550,7 +1605,7 @@
             font-family: 'Poppins', sans-serif;
             font-size: 0.85rem;
             font-weight: 700;
-            color: rgba(255, 255, 255, 0.9);
+            color: rgba(255, 255, 255, 0.85);
             margin-bottom: 8px;
             letter-spacing: 0.5px;
             text-transform: uppercase;
@@ -1558,27 +1613,27 @@
 
         .filter-input,
         .filter-select {
-            padding: 12px 14px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1.4px solid rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
             font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
+            font-size: 14px;
             color: #ffffff;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
         }
 
         .filter-input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255, 255, 255, 0.45);
         }
 
         .filter-input:focus,
         .filter-select:focus {
             outline: none;
-            background: rgba(255, 255, 255, 0.14);
+            background: rgba(255, 255, 255, 0.12);
             border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(58, 111, 248, 0.25), 0 2px 8px rgba(58, 111, 248, 0.15);
+            box-shadow: 0 0 0 3px rgba(58, 111, 248, 0.25);
         }
 
         .filter-select {
@@ -1634,7 +1689,7 @@
             background: transparent;
             color: rgba(255, 255, 255, 0.75);
             padding: 14px 32px;
-            border: 1.4px solid rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             border-radius: 12px;
             font-family: 'Poppins', sans-serif;
             font-size: 1rem;
@@ -1650,46 +1705,13 @@
             color: #ffffff;
         }
 
-        /* Responsive Filter Grid */
-        @media (max-width: 900px) {
-            .filter-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .premium-filter-card {
-                padding: 28px;
-            }
-        }
-
         @media (max-width: 640px) {
             .filter-container {
-                margin: -60px auto 60px;
                 padding: 0 16px;
-            }
-
-            .filter-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .quick-filter-pills {
-                gap: 10px;
-            }
-
-            .quick-filter-btn {
-                padding: 10px 18px;
-                font-size: 0.9rem;
             }
 
             .premium-filter-card {
                 padding: 20px;
-            }
-
-            .filter-card-header h3 {
-                font-size: 1.5rem;
-            }
-
-            .filter-card-header p {
-                font-size: 0.85rem;
             }
 
             .filter-actions {
@@ -1700,6 +1722,19 @@
             .btn-clear {
                 width: 100%;
             }
+
+            .quick-filter-pills {
+                gap: 10px;
+            }
+
+            .quick-filter-btn {
+                padding: 10px 18px;
+                font-size: 0.9rem;
+            }
+        }
+
+        .filter-section-wrapper {
+            position: relative;
         }
 
         .featured-scroll {
@@ -1840,16 +1875,13 @@
 
         /* ===== PREMIUM FOOTER STYLING ===== */
         .premium-footer {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(248, 250, 255, 0.08) 100%);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1.2px solid rgba(58, 111, 248, 0.15);
-            border-radius: 28px;
-            margin: 80px 16px 0;
+            background: linear-gradient(135deg, #050a1e 0%, #0f1938 50%, #14223a 100%);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 80px 0 0;
             padding: 60px 40px 40px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 8px 32px rgba(58, 111, 248, 0.06), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
         }
 
         .premium-footer::before {
@@ -1859,7 +1891,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle at 20% 50%, rgba(58, 111, 248, 0.03) 0%, transparent 50%),
+            background: radial-gradient(circle at 20% 50%, rgba(58, 111, 248, 0.05) 0%, transparent 50%),
                         radial-gradient(circle at 80% 80%, rgba(142, 82, 248, 0.03) 0%, transparent 50%);
             pointer-events: none;
         }
@@ -1881,7 +1913,7 @@
 
         .footer-col h3 {
             margin: 0 0 18px 0;
-            color: #1f2d52;
+            color: #ffffff;
             font-size: 1.05rem;
             font-weight: 700;
             letter-spacing: 0.3px;
@@ -1889,14 +1921,14 @@
 
         .footer-col p {
             margin: 0 0 12px 0;
-            color: #5a7a9f;
+            color: rgba(255, 255, 255, 0.7);
             font-size: 0.95rem;
             line-height: 1.6;
         }
 
         .footer-col a {
             display: block;
-            color: #3a6ff8;
+            color: rgba(255, 255, 255, 0.75);
             text-decoration: none;
             margin: 10px 0;
             font-size: 0.95rem;
@@ -1922,7 +1954,7 @@
         }
 
         .footer-col a:hover {
-            color: #8e52f8;
+            color: #3a6ff8;
             transform: translateX(4px);
         }
 
@@ -1938,7 +1970,7 @@
             gap: 10px;
             font-size: 1.2rem;
             font-weight: 800;
-            color: #1f2d52;
+            color: #ffffff;
             margin-bottom: 8px;
         }
 
@@ -1946,10 +1978,11 @@
             height: 40px;
             width: auto;
             object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
         }
 
         .footer-description {
-            color: #5a7a9f;
+            color: rgba(255, 255, 255, 0.7);
             font-size: 0.95rem;
             line-height: 1.6;
             max-width: 280px;
@@ -1968,11 +2001,11 @@
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            background: rgba(58, 111, 248, 0.1);
+            background: rgba(58, 111, 248, 0.15);
             color: #3a6ff8;
             text-decoration: none;
             transition: all 0.3s ease;
-            border: 1px solid rgba(58, 111, 248, 0.2);
+            border: 1px solid rgba(58, 111, 248, 0.3);
             font-size: 0.9rem;
             margin: 0;
             padding: 0;
@@ -1987,12 +2020,12 @@
             color: #fff;
             transform: translateY(-4px);
             border-color: transparent;
-            box-shadow: 0 8px 20px rgba(58, 111, 248, 0.25);
+            box-shadow: 0 8px 20px rgba(58, 111, 248, 0.3);
         }
 
         .newsletter-section {
-            background: rgba(58, 111, 248, 0.08);
-            border: 1px solid rgba(58, 111, 248, 0.15);
+            background: rgba(58, 111, 248, 0.12);
+            border: 1px solid rgba(58, 111, 248, 0.2);
             border-radius: 16px;
             padding: 20px;
             margin-bottom: 40px;
@@ -2000,9 +2033,13 @@
 
         .newsletter-section h4 {
             margin: 0 0 12px 0;
-            color: #1f2d52;
+            color: #ffffff;
             font-size: 1rem;
             font-weight: 700;
+        }
+
+        .newsletter-section p {
+            color: rgba(255, 255, 255, 0.7);
         }
 
         .newsletter-form {
@@ -2013,9 +2050,9 @@
         .newsletter-form input {
             flex: 1;
             padding: 10px 14px;
-            border: 1px solid rgba(58, 111, 248, 0.2);
+            border: 1px solid rgba(58, 111, 248, 0.3);
             border-radius: 10px;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.95);
             color: #1f2d52;
             font-size: 0.9rem;
             transition: all 0.2s ease;
@@ -2029,7 +2066,7 @@
             outline: none;
             border-color: #3a6ff8;
             background: #fff;
-            box-shadow: 0 0 0 3px rgba(58, 111, 248, 0.12);
+            box-shadow: 0 0 0 3px rgba(58, 111, 248, 0.15);
         }
 
         .newsletter-form button {
@@ -2053,7 +2090,7 @@
 
         .footer-divider {
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(58, 111, 248, 0.2), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
             margin: 0 0 32px 0;
         }
 
@@ -2063,12 +2100,12 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 20px;
-            color: #7a8fa5;
+            color: rgba(255, 255, 255, 0.6);
             font-size: 0.9rem;
         }
 
         .footer-bottom a {
-            color: #7a8fa5;
+            color: rgba(255, 255, 255, 0.6);
             text-decoration: none;
             transition: color 0.2s ease;
             margin: 0 12px;
@@ -2097,7 +2134,7 @@
         .footer-bottom-links a:not(:last-child)::after {
             content: '|';
             margin: 0 12px;
-            color: rgba(122, 143, 165, 0.3);
+            color: rgba(255, 255, 255, 0.2);
         }
 
         @media (max-width: 1024px) {
@@ -2109,9 +2146,8 @@
 
         @media (max-width: 640px) {
             .premium-footer {
-                margin: 60px 12px 0;
+                margin: 60px 0 0;
                 padding: 40px 24px 30px;
-                border-radius: 20px;
             }
 
             .footer-content {
@@ -2121,6 +2157,7 @@
 
             .footer-col h3 {
                 font-size: 1rem;
+                color: #ffffff;
             }
 
             .footer-col p {
@@ -2272,136 +2309,140 @@
         </section>
     </div>
 
-    <!-- Premium Filter Section -->
-    <div class="filter-container">
-        <!-- Quick Filter Pills -->
-        <div class="quick-filter-pills">
-            <button class="quick-filter-btn" onclick="setVehicleType('Car')">🚗 Cars</button>
-            <button class="quick-filter-btn" onclick="setVehicleType('Bike')">🏍️ Bikes</button>
-            <button class="quick-filter-btn" onclick="setVehicleType('Van')">🚐 Vans</button>
-            <button class="quick-filter-btn" onclick="setVehicleType('Bus')">🚌 Buses</button>
-            <button class="quick-filter-btn" onclick="setVehicleType('Tractor')">🚜 Tractors</button>
-        </div>
-
-        <!-- Premium Filter Card -->
-        <div class="premium-filter-card">
-            <div class="filter-card-header">
-                <h3>Search Vehicles</h3>
-                <p>Find your perfect vehicle with advanced filters</p>
+    <!-- Premium Filter Section with Dark Background -->
+    <div class="filter-section-wrapper">
+        <div class="filter-container">
+            <!-- Quick Filter Pills -->
+            <div class="quick-filter-pills">
+                <button class="quick-filter-btn" onclick="setVehicleType('Car')">🚗 Cars</button>
+                <button class="quick-filter-btn" onclick="setVehicleType('Bike')">🏍️ Bikes</button>
+                <button class="quick-filter-btn" onclick="setVehicleType('Van')">🚐 Vans</button>
+                <button class="quick-filter-btn" onclick="setVehicleType('Bus')">🚌 Buses</button>
+                <button class="quick-filter-btn" onclick="setVehicleType('Tractor')">🚜 Tractors</button>
             </div>
 
-            <!-- Search Bar -->
-            <div class="filter-search-bar">
-                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <path d="m21 21-4.35-4.35"></path>
-                </svg>
-                <input id="filter-search" type="text" placeholder="Search by model, brand, location..." />
-            </div>
-
-            <!-- Filter Grid -->
-            <div class="filter-grid">
-                <div class="filter-group">
-                    <label>Vehicle Type</label>
-                    <select id="filter-vehicle-type" class="filter-select">
-                        <option value="">All Types</option>
-                        <option>Car</option>
-                        <option>Bike</option>
-                        <option>Van</option>
-                        <option>Bus</option>
-                        <option>Tractor</option>
-                    </select>
+            <!-- Premium Filter Card -->
+            <div class="premium-filter-card">
+                <div class="filter-card-header">
+                    <h3>Search Vehicles</h3>
+                    <p>Find your perfect vehicle with advanced filters</p>
                 </div>
 
-                <div class="filter-group">
-                    <label>Brand</label>
-                    <input id="filter-brand" type="text" class="filter-input" placeholder="e.g., Toyota, Honda" />
-                </div>
-
-                <div class="filter-group">
-                    <label>Location</label>
-                    <select id="filter-location" class="filter-select">
-                        <option value="">All Locations</option>
-                        <option>Colombo</option>
-                        <option>Gampaha</option>
-                        <option>Negombo</option>
-                        <option>Chilaw</option>
-                        <option>Kurunegala</option>
-                        <option>Kandy</option>
-                        <option>Matara</option>
-                        <option>Galle</option>
-                        <option>Anuradhapura</option>
-                        <option>Jaffna</option>
-                        <option>Batticaloa</option>
-                        <option>Trincomalee</option>
-                        <option>Ratnapura</option>
-                        <option>Badulla</option>
-                        <option>Kalutara</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label>Min Price (Rs.)</label>
-                    <input id="filter-min-price" type="number" class="filter-input" placeholder="Minimum" min="0" />
-                </div>
-
-                <div class="filter-group">
-                    <label>Max Price (Rs.)</label>
-                    <input id="filter-max-price" type="number" class="filter-input" placeholder="Maximum" min="0" />
-                </div>
-
-                <div class="filter-group">
-                    <label>Year</label>
-                    <select id="filter-year" class="filter-select">
-                        <option value="">All Years</option>
-                        <option>2024</option>
-                        <option>2023</option>
-                        <option>2022</option>
-                        <option>2021</option>
-                        <option>2020</option>
-                        <option>2019</option>
-                        <option>2018</option>
-                        <option>2017</option>
-                        <option>2016</option>
-                        <option>2015</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label>Fuel Type</label>
-                    <select id="filter-fuel-type" class="filter-select">
-                        <option value="">All Fuel Types</option>
-                        <option>Petrol</option>
-                        <option>Diesel</option>
-                        <option>EV</option>
-                        <option>Hybrid</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label>Transmission</label>
-                    <select id="filter-transmission" class="filter-select">
-                        <option value="">All Transmissions</option>
-                        <option>Manual</option>
-                        <option>Automatic</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Filter Actions -->
-            <div class="filter-actions">
-                <button class="btn-search" onclick="applyFilters()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <!-- Search Bar -->
+                <div class="filter-search-bar">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="11" cy="11" r="8"></circle>
                         <path d="m21 21-4.35-4.35"></path>
                     </svg>
-                    Search Vehicles
-                </button>
-                <button class="btn-clear" onclick="clearFilters()">Clear All</button>
+                    <input id="filter-search" type="text" placeholder="Search by model, brand, location..." />
+                </div>
+
+                <!-- Filter Grid -->
+                <div class="filter-grid">
+                    <div class="filter-group">
+                        <label>Vehicle Type</label>
+                        <select id="filter-vehicle-type" class="filter-select">
+                            <option value="">All Types</option>
+                            <option>Car</option>
+                            <option>Bike</option>
+                            <option>Van</option>
+                            <option>Bus</option>
+                            <option>Tractor</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Brand</label>
+                        <input id="filter-brand" type="text" class="filter-input" placeholder="e.g., Toyota, Honda" />
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Location</label>
+                        <select id="filter-location" class="filter-select">
+                            <option value="">All Locations</option>
+                            <option>Colombo</option>
+                            <option>Gampaha</option>
+                            <option>Negombo</option>
+                            <option>Chilaw</option>
+                            <option>Kurunegala</option>
+                            <option>Kandy</option>
+                            <option>Matara</option>
+                            <option>Galle</option>
+                            <option>Anuradhapura</option>
+                            <option>Jaffna</option>
+                            <option>Batticaloa</option>
+                            <option>Trincomalee</option>
+                            <option>Ratnapura</option>
+                            <option>Badulla</option>
+                            <option>Kalutara</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Min Price (Rs.)</label>
+                        <input id="filter-min-price" type="number" class="filter-input" placeholder="Minimum" min="0" />
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Max Price (Rs.)</label>
+                        <input id="filter-max-price" type="number" class="filter-input" placeholder="Maximum" min="0" />
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Year</label>
+                        <select id="filter-year" class="filter-select">
+                            <option value="">All Years</option>
+                            <option>2024</option>
+                            <option>2023</option>
+                            <option>2022</option>
+                            <option>2021</option>
+                            <option>2020</option>
+                            <option>2019</option>
+                            <option>2018</option>
+                            <option>2017</option>
+                            <option>2016</option>
+                            <option>2015</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Fuel Type</label>
+                        <select id="filter-fuel-type" class="filter-select">
+                            <option value="">All Fuel Types</option>
+                            <option>Petrol</option>
+                            <option>Diesel</option>
+                            <option>EV</option>
+                            <option>Hybrid</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Transmission</label>
+                        <select id="filter-transmission" class="filter-select">
+                            <option value="">All Transmissions</option>
+                            <option>Manual</option>
+                            <option>Automatic</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Filter Actions -->
+                <div class="filter-actions">
+                    <button class="btn-search" onclick="applyFilters()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        Search Vehicles
+                    </button>
+                    <button class="btn-clear" onclick="clearFilters()">Clear All</button>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- White Content Section -->
+    <div style="position: relative; z-index: 10; background: white;">
         <section class="section-head"><h2>Featured Vehicles</h2><small>Highlighted premium listings</small></section>
         <div class="featured-scroll" id="featured-list"></div>
 
@@ -2411,14 +2452,15 @@
         <div id="empty-message" class="notice hidden">No vehicles found. Try adjusting filters.</div>
 
         <div class="vehicle-grid" id="vehicle-list"></div>
+    </div>
 
-        <!-- Premium Modern Footer -->
-        <footer class="premium-footer">
+    <!-- Premium Modern Footer -->
+    <footer class="premium-footer">
             <div class="footer-container">
                 <!-- Newsletter Section -->
                 <div class="newsletter-section">
                     <h4>Subscribe to Our Newsletter</h4>
-                    <p style="margin: 0 0 12px 0; color: #5a7a9f; font-size: 0.9rem;">Get the latest vehicles and exclusive deals delivered to your inbox</p>
+                    <p style="margin: 0 0 12px 0; color: rgba(255,255,255,0.7); font-size: 0.9rem;">Get the latest vehicles and exclusive deals delivered to your inbox</p>
                     <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Thank you for subscribing!');">
                         <input type="email" placeholder="Enter your email address" required>
                         <button type="submit">Subscribe</button>
@@ -2760,6 +2802,23 @@
             setTimeout(() => btn.classList.remove('pulse'), 250);
         }
 
+        function setupScrollIndicator() {
+            const scrollIndicator = document.querySelector('.scroll-indicator');
+            if (scrollIndicator) {
+                scrollIndicator.addEventListener('click', () => {
+                    document.querySelector('.filter-section-wrapper')?.scrollIntoView({ behavior: 'smooth' });
+                });
+            }
+        }
+
+        function setVehicleType(type) {
+            const filterEl = getEl('filter-vehicle-type');
+            if (filterEl) {
+                filterEl.value = type;
+                applyFilters();
+            }
+        }
+
         function redirectToVehicle(vehicleId) {
             window.location.href = `vehicle.html?id=${vehicleId}`;
         }
@@ -2785,7 +2844,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             updateNavigation();
             fetchVehicles();
-            // setupHamburgerMenu(); // Handled by premium navbar JS
+            setupScrollIndicator();
         });
     </script>
 
