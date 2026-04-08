@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preload" as="image" href="hero-bg.png">
     <link rel="stylesheet" href="styles.css">
     <style>
         /* ===== GLOBAL STYLES ===== */
@@ -43,14 +44,14 @@
             }
         }
 
-        /* ===== AURORA BACKGROUND EFFECT ===== */
+        /* ===== AURORA BACKGROUND EFFECT (Performance Optimized) ===== */
         .bg-aurora {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: -1;
+            z-index: 0;
             overflow: hidden;
             pointer-events: none;
         }
@@ -58,77 +59,54 @@
         .orb {
             position: absolute;
             border-radius: 50%;
-            filter: blur(60px);
+            will-change: transform;
+            transform: translateZ(0);
+            backface-visibility: hidden;
         }
 
         .orb-1 {
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(99, 179, 237, 0.18) 0%, transparent 70%);
-            top: -100px;
-            left: -150px;
-            animation: floatOrb 12s ease-in-out infinite alternate;
+            width: 550px;
+            height: 550px;
+            background: radial-gradient(circle, rgba(99, 130, 237, 0.16) 0%, transparent 70%);
+            top: -80px;
+            left: -100px;
+            animation: floatOrb1 15s ease-in-out infinite alternate;
         }
 
         .orb-2 {
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(167, 139, 250, 0.15) 0%, transparent 70%);
-            top: 200px;
-            right: -100px;
-            animation: floatOrb 16s ease-in-out infinite alternate-reverse;
+            width: 480px;
+            height: 480px;
+            background: radial-gradient(circle, rgba(167, 139, 250, 0.13) 0%, transparent 70%);
+            top: 30vh;
+            right: -80px;
+            animation: floatOrb2 18s ease-in-out infinite alternate-reverse;
         }
 
         .orb-3 {
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(251, 191, 36, 0.12) 0%, transparent 70%);
-            bottom: 100px;
-            left: 30%;
-            animation: floatOrb 14s ease-in-out infinite alternate;
+            width: 380px;
+            height: 380px;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.10) 0%, transparent 70%);
+            bottom: 5vh;
+            left: 25%;
+            animation: floatOrb3 20s ease-in-out infinite alternate;
         }
 
-        .orb-4 {
-            width: 350px;
-            height: 350px;
-            background: radial-gradient(circle, rgba(52, 211, 153, 0.1) 0%, transparent 70%);
-            bottom: -50px;
-            right: 20%;
-            animation: floatOrb 18s ease-in-out infinite alternate-reverse;
+        @keyframes floatOrb1 {
+            from { transform: translate3d(0, 0, 0); }
+            to   { transform: translate3d(25px, 35px, 0); }
         }
-
-        @keyframes floatOrb {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(30px, 40px) scale(1.08); }
+        @keyframes floatOrb2 {
+            from { transform: translate3d(0, 0, 0); }
+            to   { transform: translate3d(-20px, 30px, 0); }
+        }
+        @keyframes floatOrb3 {
+            from { transform: translate3d(0, 0, 0); }
+            to   { transform: translate3d(15px, -25px, 0); }
         }
 
         @media (max-width: 767px) {
-            .orb-1 {
-                width: 300px;
-                height: 300px;
-                top: -50px;
-                left: -75px;
-            }
-
-            .orb-2 {
-                width: 250px;
-                height: 250px;
-                top: 100px;
-                right: -50px;
-            }
-
-            .orb-3 {
-                width: 200px;
-                height: 200px;
-                bottom: 50px;
-                left: 20%;
-            }
-
-            .orb-4 {
-                width: 175px;
-                height: 175px;
-                bottom: -25px;
-                right: 10%;
+            .bg-aurora {
+                display: none;
             }
         }
 
@@ -151,8 +129,8 @@
 
         .premium-navbar.scrolled {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
@@ -383,8 +361,8 @@
             right: 0;
             max-height: 400px;
             background: rgba(5, 10, 30, 0.97);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255,255,255,0.1);
             overflow: hidden;
             flex-direction: column;
@@ -550,12 +528,12 @@
             left: 0;
             right: 0;
             bottom: 0;
-            z-index: 0;
+            z-index: 1;
             background-image: url('hero-bg.png');
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
-            background-attachment: fixed;
+            background-attachment: scroll;
             background-color: #1a2a4a;
         }
 
@@ -790,8 +768,8 @@
             align-items: center;
             gap: 0;
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(167, 139, 250, 0.08) 100%);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1.4px solid rgba(255, 255, 255, 0.25);
             border-radius: 24px;
             padding: 28px 32px;
@@ -939,8 +917,8 @@
 
         .premium-filter-card {
             background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(200, 215, 255, 0.6);
             border-radius: 24px;
             box-shadow: 
@@ -1280,8 +1258,8 @@
         /* ===== VEHICLE CARDS ===== */
         .card {
             background: rgba(255,255,255,0.85);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border-radius: 20px;
             border: 1px solid rgba(220,230,255,0.7);
             box-shadow: 
@@ -1997,12 +1975,10 @@
     </style>
 </head>
 <body>
-    <!-- Aurora Background -->
-    <div class="bg-aurora">
+    <div class="bg-aurora" aria-hidden="true">
         <div class="orb orb-1"></div>
         <div class="orb orb-2"></div>
         <div class="orb orb-3"></div>
-        <div class="orb orb-4"></div>
     </div>
 
     <div id="loader"></div>
