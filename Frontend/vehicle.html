@@ -1071,7 +1071,7 @@
             const featuresSection = document.getElementById('features-section');
             const featuresList = document.getElementById('features-list');
 
-            title.textContent = `${v.make || 'Vehicle'} ${v.model || ''} ${v.year || ''}`.trim();
+            title.textContent = v.title || `${v.make || v.brand || 'Vehicle'} ${v.year || ''}`.trim();
             price.textContent = `Rs. ${Number(v.price || 0).toLocaleString()}`;
             const location = v.location || 'Unknown';
             
@@ -1152,27 +1152,11 @@
                 </li>
                 <li>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle></svg>
-                    <span><strong>Model:</strong> ${v.model || 'N/A'}</span>
-                </li>
-                <li>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle></svg>
                     <span><strong>Year:</strong> ${v.year || 'N/A'}</span>
                 </li>
                 <li>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle></svg>
-                    <span><strong>Condition:</strong> ${v.condition || 'N/A'}</span>
-                </li>
-                <li>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle></svg>
-                    <span><strong>Transmission:</strong> ${v.transmission || 'N/A'}</span>
-                </li>
-                <li>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle></svg>
                     <span><strong>Fuel Type:</strong> ${v.fuelType || 'N/A'}</span>
-                </li>
-                <li>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle></svg>
-                    <span><strong>Mileage:</strong> ${v.mileage || 'N/A'}</span>
                 </li>
             `;
 
@@ -1216,31 +1200,45 @@
 
         async function fetchVehicle() {
             const id = getQueryParam('id');
-            if (!id) { setError('Vehicle identifier missing.'); return; }
+            if (!id) { 
+                console.error('❌ No vehicle ID provided');
+                setError('Vehicle identifier missing.'); 
+                return; 
+            }
 
             try {
-                console.log('Calling API:', API_BASE_URL);
+                console.log(`📱 Fetching vehicle ${id} from:`, API_URL + `/vehicle/${id}`);
                 const res = await fetch(`${API_URL}/vehicle/${id}`);
+                
                 if (!res.ok) {
-                    if (res.status === 404) { setError('Vehicle not found.'); } else { setError('Failed to load vehicle details.'); }
+                    if (res.status === 404) { 
+                        console.error('❌ Vehicle not found');
+                        setError('Vehicle not found.'); 
+                    } else { 
+                        console.error('❌ API error:', res.status);
+                        setError('Failed to load vehicle details.'); 
+                    }
                     return;
                 }
+                
                 const data = await res.json();
+                console.log('✅ Vehicle fetched:', data);
                 renderVehicle(data);
 
-                console.log('Calling API:', API_BASE_URL);
-                fetch(`${API_URL}/vehicle/${id}/view`, { method: 'POST' }).catch(() => {});
+                // Log view count (non-blocking)
+                fetch(`${API_URL}/vehicle/${id}/view`, { method: 'POST' })
+                    .then(r => r.json())
+                    .then(d => console.log('📊 View logged:', d))
+                    .catch(e => console.log('⚠️ View logging failed (non-critical):', e));
             } catch (e) {
-                console.error(e);
+                console.error('❌ Fetch error:', e);
                 setError('Unable to load vehicle. Please try again.');
             }
         }
 
-        fetchVehicle();
-
         function setupHamburgerMenu() {
-            const hamburger = getEl('navbar-hamburger');
-            const mobileMenu = getEl('mobile-menu');
+            const hamburger = document.getElementById('hamburger');
+            const mobileMenu = document.getElementById('mobile-menu');
             if (!hamburger || !mobileMenu) return;
 
             hamburger.addEventListener('click', () => {
@@ -1255,6 +1253,8 @@
                 });
             });
         }
+
+        fetchVehicle();
 
         document.addEventListener('DOMContentLoaded', () => {
             updateNavigation();

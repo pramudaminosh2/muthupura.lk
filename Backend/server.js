@@ -928,6 +928,80 @@ app.get('/test', (req, res) => {
     res.send("Backend working ✅");
 });
 
+// ⚕️ HEALTH CHECK - Database Connectivity Test
+app.get('/api/health', (req, res) => {
+    db.query('SELECT NOW() as server_time', (err, results) => {
+        if (err) {
+            console.error('❌ Health check failed:', err.message);
+            return res.status(503).json({
+                status: 'error',
+                db: 'disconnected',
+                message: err.message
+            });
+        }
+        res.json({
+            status: 'ok',
+            db: 'connected',
+            timestamp: results[0]?.server_time,
+            api_url: process.env.API_URL,
+            environment: process.env.NODE_ENV
+        });
+    });
+});
+
+// 📊 DEBUG ROUTES - Tables, Schema, Sample Data
+
+// List all tables in database
+app.get('/api/debug/tables', (req, res) => {
+    db.query(`SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE() ORDER BY table_name`, (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({
+            tables: results.map(r => r.table_name),
+            count: results.length
+        });
+    });
+});
+
+// Get vehicles table schema
+app.get('/api/debug/vehicles-schema', (req, res) => {
+    db.query(`SELECT column_name, data_type, is_nullable FROM information_schema.columns WHERE table_name = 'vehicles' ORDER BY column_name`, (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({
+            columns: results,
+            count: results.length
+        });
+    });
+});
+
+// Get vehicle count
+app.get('/api/debug/vehicles-count', (req, res) => {
+    db.query(`SELECT COUNT(*) as total FROM vehicles`, (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({
+            total_vehicles: results[0]?.total || 0
+        });
+    });
+});
+
+// Get first 3 vehicles (raw data for inspection)
+app.get('/api/debug/vehicles-sample', (req, res) => {
+    db.query(`SELECT * FROM vehicles ORDER BY id DESC LIMIT 3`, (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({
+            sample_vehicles: results.map(normalizeVehicleRecord),
+            count: results.length
+        });
+    });
+});
+
 // 🟢 Add Vehicle - Production Route
 app.post('/add-vehicle', upload.array('images', 10), async (req, res) => {
     console.log("🔥 POST /add-vehicle hit");
@@ -1046,11 +1120,11 @@ app.get('/get-vehicles', (req, res) => {
             }
 
             const sql = "SELECT * FROM vehicles ORDER BY isFeatured DESC, views DESC, createdAt DESC, id DESC";
-            console.log('📤 Fetching vehicles from database...');
+            console.log('📤 [/get-vehicles] Fetching vehicles from database...');
 
             db.query(sql, (err, results) => {
                 if (err) {
-                    console.error('❌ Database query error in /get-vehicles:', err.message);
+                    console.error('❌ [/get-vehicles] Database query error:', err.message);
                     return res.status(500).json({ 
                         success: false,
                         message: 'Error fetching vehicles',
@@ -1060,14 +1134,14 @@ app.get('/get-vehicles', (req, res) => {
 
                 try {
                     const normalizedResults = results.map(normalizeVehicleRecord);
-                    console.log(`✅ /get-vehicles returned ${normalizedResults.length} vehicles`);
+                    console.log(`✅ [/get-vehicles] Returned ${normalizedResults.length} vehicles`);
                     res.json({
                         success: true,
                         data: normalizedResults,
                         count: normalizedResults.length
                     });
                 } catch (normalizeErr) {
-                    console.error('❌ Error normalizing vehicle data:', normalizeErr.message);
+                    console.error('❌ [/get-vehicles] Error normalizing vehicle data:', normalizeErr.message);
                     return res.status(500).json({
                         success: false,
                         message: 'Error processing vehicle data',
@@ -1091,16 +1165,25 @@ app.get('/vehicle/:id', (req, res) => {
     const id = req.params.id;
     const sql = "SELECT * FROM vehicles WHERE id = ? LIMIT 1";
 
+    console.log(`📱 [/vehicle/${id}] Fetching vehicle...`);
+
     db.query(sql, [id], (err, results) => {
         if (err) {
-            console.error('Error fetching vehicle', err);
-            return res.status(500).json({ message: 'Error fetching vehicle' });
+            console.error(`❌ [/vehicle/${id}] Database error:`, err.message);
+            return res.status(500).json({ 
+                error: err.message, 
+                message: 'Error fetching vehicle' 
+            });
         }
         if (!results.length) {
-            return res.status(404).json({ message: 'Vehicle not found' });
+            console.log(`⚠️ [/vehicle/${id}] Vehicle not found`);
+            return res.status(404).json({ 
+                error: 'Not found',
+                message: 'Vehicle not found' 
+            });
         }
         const normalized = normalizeVehicleRecord(results[0]);
-        console.log('Vehicle fetched:', normalized.id, 'images:', normalized.images?.length || 0, normalized.images);
+        console.log(`✅ [/vehicle/${id}] Vehicle fetched, images: ${normalized.images?.length || 0}`);
         return res.json(normalized);
     });
 });
@@ -1187,22 +1270,44 @@ app.put('/update-vehicle/:id', authenticateToken, upload.array('images', 10), as
 
 // 🟢 Alias endpoint compatible with admin requirement
 app.get('/vehicles', (req, res) => {
-    expireFeaturedAds(err => {
-        if (err) {
-            console.error('Error expiring featured ads', err);
-        }
-
-        const sql = "SELECT * FROM vehicles ORDER BY isFeatured DESC, views DESC, createdAt DESC, id DESC";
-
-        db.query(sql, (err, results) => {
+    try {
+        expireFeaturedAds(err => {
             if (err) {
-                console.error(err);
-                return res.status(500).json({ message: 'Error fetching vehicles' });
+                console.error('Error expiring featured ads', err);
             }
 
-            res.json(results.map(normalizeVehicleRecord));
+            const sql = "SELECT * FROM vehicles ORDER BY isFeatured DESC, views DESC, createdAt DESC, id DESC";
+            console.log('📤 [/vehicles] Fetching vehicles from database...');
+
+            db.query(sql, (err, results) => {
+                if (err) {
+                    console.error('❌ [/vehicles] Database error:', err.message);
+                    return res.status(500).json({ 
+                        error: err.message,
+                        message: 'Error fetching vehicles'
+                    });
+                }
+
+                try {
+                    const normalized = results.map(normalizeVehicleRecord);
+                    console.log(`✅ [/vehicles] Returned ${normalized.length} vehicles`);
+                    res.json(normalized);
+                } catch (normalizeErr) {
+                    console.error('❌ [/vehicles] Normalization error:', normalizeErr.message);
+                    return res.status(500).json({
+                        error: normalizeErr.message,
+                        message: 'Error processing vehicle data'
+                    });
+                }
+            });
         });
-    });
+    } catch (err) {
+        console.error('❌ Unexpected error in /vehicles:', err.message);
+        res.status(500).json({
+            error: err.message,
+            message: 'Unexpected server error'
+        });
+    }
 });
 
 // Refresh expired featured ads

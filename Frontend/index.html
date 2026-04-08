@@ -506,10 +506,12 @@
             margin: 0;
             padding: 0;
             position: relative;
+            z-index: 1;
         }
 
         .premium-hero {
             position: relative;
+            z-index: 1;
             width: 100%;
             min-height: 100vh;
             max-width: 100%;
@@ -555,10 +557,10 @@
             position: absolute;
             inset: 0;
             background: linear-gradient(
-                135deg,
-                rgba(5, 10, 30, 0.82) 0%,
-                rgba(10, 20, 50, 0.65) 50%,
-                rgba(0, 0, 0, 0.75) 100%
+                160deg,
+                rgba(4, 8, 25, 0.80) 0%,
+                rgba(8, 16, 45, 0.65) 50%,
+                rgba(2, 5, 18, 0.78) 100%
             );
             z-index: 1;
             backdrop-filter: blur(0px);
@@ -576,6 +578,16 @@
             align-items: center;
             justify-content: center;
             min-height: calc(100vh - var(--navbar-height));
+        }
+
+        @media (max-width: 767px) {
+            .hero-container {
+                padding-top: 20px;
+                padding-left: 16px;
+                padding-right: 16px;
+                padding-bottom: 40px;
+                min-height: calc(100svh - var(--navbar-height));
+            }
         }
 
         .hero-content-block {
@@ -1255,9 +1267,24 @@
             to { transform: translate(-50%, -50%) rotate(360deg); } 
         }
 
+        /* ===== SKELETON LOADING ===== */
+        .skeleton-card {
+            background: linear-gradient(90deg, #e8edf5 25%, #f0f4fb 50%, #e8edf5 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 20px;
+            height: 380px;
+            border: 1px solid rgba(220, 230, 255, 0.7);
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
         /* ===== VEHICLE CARDS ===== */
         .card {
-            background: rgba(255,255,255,0.85);
+            background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(248,250,255,0.88) 100%);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             border-radius: 20px;
@@ -1266,12 +1293,23 @@
                 0 2px 20px rgba(100,120,255,0.08),
                 0 1px 4px rgba(0,0,0,0.04);
             overflow: hidden;
-            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             height: 100%;
             position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 10%;
+            right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
+            z-index: 2;
         }
 
         .card:hover {
@@ -1283,18 +1321,35 @@
         }
 
         .card.featured {
-            border: 2px solid rgba(245, 158, 11, 0.7);
-            box-shadow: 
-                0 0 0 2px rgba(245, 158, 11, 0.7),
-                0 12px 40px rgba(245, 158, 11, 0.15),
-                0 4px 12px rgba(0,0,0,0.08);
+            border: 2px solid rgba(245, 158, 11, 0.6);
+            box-shadow:
+                0 0 0 1px rgba(245,158,11,0.2),
+                0 8px 32px rgba(245,158,11,0.15),
+                0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .card.featured::after {
+            content: '⭐ FEATURED';
+            position: absolute;
+            top: 16px;
+            right: -1px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            padding: 5px 14px 5px 10px;
+            border-radius: 4px 0 0 4px;
+            box-shadow: -2px 2px 8px rgba(0,0,0,0.2);
+            text-transform: uppercase;
+            z-index: 4;
         }
 
         .card.featured:hover {
             box-shadow: 
-                0 0 0 2px rgba(245, 158, 11, 0.7),
-                0 16px 50px rgba(245, 158, 11, 0.25),
-                0 4px 12px rgba(0,0,0,0.08);
+                0 0 0 1px rgba(245,158,11,0.3),
+                0 12px 40px rgba(245,158,11,0.25),
+                0 2px 8px rgba(0,0,0,0.06);
             border-color: rgba(245, 158, 11, 0.9);
         }
 
@@ -1302,8 +1357,15 @@
             position: relative;
             width: 100%;
             height: 210px;
-            background: #e8edf5;
+            background: linear-gradient(90deg, #e8edf5 0%, #f0f4fb 50%, #e8edf5 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
             overflow: hidden;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
 
         .card-image img {
@@ -1451,7 +1513,10 @@
         .card-price {
             font-size: 22px;
             font-weight: 800;
-            color: var(--accent);
+            background: linear-gradient(135deg, var(--accent), #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 14px;
         }
 
@@ -1497,7 +1562,12 @@
         .card-action-btn {
             border: none;
             border-radius: 10px;
-            padding: 8px 14px;
+            padding: 9px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
@@ -2617,23 +2687,63 @@
         }
 
         async function fetchVehicles() {
+            const listEl = getEl('vehicle-list');
+            const demoCards = getEl('demo-cards');
             const loaderEl = getEl('loader');
+            const errorEl = getEl('error-message');
+            
+            // Show loading state
             if (loaderEl) loaderEl.style.display = 'block';
+            if (errorEl) errorEl.classList.add('hidden');
+            
+            // Hide demo cards and show skeleton placeholders
+            if (demoCards) demoCards.style.display = 'none';
+            if (listEl) {
+                listEl.innerHTML = `
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                `;
+                listEl.style.display = 'grid';
+            }
+            
             try {
+                console.log('🚗 Fetching vehicles from:', API_URL + '/vehicles');
                 const res = await fetch(`${API_URL}/vehicles`);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+                
                 vehiclesData = await res.json();
-                const demoCards = getEl('demo-cards');
+                console.log('✅ Vehicles fetched:', vehiclesData.length || vehiclesData?.data?.length || 0);
+                
+                // Check if response is wrapped or raw array
+                const vehicles = Array.isArray(vehiclesData) ? vehiclesData : (vehiclesData?.data || vehiclesData);
+                
+                if (!vehicles || vehicles.length === 0) {
+                    console.log('⚠️ No vehicles returned from API');
+                    if (demoCards) demoCards.style.display = 'grid';
+                    if (listEl) listEl.style.display = 'none';
+                    return;
+                }
+                
+                // Hide demo cards and render real data
                 if (demoCards) demoCards.style.display = 'none';
-                renderVehicles(vehiclesData);
-                renderFeatured(vehiclesData.filter(v => v.featured));
+                renderVehicles(vehicles);
+                renderFeatured(vehicles.filter(v => v.isFeatured || v.featured));
             } catch (err) {
-                console.error('Fetch error:', err);
-                const errorEl = getEl('error-message');
+                console.error('❌ Fetch error:', err);
                 if (errorEl) {
-                    errorEl.textContent = 'Failed to load vehicles. Please try again.';
+                    errorEl.textContent = `Failed to load vehicles: ${err.message}. Showing demo cards instead.`;
                     errorEl.classList.remove('hidden');
                 }
+                // Show demo cards on error
+                if (demoCards) demoCards.style.display = 'grid';
+                if (listEl) listEl.style.display = 'none';
             } finally {
                 if (loaderEl) loaderEl.style.display = 'none';
             }
@@ -2653,16 +2763,21 @@
             listEl.classList.add('visible');
         }
 
+        function contactSeller(vehicleId) {
+            // Open vehicle detail page, which will handle WhatsApp contact
+            window.location.href = `vehicle.html?id=${vehicleId}`;
+        }
+
         function openVehicleDetail(vehicleId) {
             window.location.href = `vehicle.html?id=${vehicleId}`;
         }
 
         function createCard(v) {
             const img = getImageUrl(v.images);
-            const isFeatured = v.featured;
-            const title = [v.make, v.model, v.year].filter(Boolean).join(' ') || 'Vehicle';
+            const isFeatured = v.isFeatured || v.featured; // Support both field names
+            const title = v.title || (v.brand ? `${v.brand} ${v.year || ''}`.trim() : 'Vehicle');
             const location = v.location || 'N/A';
-            const isEV = v.type === 'EV' || v.fuelType === 'electric' || v.fuelType === 'EV';
+            const isEV = v.type === 'EV' || (v.fuelType && (v.fuelType.toLowerCase() === 'electric' || v.fuelType.toLowerCase() === 'ev'));
             
             return `
                 <div class="card${isFeatured ? ' featured' : ''}" data-vehicle-id="${v.id}">
@@ -2686,11 +2801,11 @@
                         <div class="card-price">Rs ${(v.price || 0).toLocaleString()}</div>
                         <div class="card-footer">
                             <div class="card-seller">
-                                <div class="card-seller-avatar">${(v.sellerName || 'S')[0].toUpperCase()}</div>
-                                <span class="card-seller-name">${v.sellerName || 'Seller'}</span>
+                                <div class="card-seller-avatar">S</div>
+                                <span class="card-seller-name">Seller</span>
                             </div>
                             <div class="card-actions">
-                                <button class="card-action-btn card-whatsapp-btn">💬 WhatsApp</button>
+                                <button class="card-action-btn card-whatsapp-btn" onclick="contactSeller(${v.id})">💬 WhatsApp</button>
                                 <button class="card-action-btn card-view-btn" onclick="openVehicleDetail(${v.id})">View →</button>
                             </div>
                         </div>
@@ -2753,6 +2868,15 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             updateNavigation();
+            
+            // 🌐 Wake-up ping for Render cold start (silent)
+            console.log('💤 Pinging backend to wake up from cold start...');
+            fetch(`${API_URL}/api/health`, { method: 'GET' })
+                .then(r => r.json())
+                .then(data => console.log('✅ Backend healthy:', data))
+                .catch(() => console.log('⚠️ Backend not responding yet, proceeding anyway...'));
+            
+            // Fetch vehicles
             fetchVehicles();
 
             // Navbar scroll effect
