@@ -896,6 +896,62 @@
             box-shadow: 0 12px 28px rgba(58,111,248,0.18);
         }
 
+        /* ===== BUTTON STYLING ===== */
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            text-align: center;
+            outline: none;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', 'Poppins', system-ui, sans-serif;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn.primary {
+            background: linear-gradient(135deg, var(--accent1) 0%, var(--accent2) 100%);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(58, 111, 248, 0.3);
+            border: none;
+        }
+
+        .btn.primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(58, 111, 248, 0.4);
+        }
+
+        .btn.primary:active:not(:disabled) {
+            transform: translateY(0);
+            box-shadow: 0 4px 12px rgba(58, 111, 248, 0.25);
+        }
+
+        .btn.secondary {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text);
+            border: 1.5px solid rgba(58, 111, 248, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn.secondary:hover:not(:disabled) {
+            background: #fff;
+            border-color: var(--accent1);
+            box-shadow: 0 4px 12px rgba(58, 111, 248, 0.15);
+            transform: translateY(-1px);
+        }
+
         .submit-row {
             display: flex;
             justify-content: flex-end;
@@ -1519,23 +1575,29 @@
 
                     const formData = new FormData();
                     Array.from(files).slice(0, 10).forEach(file => formData.append('images', file));
-                    formData.append('sellerName', (getEl('sellerName')?.value || '').trim());
-                    formData.append('phone', (getEl('phone')?.value || '').trim());
-                    formData.append('city', (getEl('city')?.value || '').trim());
-                    formData.append('vehicleType', (getEl('vehicleType')?.value || ''));
-                    formData.append('condition', (getEl('condition')?.value || ''));
-                    formData.append('make', (getEl('make')?.value || '').trim());
-                    formData.append('model', (getEl('model')?.value || '').trim());
-                    formData.append('year', (getEl('year')?.value || ''));
-                    formData.append('price', (getEl('price')?.value || ''));
-                    formData.append('transmission', (getEl('transmission')?.value || ''));
-                    formData.append('fuelType', (getEl('fuelType')?.value || ''));
-                    formData.append('engineCapacity', (getEl('engineCapacity')?.value || ''));
-                    formData.append('mileage', (getEl('mileage')?.value || ''));
-                    formData.append('description', (getEl('description')?.value || '').trim());
-
-                    const features = Array.from(form.querySelectorAll('input[name="features"]:checked')).map(input => input.value);
-                    formData.append('features', JSON.stringify(features));
+                    
+                    // Get form values
+                    const phone = (getEl('phone')?.value || '').trim();
+                    const location = (getEl('city')?.value || '').trim();
+                    const make = (getEl('make')?.value || '').trim();
+                    const model = (getEl('model')?.value || '').trim();
+                    const year = (getEl('year')?.value || '');
+                    const price = (getEl('price')?.value || '');
+                    const fuelType = (getEl('fuelType')?.value || '');
+                    const description = (getEl('description')?.value || '').trim();
+                    
+                    // Create title from make and model (or use as fallback)
+                    const title = (make && model) ? `${model} ${make}`.trim() : (make || model || 'Vehicle');
+                    
+                    // Append form data with correct field names for backend
+                    formData.append('title', title);
+                    formData.append('brand', make); // Backend expects 'brand' not 'make'
+                    formData.append('location', location); // Backend expects 'location' not 'city'
+                    formData.append('phone', phone);
+                    formData.append('year', year);
+                    formData.append('price', price);
+                    formData.append('fuelType', fuelType);
+                    formData.append('description', description);
 
                     try {
                         console.log('Calling API:', API_BASE_URL);
