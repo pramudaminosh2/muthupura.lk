@@ -1799,7 +1799,9 @@
         }
 
         function formatVehicleTitle(make, model, year) {
-            return `${make || 'Vehicle'} ${model || ''}${year ? ` ${year}` : ''}`.trim();
+            // Safe title generation - filter out undefined/null/empty values
+            const parts = [make, model, year].filter(Boolean);
+            return parts.length > 0 ? parts.join(' ') : 'Vehicle';
         }
 
         function createCard(v) {
