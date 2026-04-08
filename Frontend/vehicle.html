@@ -6,7 +6,7 @@
     <title>Vehicle Detail - Muthupura.lk</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <style>
         :root {
@@ -20,15 +20,57 @@
             --radius: 18px;
         }
 
-        .container {
-            max-width: 1180px;
-            margin: 0 auto;
-            padding: 18px 14px 36px;
+        html, body {
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            background: radial-gradient(circle at top, rgba(58,111,248,0.12), transparent 40%), linear-gradient(to bottom, #eef2f8, #ffffff);
+            background-attachment: fixed;
         }
+
+        .container {
+            max-width: 1200px;
+            margin: 100px auto 0;
+            padding: 0 16px 40px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
         .layout {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 24px;
+            gap: 32px;
+            animation: fadeInUp 0.45s ease both;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+
+        .error-notice {
+            padding: 20px;
+            border-radius: 14px;
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #dc2626;
+            font-size: 0.95rem;
+            margin: 20px 0;
+            text-align: center;
+            display: none;
+        }
+
+        .error-notice.active {
+            display: block;
+        }
+
+        /* Gallery */
+        .gallery-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .card {
@@ -37,24 +79,38 @@
             border: 1.2px solid rgba(58, 111, 248, 0.14);
             border-radius: var(--radius);
             box-shadow: var(--shadow-strong);
-            padding: 28px;
+            padding: 32px;
             animation: fadeInUp 0.45s ease;
+        }
+
+        @media (max-width: 900px) {
+            .card {
+                padding: 24px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .card {
+                padding: 20px;
+            }
         }
 
         .gallery-main {
             position: relative;
-            height: 380px;
+            width: 100%;
+            height: 400px;
             overflow: hidden;
             border-radius: 18px;
             border: 1.2px solid rgba(58, 111, 248, 0.14);
             background: linear-gradient(135deg, #f9faff, #f5f9ff);
-            box-shadow: var(--shadow-strong);
+            box-shadow: 0 16px 40px rgba(58, 111, 248, 0.12);
         }
 
         .gallery-main img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            object-position: center;
             transition: opacity 0.35s ease, transform 0.35s ease;
         }
 
@@ -96,7 +152,6 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
             gap: 10px;
-            margin-top: 12px;
         }
 
         .thumb-row img {
@@ -122,23 +177,36 @@
 
         .detail-title {
             margin: 0 0 14px;
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 900;
             background: linear-gradient(135deg, #1f2f4f 0%, #3a6ff8 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
+        @media (max-width: 640px) {
+            .detail-title {
+                font-size: 1.5rem;
+            }
         }
 
         .price {
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 900;
             background: linear-gradient(110deg, var(--accent1), var(--accent2));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin: 12px 0;
+            margin: 16px 0;
+        }
+
+        @media (max-width: 640px) {
+            .price {
+                font-size: 1.5rem;
+            }
         }
 
         .meta {
@@ -147,43 +215,170 @@
             gap: 10px;
             color: var(--muted);
             font-size: 0.9rem;
-            margin-top: 12px;
+            margin: 20px 0;
         }
 
         .meta span {
             background: linear-gradient(135deg, #f9faff, #f5f9ff);
             border: 1px solid rgba(58, 111, 248, 0.18);
             border-radius: 12px;
-            padding: 8px 12px;
+            padding: 8px 14px;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .split {
+        .action-buttons {
             display: flex;
-            gap: 16px;
-            margin-top: 20px;
+            gap: 12px;
+            margin: 24px 0;
             flex-wrap: wrap;
         }
 
-        .details-list {
+        @media (max-width: 640px) {
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            white-space: nowrap;
+            flex: 1;
+            min-height: 48px;
+        }
+
+        @media (max-width: 640px) {
+            .btn-primary,
+            .btn-secondary {
+                flex: 1;
+            }
+        }
+
+        .btn-primary {
+            background: linear-gradient(110deg, var(--accent1), var(--accent2));
+            color: #fff;
+            box-shadow: 0 12px 32px rgba(58, 111, 248, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 40px rgba(58, 111, 248, 0.35);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: rgba(58, 111, 248, 0.08);
+            color: var(--accent1);
+            border: 1.2px solid rgba(58, 111, 248, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(58, 111, 248, 0.12);
+            border-color: rgba(58, 111, 248, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(58, 111, 248, 0.15);
+        }
+
+        /* Sections */
+        .sections {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-top: 32px;
+        }
+
+        .section {
+            background: linear-gradient(135deg, #f9faff, #f5f9ff);
+            border: 1.2px solid rgba(58, 111, 248, 0.14);
+            border-radius: 14px;
+            padding: 20px;
+        }
+
+        .section h3 {
+            margin: 0 0 16px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h3 svg {
+            width: 24px;
+            height: 24px;
+            color: var(--accent1);
+        }
+
+        .section ul {
             list-style: none;
             padding: 0;
-            margin: 14px 0 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .details-list li {
-            margin-bottom: 10px;
-            font-size: 0.96rem;
+        .section li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             padding: 8px 0;
-            border-bottom: 1px solid rgba(74, 99, 142, 0.1);
             color: var(--text);
+            font-size: 0.95rem;
+            border-bottom: 1px solid rgba(74, 99, 142, 0.08);
         }
 
-        .description {
-            margin-top: 18px;
+        .section li:last-child {
+            border-bottom: none;
+        }
+
+        .section li svg {
+            width: 18px;
+            height: 18px;
+            color: var(--accent1);
+            flex-shrink: 0;
+        }
+
+        .section p {
+            margin: 0;
             color: var(--muted);
-            line-height: 1.8;
+            line-height: 1.7;
             font-size: 0.95rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+        }
+
+        .feature-badge {
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(58, 111, 248, 0.2);
         }
 
         @keyframes fadeInUp {
@@ -197,9 +392,19 @@
             }
         }
 
-        @media (max-width: 900px) {
-            .layout {
-                grid-template-columns: 1fr;
+        @media (max-width: 640px) {
+            .gallery-main {
+                height: 300px;
+            }
+
+            .action-buttons {
+                gap: 8px;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                padding: 12px 16px;
+                font-size: 0.9rem;
             }
         }        
         /* ===== NAVBAR FIXED POSITIONING ===== */
@@ -572,29 +777,83 @@
         <a id="admin-link-mobile" href="admin.html" style="display:none;">Admin</a>
     </div>
 
-    <div class="container" style="margin-top: 100px;">
-
-        <div id="error-message" class="card" style="display:none;color:#a13636;background:#fff1f1;border-color:#ecbcbc;"></div>
+    <div class="container">
+        <div id="error-message" class="error-notice"></div>
 
         <div class="layout" id="vehicle-detail" style="display:none;">
-            <div>
+            <!-- Left: Gallery -->
+            <div class="gallery-container">
                 <div class="gallery-main" id="gallery-main">
                     <button class="gallery-arrow prev" id="gallery-prev" aria-label="Previous image">&#10094;</button>
-                    <img src="/logo.PNG" alt="Main image">
+                    <img src="/logo.PNG" alt="Main image" id="main-image">
                     <button class="gallery-arrow next" id="gallery-next" aria-label="Next image">&#10095;</button>
                 </div>
                 <div class="thumb-row" id="gallery-thumbs"></div>
             </div>
+
+            <!-- Right: Details -->
             <div class="card">
                 <h1 class="detail-title" id="vehicle-title">Loading...</h1>
                 <div class="price" id="vehicle-price">Rs. 0</div>
                 <div class="meta" id="vehicle-meta"></div>
-                <div class="split">
-                    <button class="btn primary" id="contact-btn">📞 Contact Seller</button>
-                    <button class="btn secondary" id="leasing-btn">💰 Get Leasing</button>
+
+                <div class="action-buttons">
+                    <button class="btn-primary" id="contact-btn">📞 Contact Seller</button>
+                    <button class="btn-secondary" id="leasing-btn">💰 Get Leasing Quote</button>
                 </div>
-                <ul class="details-list" id="vehicle-info"></ul>
-                <p class="description" id="vehicle-description">No additional description available.</p>
+
+                <div class="sections">
+                    <!-- Contact Info -->
+                    <div class="section">
+                        <h3>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            Seller Information
+                        </h3>
+                        <ul id="contact-info"></ul>
+                    </div>
+
+                    <!-- Vehicle Info -->
+                    <div class="section">
+                        <h3>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M7 18c-.5 1-1.5 2-2.5 2s-2-1-2-2.5 1-2.5 2-2.5 2 1 2 2.5"></path>
+                                <circle cx="7" cy="5" r="2"></circle>
+                                <circle cx="18" cy="5" r="2"></circle>
+                                <path d="M17 18c.5 1 1.5 2 2.5 2s2-1 2-2.5-1-2.5-2-2.5-2 1-2 2.5"></path>
+                                <path d="M9 5h6v7H9z"></path>
+                            </svg>
+                            Vehicle Information
+                        </h3>
+                        <ul id="vehicle-info"></ul>
+                    </div>
+
+                    <!-- Features -->
+                    <div class="section" id="features-section" style="display:none;">
+                        <h3>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                <path d="M9 12l2 2 4-4"></path>
+                            </svg>
+                            Features & Amenities
+                        </h3>
+                        <div class="features-grid" id="features-list"></div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="section" id="description-section" style="display:none;">
+                        <h3>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16v16H4z"></path>
+                                <path d="M4 8h16M4 12h16M4 16h16"></path>
+                            </svg>
+                            Description
+                        </h3>
+                        <p id="vehicle-description">No additional description available.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -736,7 +995,7 @@
         function setError(message) {
             const el = document.getElementById('error-message');
             el.textContent = message;
-            el.style.display = 'block';
+            el.classList.add('active');
             document.getElementById('vehicle-detail').style.display = 'none';
         }
 
@@ -766,13 +1025,14 @@
                 return;
             }
 
-            document.getElementById('error-message').style.display = 'none';
+            document.getElementById('error-message').classList.remove('active');
             const detailSection = document.getElementById('vehicle-detail');
             detailSection.style.display = 'grid';
 
             const title = document.getElementById('vehicle-title');
             const price = document.getElementById('vehicle-price');
             const meta = document.getElementById('vehicle-meta');
+            const contactInfo = document.getElementById('contact-info');
             const info = document.getElementById('vehicle-info');
             const mainImage = document.querySelector('#gallery-main img');
             const thumbs = document.getElementById('gallery-thumbs');
@@ -781,51 +1041,46 @@
             const contactBtn = document.getElementById('contact-btn');
             const leasingBtn = document.getElementById('leasing-btn');
             const desc = document.getElementById('vehicle-description');
+            const descSection = document.getElementById('description-section');
+            const featuresSection = document.getElementById('features-section');
+            const featuresList = document.getElementById('features-list');
 
-            title.textContent = v.title || 'Untitled Vehicle';
+            title.textContent = `${v.make || 'Vehicle'} ${v.model || ''} ${v.year || ''}`.trim();
             price.textContent = `Rs. ${Number(v.price || 0).toLocaleString()}`;
             const location = v.location || 'Unknown';
-            meta.innerHTML = `<span>Brand: ${v.brand || '-'}</span><span>Year: ${v.year || '-'}</span><span>Fuel: ${v.fuelType || '-'}</span><span>📍 ${location}</span><span>👁️ ${v.views || 0}</span>`;
+            
+            meta.innerHTML = `
+                <span>📍 ${location}</span>
+                <span>📅 ${v.year || 'N/A'}</span>
+                <span>⛽ ${v.fuelType || 'N/A'}</span>
+                <span>👁️ ${v.views || 0} views</span>
+            `;
 
-            // Firebase Storage URLs are stored as JSON array - parse and use directly
+            // Parse images
             let detailImagesArray = [];
             if (typeof v.images === 'string' && v.images.trim()) {
                 try {
                     const parsed = JSON.parse(v.images);
-                    // Ensure it's actually an array
-                    if (Array.isArray(parsed)) {
-                        detailImagesArray = parsed;
-                    } else {
-                        // If parsed but not an array, treat as single image
-                        detailImagesArray = [v.images];
-                    }
-                } catch (parseError) {
-                    // If JSON.parse fails, treat as single image URL
+                    detailImagesArray = Array.isArray(parsed) ? parsed : [v.images];
+                } catch (e) {
                     detailImagesArray = [v.images];
                 }
             } else if (Array.isArray(v.images)) {
                 detailImagesArray = v.images;
             }
 
-            // Fallback to single image field if no array
-            if (!detailImagesArray.length && v.image) {
-                detailImagesArray = [v.image];
-            }
-
-            // All images should be full Firebase Storage URLs - use directly
             detailImages = detailImagesArray.filter(Boolean).length ? detailImagesArray : [PLACEHOLDER_IMAGE];
-            console.log('☁️ Vehicle images loaded from Firebase Storage:', { count: detailImages.length, urls: detailImages.map(u => u.substring(0, 60) + '...') });
 
             mainImage.src = detailImages[0] || PLACEHOLDER_IMAGE;
-            mainImage.alt = v.title || 'Vehicle Image';
-            mainImage.onerror = () => { mainImage.src = '/logo.PNG'; console.warn('⚠️ Main image failed to load'); };
+            mainImage.alt = title.textContent;
+            mainImage.onerror = () => { mainImage.src = PLACEHOLDER_IMAGE; };
 
             thumbs.innerHTML = '';
             detailImages.forEach((urlSrc, idx) => {
                 const thumb = document.createElement('img');
                 thumb.src = urlSrc;
                 thumb.alt = `Photo ${idx + 1}`;
-                thumb.onerror = () => { thumb.src = '/logo.PNG'; console.warn('⚠️ Thumbnail failed'); };
+                thumb.onerror = () => { thumb.src = PLACEHOLDER_IMAGE; };
                 if (idx === 0) thumb.classList.add('active');
                 thumb.onclick = () => setMainGalleryImage(idx);
                 thumbs.appendChild(thumb);
@@ -847,28 +1102,77 @@
                 }
             };
 
-            console.log('Number of images received:', detailImages.length, 'Number rendered:', thumbs.children.length);
+            // Contact Info
+            contactInfo.innerHTML = `
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <span><strong>Seller:</strong> ${v.seller || 'Unknown'}</span>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    <span><strong>Phone:</strong> ${v.phone || 'N/A'}</span>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    <span><strong>Location:</strong> ${location}</span>
+                </li>
+            `;
 
+            // Vehicle Info
+            info.innerHTML = `
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle></svg>
+                    <span><strong>Brand:</strong> ${v.make || v.brand || 'N/A'}</span>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle></svg>
+                    <span><strong>Model:</strong> ${v.model || 'N/A'}</span>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle></svg>
+                    <span><strong>Year:</strong> ${v.year || 'N/A'}</span>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle></svg>
+                    <span><strong>Fuel Type:</strong> ${v.fuelType || 'N/A'}</span>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle></svg>
+                    <span><strong>Transmission:</strong> ${v.transmission || 'N/A'}</span>
+                </li>
+                <li>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle></svg>
+                    <span><strong>Mileage:</strong> ${v.mileage || 'N/A'}</span>
+                </li>
+            `;
+
+            // Features (if available)
+            if (v.features && Array.isArray(v.features) && v.features.length > 0) {
+                featuresSection.style.display = 'block';
+                featuresList.innerHTML = v.features.map(f => `<div class="feature-badge">${f}</div>`).join('');
+            } else {
+                featuresSection.style.display = 'none';
+            }
+
+            // Description
+            if (v.description && v.description.trim()) {
+                descSection.style.display = 'block';
+                desc.textContent = v.description;
+            } else {
+                descSection.style.display = 'none';
+            }
+
+            // Buttons
             contactBtn.onclick = () => {
-                const phone = v.phone || '94777150660';
-                window.open(`https://wa.me/${phone}`,'_blank');
+                const phone = (v.phone || '94777150660').replace(/\D/g, '');
+                window.open(`https://wa.me/${phone}`, '_blank');
             };
 
             leasingBtn.onclick = () => {
-                window.open(`https://wa.me/94777150660?text=${encodeURIComponent('I want leasing for ' + (v.title || 'this vehicle'))}`,'_blank');
+                const phone = (v.phone || '94777150660').replace(/\D/g, '');
+                const title = document.getElementById('vehicle-title').textContent;
+                window.open(`https://wa.me/${phone}?text=${encodeURIComponent('Hello, I am interested in leasing: ' + title)}`, '_blank');
             };
-
-
-            info.innerHTML = `
-                <li><strong>Brand:</strong> ${v.brand || 'N/A'}</li>
-                <li><strong>Year:</strong> ${v.year || 'N/A'}</li>
-                <li><strong>Fuel Type:</strong> ${v.fuelType || 'N/A'}</li>
-                <li><strong>Location:</strong> ${location}</li>
-                <li><strong>Views:</strong> ${v.views || 0}</li>
-                <li><strong>Seller Phone:</strong> ${v.phone || 'N/A'}</li>
-            `;
-
-            desc.textContent = `Full listing details for ${v.title || 'this vehicle'}. Submit and contact seller for viewing and test-drives.`;
         }
 
         async function fetchVehicle() {

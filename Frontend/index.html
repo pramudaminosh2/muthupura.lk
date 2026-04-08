@@ -574,11 +574,11 @@
             font-size: 0.9rem;
         }
 
-        /* Responsive vehicle grid */
+        /* Premium Responsive Vehicle Grid */
         .vehicle-grid {
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
             opacity: 0;
             transform: translateY(16px);
             transition: opacity 0.3s ease, transform 0.3s ease;
@@ -591,54 +591,48 @@
             transform: translateY(0);
         }
 
-        @media (min-width: 640px) {
+        @media (max-width: 640px) {
             .vehicle-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .vehicle-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 24px;
-            }
-        }
-
-        @media (min-width: 1400px) {
-            .vehicle-grid {
-                grid-template-columns: repeat(4, 1fr);
-                gap: 24px;
+                grid-template-columns: 1fr;
+                gap: 16px;
             }
         }
 
         /* ===== VEHICLE CARDS (Premium Design) ===== */
         .card {
-            background: #ffffff;
+            background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(248,250,255,0.95));
             border-radius: 18px;
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(40, 80, 140, 0.08);
-            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 16px rgba(40, 80, 140, 0.1), inset 0 1px 1px rgba(255,255,255,0.8);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             display: flex;
             flex-direction: column;
             height: 100%;
+            position: relative;
         }
 
         .card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 28px rgba(40, 80, 140, 0.14);
+            transform: translateY(-8px);
+            box-shadow: 0 16px 32px rgba(58, 111, 248, 0.18), inset 0 1px 1px rgba(255,255,255,0.8);
         }
 
         .card.featured {
-            border: 1.5px solid rgba(58, 111, 248, 0.2);
+            border: 1.5px solid rgba(255, 215, 0, 0.5);
+            box-shadow: 0 4px 16px rgba(40, 80, 140, 0.1), 0 0 20px rgba(255, 215, 0, 0.18), inset 0 1px 1px rgba(255,255,255,0.8);
+        }
+
+        .card.featured:hover {
+            box-shadow: 0 16px 32px rgba(58, 111, 248, 0.18), 0 0 30px rgba(255, 215, 0, 0.3), inset 0 1px 1px rgba(255,255,255,0.8);
+            border-color: rgba(255, 215, 0, 0.7);
         }
 
         .card-image {
             position: relative;
             width: 100%;
             height: 200px;
-            background: #f0f4ff;
+            background: linear-gradient(135deg, #f0f4ff, #fafbff);
             overflow: hidden;
         }
 
@@ -655,13 +649,30 @@
             left: 12px;
             background: linear-gradient(135deg, #3a6ff8, #5580ff);
             color: #fff;
-            padding: 6px 12px;
+            padding: 8px 14px;
             border-radius: 8px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            box-shadow: 0 4px 12px rgba(58, 111, 248, 0.25);
+            box-shadow: 0 4px 12px rgba(58, 111, 248, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            z-index: 2;
+        }
+
+        .card-badge.featured-badge {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.8), rgba(255, 200, 0, 0.7));
+            color: #1f2d52;
+            border: 1px solid rgba(255, 215, 0, 0.6);
+            box-shadow: 0 4px 16px rgba(255, 215, 0, 0.3);
+            text-transform: none;
+            font-weight: 700;
+            top: auto;
+            left: auto;
+            right: 12px;
+            top: 12px;
         }
 
         .card-badge.ev-badge {
@@ -714,21 +725,22 @@
             display: flex;
             flex-direction: column;
             padding: 16px;
-            gap: 10px;
+            gap: 8px;
         }
 
         .card-title {
-            margin: 0;
-            font-size: 1.1rem;
+            margin: 0 0 4px 0;
+            font-size: 1.05rem;
             font-weight: 700;
             color: #1f2d52;
             line-height: 1.3;
+            word-wrap: break-word;
         }
 
         .card-price {
-            margin: 0;
-            font-size: 1.3rem;
-            font-weight: 700;
+            margin: 0 0 8px 0;
+            font-size: 1.35rem;
+            font-weight: 800;
             background: linear-gradient(135deg, #3a6ff8, #8e52f8);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -738,33 +750,49 @@
         .card-details {
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            margin: 6px 0;
+            gap: 5px;
+            margin: 4px 0;
+            flex: 1;
         }
 
         .detail-item {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #5f7a9f;
             line-height: 1.4;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-item svg {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+            color: #3a6ff8;
+        }
+
+        .detail-item span {
+            flex: 1;
         }
 
         .card-view-btn {
             margin-top: auto;
-            padding: 11px 14px;
+            padding: 10px 16px;
             border: none;
             border-radius: 10px;
-            background: linear-gradient(110deg, #3a6ff8, #8e52f8);
+            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
             color: #fff;
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 8px rgba(58, 111, 248, 0.15);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(58, 111, 248, 0.2);
+            text-transform: capitalize;
         }
 
         .card-view-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(58, 111, 248, 0.25);
+            box-shadow: 0 6px 18px rgba(58, 111, 248, 0.3);
         }
 
         .card-view-btn:active {
@@ -1766,26 +1794,59 @@
             listEl.classList.add('visible');
         }
 
+        function openVehicleDetail(vehicleId) {
+            window.location.href = `vehicle.html?id=${vehicleId}`;
+        }
+
+        function formatVehicleTitle(make, model, year) {
+            return `${make || 'Vehicle'} ${model || ''}${year ? ` ${year}` : ''}`.trim();
+        }
+
         function createCard(v) {
             const img = getImageUrl(v.images);
-            const featured = v.featured ? ' featured' : '';
+            const isFeatured = v.featured;
+            const title = formatVehicleTitle(v.make, v.model, v.year);
+            const location = v.location || 'N/A';
+            const phone = v.phone || 'Contact seller';
+            const isEV = v.type === 'EV' || v.fuelType === 'electric';
+            
             return `
-                <div class="card${featured}">
+                <div class="card${isFeatured ? ' featured' : ''}" data-vehicle-id="${v.id}" onclick="openVehicleDetail(${v.id})">
                     <div class="card-image">
-                        <img src="${img}" alt="${v.make} ${v.model}">
-                        ${featured ? `<span class="card-badge">Featured</span>` : ''}
-                        ${v.type === 'EV' ? `<span class="card-badge ev-badge">EV</span>` : ''}
-                        <button class="card-save-btn" onclick="toggleHeart(event, ${v.id})" title="Save vehicle">♡</button>
+                        <img src="${img}" alt="${title}" loading="lazy">
+                        ${isFeatured ? `<div class="card-badge featured-badge">👑 Featured</div>` : ''}
+                        ${isEV ? `<div class="card-badge ev-badge">⚡ EV</div>` : ''}
+                        <button class="card-save-btn" onclick="toggleHeart(event, ${v.id})" title="Save vehicle" aria-label="Save vehicle">♡</button>
                     </div>
                     <div class="card-content">
-                        <h3 class="card-title">${v.make} ${v.model}</h3>
-                        <p class="card-price">Rs ${v.price.toLocaleString()}</p>
+                        <h3 class="card-title">${title}</h3>
+                        <p class="card-price">Rs ${(v.price || 0).toLocaleString()}</p>
                         <div class="card-details">
-                            <span class="detail-item">${v.year}</span>
-                            <span class="detail-item">${v.location}</span>
-                            <span class="detail-item">${v.condition}</span>
+                            <div class="detail-item">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                                <span>${location}</span>
+                            </div>
+                            <div class="detail-item">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                </svg>
+                                <span>${phone}</span>
+                            </div>
+                            ${v.transmission ? `<div class="detail-item">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="1"></circle>
+                                    <path d="M12 1v6m0 6v6"></path>
+                                    <path d="M4.22 4.22l4.24 4.24m5.08 0l4.24-4.24"></path>
+                                    <path d="M1 12h6m6 0h6"></path>
+                                    <path d="M4.22 19.78l4.24-4.24m5.08 0l4.24 4.24"></path>
+                                </svg>
+                                <span>${v.transmission}</span>
+                            </div>` : ''}
                         </div>
-                        <button class="card-view-btn" onclick="redirectToVehicle(${v.id})">View Details</button>
+                        <button class="card-view-btn" onclick="event.stopPropagation(); openVehicleDetail(${v.id})">View Details</button>
                     </div>
                 </div>
             `;
