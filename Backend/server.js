@@ -237,7 +237,8 @@ let db = mysql.createPool({
     queueLimit: 0
 });
 
-db.connect((err) => {
+// ✅ FIXED: Pools don't need .connect() - test connection with a simple query instead
+db.query('SELECT NOW() as server_time', (err, results) => {
     if (err) {
         console.error('❌ Database connection FAILED:', err.message);
         console.error('Connection details:', {
@@ -256,6 +257,7 @@ db.connect((err) => {
         console.log(`  User: ${process.env.DB_USER}`);
         console.log(`  Port: ${process.env.DB_PORT}`);
         console.log(`  SSL: ${process.env.DB_SSL === 'true' ? 'Enabled' : 'Disabled'}`);
+        console.log('  Server Time:', results[0]?.server_time);
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
         // Ensure required vehicle fields exist for featured and view counter

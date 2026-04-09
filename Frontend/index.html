@@ -2362,7 +2362,7 @@
             <p class="hero-sub">Sri Lanka's trusted marketplace to buy, sell & lease vehicles with confidence</p>
             
             <div class="hero-buttons">
-                <a href="#vehicles-section" class="btn-primary">
+                <a href="#filter-section-wrapper" class="btn-primary">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;">
                         <path d="M19 12H5M12 19l-7-7 7-7"></path>
                     </svg>
@@ -2398,7 +2398,7 @@
     </section>
 
     <!-- Filter Section -->
-    <div class="filter-section-wrapper">
+    <div class="filter-section-wrapper" id="filter-section-wrapper">
         <div class="filter-container">
             <div class="quick-filter-pills">
                 <button class="quick-filter-btn" onclick="setVehicleType('Car')">🚗 Cars</button>
@@ -3441,45 +3441,138 @@
 
         function renderFeatured(vehicles) {
             const scrollEl = getEl('featured-list');
-            if (!scrollEl || vehicles.length === 0) return;
+            if (!scrollEl) return;
+            
+            // Find the featured section header (sibling before featured-scroll)
+            let featuredSection = null;
+            let el = scrollEl.previousElementSibling;
+            while (el) {
+                if (el.classList.contains('section-head')) {
+                    featuredSection = el;
+                    break;
+                }
+                el = el.previousElementSibling;
+            }
+            
+            if (vehicles.length === 0) {
+                // Hide both section header and scroll container if no featured vehicles
+                if (featuredSection) featuredSection.style.display = 'none';
+                scrollEl.style.display = 'none';
+                return;
+            }
+            
+            // Show featured section and populate with vehicles
+            if (featuredSection) featuredSection.style.display = 'block';
+            scrollEl.style.display = 'flex';
             scrollEl.innerHTML = vehicles.map(createCard).join('');
         }
 
         function applyFilters() {
+            // Get filter values from form
             const searchVal = getEl('filter-search')?.value || '';
+            const typeVal = getEl('filter-vehicle-type')?.value || '';
             const brandVal = getEl('filter-brand')?.value || '';
             const locationVal = getEl('filter-location')?.value || '';
-            const minPrice = parseInt(getEl('filter-min-price')?.value || '0');
-            const maxPrice = parseInt(getEl('filter-max-price')?.value || '999999999');
-            const yearVal = parseInt(getEl('filter-year')?.value || '0');
+            const minPrice = getEl('filter-min-price')?.value || '';
+            const maxPrice = getEl('filter-max-price')?.value || '';
+            const yearVal = getEl('filter-year')?.value || '';
+            const fuelVal = getEl('filter-fuel')?.value || '';
+            const transmissionVal = getEl('filter-transmission')?.value || '';
 
-            const filtered = vehiclesData.filter(v => {
-                const searchMatch = !searchVal || `${v.make} ${v.model} ${v.description}`.toLowerCase().includes(searchVal.toLowerCase());
-                const brandMatch = !brandVal || v.make.toLowerCase().includes(brandVal.toLowerCase());
-                const locationMatch = !locationVal || v.location.toLowerCase().includes(locationVal.toLowerCase());
-                const priceMatch = v.price >= minPrice && v.price <= maxPrice;
-                const yearMatch = !yearVal || v.year >= yearVal;
-                return searchMatch && brandMatch && locationMatch && priceMatch && yearMatch;
-            });
+            // Build query params
+            const params = new URLSearchParams();
+            if (searchVal) params.append('search', searchVal);
+            if (typeVal) params.append('type', typeVal);
+            if (brandVal) params.append('brand', brandVal);
+            if (locationVal) params.append('location', locationVal);
+            if (minPrice) params.append('minPrice', minPrice);
+            if (maxPrice) params.append('maxPrice', maxPrice);
+            if (yearVal) params.append('year', yearVal);
+            if (fuelVal) params.append('fuel', fuelVal);
+            if (transmissionVal) params.append('transmission', transmissionVal);
 
-            renderVehicles(filtered);
+            // Fetch vehicles with filter params
+            fetchVehiclesWithFilters(params.toString());
+        }
+
+        async function fetchVehiclesWithFilters(queryString = '') {
+            const listEl = getEl('vehicle-list');
+            const demoCards = getEl('demo-cards');
+            const loaderEl = getEl('loader');
+            const errorEl = getEl('error-message');
+            
+            if (loaderEl) loaderEl.style.display = 'block';
+            if (errorEl) errorEl.classList.add('hidden');
+            if (demoCards) demoCards.style.display = 'none';
+            if (listEl) {
+                listEl.innerHTML = `
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                `;
+                listEl.style.display = 'grid';
+            }
+            
+            try {
+                const url = queryString 
+                    ? `${API_URL}/vehicles?${queryString}`
+                    : `${API_URL}/vehicles`;
+                
+                console.log('🔍 Filtering vehicles:', url);
+                const res = await fetch(url);
+                
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const vehicles = await res.json();
+                const vehicleArray = Array.isArray(vehicles) ? vehicles : (vehicles?.data || []);
+                
+                if (!vehicleArray || vehicleArray.length === 0) {
+                    if (listEl) {
+                        listEl.innerHTML = '<div class="notice">No vehicles match your filters. Try adjusting them.</div>';
+                    }
+                    if (demoCards) demoCards.style.display = 'grid';
+                    return;
+                }
+                
+                vehiclesData = vehicleArray;
+                renderVehicles(vehicleArray);
+                renderFeatured(vehicleArray.filter(v => v.isFeatured === true || v.featured === true));
+                
+            } catch (err) {
+                console.error('❌ Filter error:', err);
+                if (errorEl) {
+                    errorEl.textContent = `Failed to apply filters: ${err.message}`;
+                    errorEl.classList.remove('hidden');
+                }
+                if (listEl) listEl.style.display = 'none';
+            } finally {
+                if (loaderEl) loaderEl.style.display = 'none';
+            }
         }
 
         function clearFilters() {
+            // Reset all filter inputs
             getEl('filter-search').value = '';
+            getEl('filter-vehicle-type').value = '';
             getEl('filter-brand').value = '';
             getEl('filter-location').value = '';
             getEl('filter-min-price').value = '';
             getEl('filter-max-price').value = '';
             getEl('filter-year').value = '';
-            renderVehicles(vehiclesData);
+            getEl('filter-fuel').value = '';
+            getEl('filter-transmission').value = '';
+            // Fetch all vehicles without filters
+            fetchVehicles();
         }
 
         function setVehicleType(type) {
             const filterEl = getEl('filter-vehicle-type');
             if (filterEl) {
                 filterEl.value = type;
-                applyFilters();
+                // Fetch vehicles filtered by type only
+                const params = new URLSearchParams();
+                if (type) params.append('type', type);
+                fetchVehiclesWithFilters(params.toString());
             }
         }
 
