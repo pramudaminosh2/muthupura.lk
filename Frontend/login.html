@@ -75,7 +75,7 @@
         }
 
         .auth-logo {
-            width: 130px;
+            width: 400px;
             height: auto;
             margin-bottom: 32px;
             filter: drop-shadow(0 0 20px rgba(255,255,255,0.3));
@@ -570,16 +570,16 @@
 
                 <div id="auth-error" class="auth-error-msg"></div>
 
-                <!-- Email/Password -->
+                <!-- Phone/Password -->
                 <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" id="login-email" placeholder="you@example.com" class="auth-input">
+                    <label>Phone Number</label>
+                    <input type="tel" id="phone" placeholder="771234567" class="auth-input">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
                     <div class="input-password-wrap">
-                        <input type="password" id="login-password" placeholder="Enter your password" class="auth-input">
-                        <button class="toggle-password" onclick="togglePassword('login-password')">👁️</button>
+                        <input type="password" id="password" placeholder="Enter your password" class="auth-input">
+                        <button class="toggle-password" onclick="togglePassword('password')">👁️</button>
                     </div>
                 </div>
 
@@ -591,7 +591,7 @@
                     <a href="#" class="forgot-link" onclick="showForgotPassword()">Forgot password?</a>
                 </div>
 
-                <button class="btn-auth-primary" id="login-btn" onclick="handleEmailLogin()">Login</button>
+                <button class="btn-auth-primary" id="login-btn" onclick="performLogin()">Login</button>
 
                 <div class="auth-divider"><span>or continue with</span></div>
 
@@ -798,55 +798,45 @@
         }
 
         // ============================================
-        // EMAIL/PASSWORD LOGIN
+        // PHONE/PASSWORD LOGIN
         // ============================================
-        async function handleEmailLogin() {
-            clearError();
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value;
-
-            if (!email || !password) {
-                showError('Please enter your email and password.');
-                return;
-            }
-
-            setLoading('login-btn', true);
-
+        async function performLogin() {
             try {
-                // Firebase Auth sign in
-                const userCred = await signInWithEmailAndPassword(auth, email, password);
-                
-                // Get Firebase ID token
-                const idToken = await userCred.user.getIdToken();
+                const phone = document.querySelector("#phone").value.trim();
+                const password = document.querySelector("#password").value.trim();
 
-                // Send to backend
+                if (!phone || !password) {
+                    alert("Please fill all fields");
+                    return;
+                }
+
                 const res = await fetch(`${API_BASE}/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ idToken, email })
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ phone, password })
                 });
 
                 const data = await res.json();
 
-                if (!res.ok || !data.success) {
-                    throw new Error(data.message || 'Login failed');
+                if (!res.ok) {
+                    throw new Error(data.message || "Login failed");
                 }
 
-                onLoginSuccess(data.user, data.token || idToken);
+                // Save user session
+                localStorage.setItem("user", JSON.stringify(data.user));
+
+                // Redirect
+                if (data.user.is_admin) {
+                    window.location.href = "admin.html";
+                } else {
+                    window.location.href = "index.html";
+                }
 
             } catch (err) {
-                console.error('Login error:', err);
-                const msg = {
-                    'auth/user-not-found': 'No account found with this email.',
-                    'auth/wrong-password': 'Incorrect password. Try again.',
-                    'auth/invalid-email': 'Please enter a valid email address.',
-                    'auth/too-many-requests': 'Too many attempts. Try again later.',
-                    'auth/user-disabled': 'This account has been disabled.',
-                    'auth/invalid-credential': 'Invalid email or password.'
-                }[err.code] || err.message || 'Login failed. Please try again.';
-
-                showError(msg);
-                setLoading('login-btn', false, 'Login');
+                console.error(err);
+                alert(err.message);
             }
         }
 
