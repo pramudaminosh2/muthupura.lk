@@ -428,34 +428,8 @@
     </style>
     </style>
 </head>
-<body>
-    <!-- Fixed Navbar -->
-    <nav class="navbar" id="navbar">
-        <div class="nav-container">
-            <div class="nav-left">
-                <a class="nav-brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk"><span>Muthupura.lk</span></a>
-            </div>
-            <div class="nav-center">
-                <a href="index.html">Home</a>
-                <a href="post.html">Post Ad</a>
-            </div>
-            <div class="nav-right">
-                <button id="logout-btn" style="padding: 9px 18px; background: rgba(209, 40, 69, 0.08); color: #d12845; border-radius: 12px; border: 1px solid rgba(209, 40, 69, 0.2); transition: all 0.22s ease; font-weight: 500; cursor: pointer; font-size: 0.9rem; display: inline-block;">Logout</button>
-                <button class="hamburger" id="navbar-hamburger" aria-label="Toggle menu">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <div class="mobile-menu" id="mobile-menu">
-        <a href="index.html">Home</a>
-        <a href="post.html">Post Ad</a>
-        <hr style="border: none; border-top: 1px solid rgba(200, 210, 230, 0.3); margin: 8px 0;">
-        <button id="logout-btn-mobile" style="width: 100%; padding: 12px 16px; background: rgba(209, 40, 69, 0.08); color: #d12845; border: 1px solid rgba(209, 40, 69, 0.2); border-radius: 12px; font-weight: 500; cursor: pointer; font-size: 0.9rem; display: block; transition: all 0.22s ease;">Logout</button>
-    </div>
+<body data-light-nav="true">
+    <!-- Navbar will be injected by navbar.js -->
 
     <div class="wrapper" style="margin-top: 100px;">
 
@@ -606,5 +580,6 @@
 
         loadVehicles();
     </script>
+    <script src="navbar.js"></script>
 </body>
 </html>

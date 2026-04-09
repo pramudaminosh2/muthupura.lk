@@ -534,7 +534,7 @@
         }
     </style>
 </head>
-<body>
+<body data-light-nav="true">
     <div class="auth-container">
         <!-- LEFT PANEL -->
         <div class="auth-left">
@@ -570,16 +570,16 @@
 
                 <div id="auth-error" class="auth-error-msg"></div>
 
-                <!-- Phone/Password -->
+                <!-- Email/Password -->
                 <div class="form-group">
-                    <label>Phone Number</label>
-                    <input type="tel" id="phone" placeholder="771234567" class="auth-input">
+                    <label>Email Address</label>
+                    <input type="email" id="login-email" placeholder="you@example.com" class="auth-input">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
                     <div class="input-password-wrap">
-                        <input type="password" id="password" placeholder="Enter your password" class="auth-input">
-                        <button class="toggle-password" onclick="togglePassword('password')">👁️</button>
+                        <input type="password" id="login-password" placeholder="Enter your password" class="auth-input">
+                        <button class="toggle-password" onclick="togglePassword('login-password')">👁️</button>
                     </div>
                 </div>
 
@@ -591,7 +591,7 @@
                     <a href="#" class="forgot-link" onclick="showForgotPassword()">Forgot password?</a>
                 </div>
 
-                <button class="btn-auth-primary" id="login-btn" onclick="performLogin()">Login</button>
+                <button class="btn-auth-primary" id="login-btn" onclick="handleEmailLogin()">Login</button>
 
                 <div class="auth-divider"><span>or continue with</span></div>
 
@@ -694,12 +694,12 @@
 
     <script src="config.js"></script>
     <script type="module">
-        // ============================================
-        // FIREBASE AUTH SETUP (Modular SDK)
-        // ============================================
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, signInWithPhoneNumber, RecaptchaVerifier, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, signInWithPhoneNumber, RecaptchaVerifier, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+        // ════════════════════════════════
+        // FIREBASE CONFIGURATION
+        // ════════════════════════════════
         const firebaseConfig = {
             apiKey: "AIzaSyD6APHZMfX39NE3D0QmqhM9CYcJLEYAq7A",
             authDomain: "muthupuralk.firebaseapp.com",
@@ -712,342 +712,399 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+
+        // ════════════════════════════════
+        // BACKEND URL - CRITICAL
+        // ════════════════════════════════
         const API_BASE = API_BASE_URL || 'https://muthupura-lk.onrender.com';
 
         let confirmationResult = null;
 
-        // ============================================
+        // ════════════════════════════════
         // TAB SWITCHING
-        // ============================================
-        function switchTab(tab) {
-            const loginPanel = document.getElementById('panel-login');
-            const regPanel = document.getElementById('panel-register');
-            const successPanel = document.getElementById('auth-success');
-            const tabLogin = document.getElementById('tab-login');
-            const tabRegister = document.getElementById('tab-register');
+        // ════════════════════════════════
+        window.switchTab = function(tab) {
+            const panels = {
+                login:    document.getElementById('panel-login'),
+                register: document.getElementById('panel-register')
+            };
+            const tabs = {
+                login:    document.getElementById('tab-login'),
+                register: document.getElementById('tab-register')
+            };
 
-            if (tab === 'login') {
-                loginPanel.style.display = 'block';
-                regPanel.style.display = 'none';
-                successPanel.style.display = 'none';
-                tabLogin.classList.add('active');
-                tabRegister.classList.remove('active');
-            } else {
-                loginPanel.style.display = 'none';
-                regPanel.style.display = 'block';
-                successPanel.style.display = 'none';
-                tabRegister.classList.add('active');
-                tabLogin.classList.remove('active');
-            }
+            Object.keys(panels).forEach(key => {
+                if (panels[key]) {
+                    panels[key].style.display = key === tab ? 'block' : 'none';
+                }
+                if (tabs[key]) {
+                    tabs[key].classList.toggle('active', key === tab);
+                }
+            });
             clearError();
-        }
+        };
 
-        // ============================================
-        // ERROR HANDLING
-        // ============================================
-        function showError(msg) {
-            const errorEl = document.getElementById('auth-error');
-            const errorRegEl = document.getElementById('auth-error-reg');
-            errorEl.textContent = '⚠️ ' + msg;
-            errorEl.style.display = 'block';
-            if (errorRegEl) errorRegEl.textContent = '⚠️ ' + msg;
-            if (errorRegEl) errorRegEl.style.display = 'block';
+        // ════════════════════════════════
+        // UI HELPERS
+        // ════════════════════════════════
+        function showError(message) {
+            let el = document.getElementById('auth-error');
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'auth-error';
+                el.className = 'auth-error-msg';
+                const activePanel = document.querySelector('.auth-form-panel:not([style*="none"])');
+                if (activePanel) activePanel.prepend(el);
+            }
+            el.style.display = 'flex';
+            el.innerHTML = '⚠️ ' + message;
         }
 
         function clearError() {
-            const errorEl = document.getElementById('auth-error');
-            const errorRegEl = document.getElementById('auth-error-reg');
-            errorEl.style.display = 'none';
-            if (errorRegEl) errorRegEl.style.display = 'none';
+            const el = document.getElementById('auth-error');
+            if (el) {
+                el.style.display = 'none';
+                el.innerHTML = '';
+            }
         }
 
-        // ============================================
-        // BUTTON LOADING STATE
-        // ============================================
-        function setLoading(btnId, loading, text = 'Login') {
+        function setButtonLoading(btnId, isLoading, originalText) {
             const btn = document.getElementById(btnId);
             if (!btn) return;
-            btn.disabled = loading;
-            btn.innerHTML = loading
-                ? '<span class="btn-loading"><span class="spinner"></span>Please wait...</span>'
-                : text;
+            btn.disabled = isLoading;
+            if (isLoading) {
+                btn.dataset.originalText = btn.textContent;
+                btn.innerHTML = `
+                    <span style="display:inline-flex;align-items:center;gap:8px">
+                        <span style="width:16px;height:16px;border:2px solid rgba(255,255,255,0.35);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;"></span>
+                        Please wait...
+                    </span>`;
+            } else {
+                btn.textContent = originalText || btn.dataset.originalText || 'Submit';
+            }
         }
 
-        // ============================================
-        // PASSWORD TOGGLE
-        // ============================================
-        function togglePassword(inputId) {
-            const input = document.getElementById(inputId);
-            input.type = input.type === 'password' ? 'text' : 'password';
-        }
+        function showSuccessAndRedirect(userData, token) {
+            if (token) localStorage.setItem('authToken', token);
+            if (userData) {
+                localStorage.setItem('userData', JSON.stringify(userData));
+            }
 
-        // ============================================
-        // AFTER LOGIN SUCCESS
-        // ============================================
-        function onLoginSuccess(userData, token) {
-            localStorage.setItem('authToken', token);
-            localStorage.setItem('userData', JSON.stringify(userData));
+            const loginPanel = document.getElementById('panel-login');
+            const regPanel = document.getElementById('panel-register');
+            if (loginPanel) loginPanel.style.display = 'none';
+            if (regPanel) regPanel.style.display = 'none';
 
-            document.getElementById('panel-login').style.display = 'none';
-            document.getElementById('panel-register').style.display = 'none';
-            document.getElementById('auth-success').style.display = 'block';
+            let successEl = document.getElementById('auth-success');
+            if (!successEl) {
+                successEl = document.createElement('div');
+                successEl.id = 'auth-success';
+                successEl.style.cssText = 'text-align:center;padding:60px 20px;';
+                const authRight = document.querySelector('.auth-right');
+                if (authRight) authRight.appendChild(successEl);
+            }
+            successEl.innerHTML = `
+                <div style="font-size:56px;margin-bottom:16px">✅</div>
+                <h2 style="font-size:22px;font-weight:800;color:#1e2a4a;margin-bottom:8px;font-family:Poppins">You're logged in!</h2>
+                <p style="color:#64748b;font-family:Poppins;font-size:14px">Redirecting you now...</p>
+            `;
+            successEl.style.display = 'block';
 
             setTimeout(() => {
-                window.location.href = 'index.html';
+                const redirect = sessionStorage.getItem('redirectAfterLogin');
+                sessionStorage.removeItem('redirectAfterLogin');
+                window.location.href = redirect || 'index.html';
             }, 1500);
         }
 
-        // ============================================
-        // PHONE/PASSWORD LOGIN
-        // ============================================
-        async function performLogin() {
+        window.togglePassword = function(inputId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            input.type = input.type === 'password' ? 'text' : 'password';
+        };
+
+        // ════════════════════════════════
+        // SYNC USER TO BACKEND DB
+        // ════════════════════════════════
+        async function syncUserToBackend(idToken, extraData = {}) {
             try {
-                const phone = document.querySelector("#phone").value.trim();
-                const password = document.querySelector("#password").value.trim();
-
-                if (!phone || !password) {
-                    alert("Please fill all fields");
-                    return;
-                }
-
-                const res = await fetch(`${API_BASE}/login`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ phone, password })
+                const res = await fetch(`${API_BASE}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idToken, ...extraData })
                 });
-
-                const data = await res.json();
-
+                
                 if (!res.ok) {
-                    throw new Error(data.message || "Login failed");
+                    const errData = await res.json().catch(() => ({}));
+                    if (res.status === 409) {
+                        return { success: true, existing: true };
+                    }
+                    throw new Error(errData.message || `Server error ${res.status}`);
                 }
-
-                // Save user session
-                localStorage.setItem("user", JSON.stringify(data.user));
-
-                // Redirect
-                if (data.user.is_admin) {
-                    window.location.href = "admin.html";
-                } else {
-                    window.location.href = "index.html";
-                }
-
+                
+                return await res.json();
             } catch (err) {
-                console.error(err);
-                alert(err.message);
+                console.error('Backend sync error:', err);
+                return { success: true, backendError: err.message };
             }
         }
 
-        // ============================================
-        // REGISTER
-        // ============================================
-        async function handleRegister() {
+        // ════════════════════════════════
+        // EMAIL / PASSWORD LOGIN
+        // ════════════════════════════════
+        window.handleEmailLogin = async function() {
             clearError();
-            const name = document.getElementById('reg-name').value.trim();
-            const email = document.getElementById('reg-email').value.trim();
-            const phone = document.getElementById('reg-phone').value.trim();
-            const password = document.getElementById('reg-password').value;
-            const confirm = document.getElementById('reg-confirm').value;
-            const agreed = document.getElementById('terms-agree').checked;
 
-            if (!name || !email || !password || !confirm) {
-                showError('Please fill in all required fields.');
+            const emailEl = document.getElementById('login-email');
+            const passwordEl = document.getElementById('login-password');
+
+            if (!emailEl || !passwordEl) {
+                showError('Form elements not found. Please refresh.');
+                return;
+            }
+
+            const email = emailEl.value.trim();
+            const password = passwordEl.value;
+
+            if (!email) {
+                showError('Please enter your email address.');
+                emailEl.focus();
+                return;
+            }
+            if (!password) {
+                showError('Please enter your password.');
+                passwordEl.focus();
+                return;
+            }
+
+            setButtonLoading('login-btn', true);
+
+            try {
+                const userCred = await signInWithEmailAndPassword(auth, email, password);
+                const idToken = await userCred.user.getIdToken();
+                const userData = {
+                    name: userCred.user.displayName || email.split('@')[0],
+                    email: userCred.user.email,
+                    uid: userCred.user.uid
+                };
+
+                syncUserToBackend(idToken, userData);
+                showSuccessAndRedirect(userData, idToken);
+
+            } catch (err) {
+                console.error('Email login error:', err.code, err.message);
+
+                const friendlyErrors = {
+                    'auth/user-not-found': 'No account found with this email. Please register.',
+                    'auth/wrong-password': 'Incorrect password. Please try again.',
+                    'auth/invalid-email': 'Please enter a valid email address.',
+                    'auth/invalid-credential': 'Invalid email or password. Please check and try again.',
+                    'auth/too-many-requests': 'Too many failed attempts. Please wait a few minutes.',
+                    'auth/user-disabled': 'This account has been disabled. Contact support.',
+                    'auth/network-request-failed': 'Network error. Please check your internet connection.'
+                };
+
+                showError(friendlyErrors[err.code] || err.message);
+                setButtonLoading('login-btn', false, 'Login');
+            }
+        };
+
+        // ════════════════════════════════
+        // REGISTER
+        // ════════════════════════════════
+        window.handleRegister = async function() {
+            clearError();
+
+            const name = document.getElementById('reg-name')?.value.trim();
+            const email = document.getElementById('reg-email')?.value.trim();
+            const phone = document.getElementById('reg-phone')?.value.trim();
+            const password = document.getElementById('reg-password')?.value;
+            const confirm = document.getElementById('reg-confirm')?.value;
+            const agreed = document.getElementById('terms-agree')?.checked;
+
+            if (!name) {
+                showError('Please enter your full name.');
+                return;
+            }
+            if (!email) {
+                showError('Please enter your email address.');
+                return;
+            }
+            if (!password) {
+                showError('Please enter a password.');
                 return;
             }
             if (password.length < 8) {
-                showError('Password must be at least 8 characters.');
+                showError('Password must be at least 8 characters long.');
                 return;
             }
             if (password !== confirm) {
-                showError('Passwords do not match.');
+                showError('Passwords do not match. Please check again.');
                 return;
             }
-            if (!agreed) {
-                showError('Please agree to the Terms of Service.');
+            if (agreed === false) {
+                showError('Please agree to the Terms of Service to continue.');
                 return;
             }
 
-            setLoading('register-btn', true, 'Creating Account...');
+            setButtonLoading('register-btn', true, 'Creating Account...');
 
             try {
-                // Create Firebase user
                 const userCred = await createUserWithEmailAndPassword(auth, email, password);
-                
-                // Update display name
                 await userCred.user.updateProfile({ displayName: name });
-                
-                // Get ID token
+
                 const idToken = await userCred.user.getIdToken();
+                const userData = {
+                    name,
+                    email,
+                    phone: phone || '',
+                    uid: userCred.user.uid
+                };
 
-                // Register in backend DB
-                const res = await fetch(`${API_BASE}/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        idToken, name, email, phone, provider: 'email'
-                    })
-                });
+                const backendRes = await syncUserToBackend(idToken, userData);
 
-                const data = await res.json();
-
-                if (!res.ok || !data.success) {
-                    // Delete Firebase user if backend fails
+                if (backendRes && backendRes.success === false) {
                     await userCred.user.delete();
-                    throw new Error(data.message || 'Registration failed');
+                    throw new Error(backendRes.message || 'Registration failed');
                 }
 
-                onLoginSuccess(data.user, data.token || idToken);
+                showSuccessAndRedirect(userData, idToken);
 
             } catch (err) {
-                console.error('Register error:', err);
-                const msg = {
-                    'auth/email-already-in-use': 'An account with this email already exists.',
+                console.error('Register error:', err.code, err.message);
+
+                const friendlyErrors = {
+                    'auth/email-already-in-use': 'An account with this email already exists. Try logging in.',
                     'auth/weak-password': 'Password is too weak. Use at least 8 characters.',
-                    'auth/invalid-email': 'Please enter a valid email address.'
-                }[err.code] || err.message || 'Registration failed.';
+                    'auth/invalid-email': 'Please enter a valid email address.',
+                    'auth/network-request-failed': 'Network error. Please check your internet connection.'
+                };
 
-                showError(msg);
-                setLoading('register-btn', false, 'Create Account');
+                showError(friendlyErrors[err.code] || err.message);
+                setButtonLoading('register-btn', false, 'Create Account');
             }
-        }
+        };
 
-        // ============================================
+        // ════════════════════════════════
         // GOOGLE LOGIN
-        // ============================================
-        async function handleGoogleLogin() {
+        // ════════════════════════════════
+        window.handleGoogleLogin = async function() {
             clearError();
             try {
                 const provider = new GoogleAuthProvider();
-                provider.addScope('email');
-                provider.addScope('profile');
+                provider.setCustomParameters({ prompt: 'select_account' });
 
                 const result = await signInWithPopup(auth, provider);
-                
                 const idToken = await result.user.getIdToken();
-                const name = result.user.displayName;
-                const email = result.user.email;
+                const userData = {
+                    name: result.user.displayName || '',
+                    email: result.user.email || '',
+                    uid: result.user.uid,
+                    provider: 'google'
+                };
 
-                const res = await fetch(`${API_BASE}/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        idToken, name, email, 
-                        provider: 'google' 
-                    })
-                });
-
-                const data = await res.json();
-                
-                if (!res.ok && res.status !== 409) {
-                    throw new Error(data.message || 'Google login failed');
-                }
-
-                onLoginSuccess(
-                    data.user || { name, email }, 
-                    data.token || idToken
-                );
+                await syncUserToBackend(idToken, userData);
+                showSuccessAndRedirect(userData, idToken);
 
             } catch (err) {
                 console.error('Google login error:', err);
-                if (err.code === 'auth/popup-closed-by-user') return;
-                showError(err.message || 'Google login failed.');
+                if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') return;
+                showError(err.message || 'Google login failed. Try again.');
             }
-        }
+        };
 
-        // ============================================
+        // ════════════════════════════════
         // FACEBOOK LOGIN
-        // ============================================
-        async function handleFacebookLogin() {
+        // ════════════════════════════════
+        window.handleFacebookLogin = async function() {
             clearError();
             try {
                 const provider = new FacebookAuthProvider();
                 provider.addScope('email');
 
                 const result = await signInWithPopup(auth, provider);
-                
                 const idToken = await result.user.getIdToken();
-                const name = result.user.displayName;
-                const email = result.user.email;
+                const userData = {
+                    name: result.user.displayName || '',
+                    email: result.user.email || '',
+                    uid: result.user.uid,
+                    provider: 'facebook'
+                };
 
-                const res = await fetch(`${API_BASE}/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        idToken, name, email, 
-                        provider: 'facebook' 
-                    })
-                });
-
-                const data = await res.json();
-                onLoginSuccess(
-                    data.user || { name, email }, 
-                    data.token || idToken
-                );
+                await syncUserToBackend(idToken, userData);
+                showSuccessAndRedirect(userData, idToken);
 
             } catch (err) {
                 console.error('Facebook login error:', err);
                 if (err.code === 'auth/popup-closed-by-user') return;
-                showError(err.message || 'Facebook login failed.');
+                showError(err.message || 'Facebook login failed. Try again.');
             }
-        }
+        };
 
-        // ============================================
-        // PHONE OTP LOGIN
-        // ============================================
-        function sendOTP() {
+        // ════════════════════════════════
+        // PHONE OTP
+        // ════════════════════════════════
+        window.sendOTP = function() {
             clearError();
-            const phoneInput = document.getElementById('otp-phone').value.trim();
-            
-            if (!phoneInput || phoneInput.length < 9) {
+            const phoneInput = document.getElementById('otp-phone');
+            if (!phoneInput) return;
+
+            const raw = phoneInput.value.trim().replace(/^0/, '');
+            if (!raw || raw.length < 9) {
                 showError('Please enter a valid 9-digit phone number.');
                 return;
             }
 
-            const phoneNumber = '+94' + phoneInput.replace(/^0/, '');
+            const phoneNumber = '+94' + raw;
+            const sendBtn = document.getElementById('send-otp-btn');
 
-            // Setup reCAPTCHA
             if (!window.recaptchaVerifier) {
                 window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
                     size: 'invisible',
-                    callback: () => {}
+                    callback: () => { console.log('reCAPTCHA solved'); }
                 });
             }
 
-            const sendBtn = document.getElementById('send-otp-btn');
-            sendBtn.disabled = true;
-            sendBtn.textContent = 'Sending...';
+            if (sendBtn) {
+                sendBtn.disabled = true;
+                sendBtn.textContent = 'Sending...';
+            }
 
             signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier)
-                .then((result) => {
+                .then(result => {
                     confirmationResult = result;
-                    document.getElementById('otp-verify-group').style.display = 'block';
-                    sendBtn.textContent = 'Resend OTP';
-                    sendBtn.disabled = false;
+                    const verifyGroup = document.getElementById('otp-verify-group');
+                    if (verifyGroup) verifyGroup.style.display = 'block';
+                    if (sendBtn) {
+                        sendBtn.textContent = 'Resend';
+                        sendBtn.disabled = false;
+                    }
+                    console.log('OTP sent to', phoneNumber);
                 })
-                .catch((err) => {
+                .catch(err => {
                     console.error('OTP send error:', err);
                     showError('Failed to send OTP: ' + err.message);
-                    sendBtn.disabled = false;
-                    sendBtn.textContent = 'Send OTP';
+                    if (sendBtn) {
+                        sendBtn.textContent = 'Send OTP';
+                        sendBtn.disabled = false;
+                    }
                     if (window.recaptchaVerifier) {
                         window.recaptchaVerifier.clear();
                         window.recaptchaVerifier = null;
                     }
                 });
-        }
+        };
 
-        async function verifyOTP() {
+        window.verifyOTP = async function() {
             clearError();
-            const code = document.getElementById('otp-code').value.trim();
-            
-            if (!code || code.length !== 6) {
+            const code = document.getElementById('otp-code')?.value.trim();
+
+            if (!code || code.length < 6) {
                 showError('Please enter the 6-digit OTP code.');
                 return;
             }
             if (!confirmationResult) {
-                showError('Please send OTP first.');
+                showError('Please request an OTP first.');
                 return;
             }
 
@@ -1056,57 +1113,57 @@
                 const idToken = await result.user.getIdToken();
                 const phone = result.user.phoneNumber;
 
-                const res = await fetch(`${API_BASE}/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        idToken, phone, 
-                        provider: 'phone' 
-                    })
-                });
-
-                const data = await res.json();
-                onLoginSuccess(
-                    data.user || { phone }, 
-                    data.token || idToken
-                );
+                const userData = { phone, uid: result.user.uid };
+                await syncUserToBackend(idToken, { phone, provider: 'phone' });
+                showSuccessAndRedirect(userData, idToken);
 
             } catch (err) {
-                console.error('OTP verify error:', err);
-                const msg = {
-                    'auth/invalid-verification-code': 'Invalid OTP code. Please check and try again.',
+                const msgs = {
+                    'auth/invalid-verification-code': 'Wrong OTP code. Please check and try again.',
                     'auth/code-expired': 'OTP has expired. Please request a new one.'
-                }[err.code] || 'Verification failed.';
-                showError(msg);
+                };
+                showError(msgs[err.code] || 'Verification failed: ' + err.message);
             }
-        }
+        };
 
-        // ============================================
+        // ════════════════════════════════
         // FORGOT PASSWORD
-        // ============================================
-        async function showForgotPassword() {
-            const email = document.getElementById('login-email').value.trim();
-            const emailToReset = email || prompt('Enter your email address to reset password:');
-            
-            if (!emailToReset) return;
+        // ════════════════════════════════
+        window.showForgotPassword = async function() {
+            const emailEl = document.getElementById('login-email');
+            const email = emailEl?.value.trim();
+
+            const target = email || window.prompt('Enter your email address to reset your password:');
+            if (!target) return;
 
             try {
-                await sendPasswordResetEmail(auth, emailToReset);
-                alert('Password reset email sent! Check your inbox.');
+                await sendPasswordResetEmail(auth, target);
+                alert('✅ Password reset email sent! Please check your inbox.');
             } catch (err) {
                 showError('Could not send reset email: ' + err.message);
             }
-        }
+        };
 
-        // ============================================
-        // CHECK IF ALREADY LOGGED IN
-        // ============================================
-        auth.onAuthStateChanged((user) => {
+        // ════════════════════════════════
+        // AUTO REDIRECT IF ALREADY LOGGED IN
+        // ════════════════════════════════
+        onAuthStateChanged(auth, user => {
             if (user) {
-                // Already logged in → redirect
-                window.location.href = 'index.html';
+                const redirect = sessionStorage.getItem('redirectAfterLogin');
+                sessionStorage.removeItem('redirectAfterLogin');
+                window.location.href = redirect || 'index.html';
             }
         });
+
+        // ════════════════════════════════
+        // SPIN ANIMATION
+        // ════════════════════════════════
+        const spinStyle = document.createElement('style');
+        spinStyle.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+        document.head.appendChild(spinStyle);
+
+        console.log('✅ Muthupura.lk auth system loaded');
     </script>
+    <script src="navbar.js"></script>
 </body>
 </html>

@@ -1175,45 +1175,9 @@
         }
     </style>
 </head>
-<body>
+<body data-light-nav="true">
+    <!-- Navbar will be injected by navbar.js -->
     <div class="page-shell">
-        <!-- Fixed Navbar -->
-        <nav class="navbar" id="navbar">
-            <div class="nav-container">
-                <div class="nav-left">
-                    <a class="nav-brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk"><span>Muthupura.lk</span></a>
-                </div>
-                <div class="nav-center">
-                    <a href="index.html">Home</a>
-                    <a href="post.html">Post Ad</a>
-                    <a href="dashboard.html" id="mylistings-link" style="display:none;">My Listings</a>
-                    <a href="about.html">About Us</a>
-                    <a href="contact.html">Contact Us</a>
-                </div>
-                <div class="nav-right">
-                    <span id="user-greeting" style="display:none;"></span>
-                    <a id="auth-link" href="login.html">Login</a>
-                    <a id="admin-link" href="admin.html" style="display:none;">Admin</a>
-                    <button class="hamburger" id="navbar-hamburger" aria-label="Toggle menu">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </button>
-                </div>
-            </div>
-        </nav>
-
-        <div class="mobile-menu" id="mobile-menu">
-            <a href="index.html">Home</a>
-            <a href="post.html">Post Ad</a>
-            <a href="dashboard.html" id="mylistings-link-mobile" style="display:none;">My Listings</a>
-            <a href="about.html">About Us</a>
-            <a href="contact.html">Contact Us</a>
-            <hr style="border: none; border-top: 1px solid rgba(200, 210, 230, 0.3); margin: 8px 0;">
-            <a id="auth-link-mobile" href="login.html">Login</a>
-            <a id="admin-link-mobile" href="admin.html" style="display:none;">Admin</a>
-        </div>
-
         <section class="header-copy">
             <h1>Post your vehicle with confidence</h1>
             <p>Create a high-quality listing in minutes. Upload clear photos, add rich details, and help buyers find your vehicle faster.</p>
@@ -1701,5 +1665,6 @@
         setTimeout(setupHamburgerMenu, 100);
         syncAuthLinks();
     </script>
+    <script src="navbar.js"></script>
 </body>
 </html>
