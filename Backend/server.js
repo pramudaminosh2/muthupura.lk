@@ -22,9 +22,6 @@ app.use(cors({
 
 const mysql = require('mysql2');
 
-// Firebase Storage setup
-const bucket = require('./firebase');
-
 // Test URL parsing function (for debugging)
 function extractFilePathFromUrl(imageUrl) {
     try {
