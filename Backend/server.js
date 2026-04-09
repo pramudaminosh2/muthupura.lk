@@ -221,7 +221,9 @@ passport.use(new FacebookStrategy({
     handleOAuthLogin('facebook', facebookId, email, name, done);
 }));
 
-let db = mysql.createConnection({
+// ✅ FIXED: Use Pool instead of single connection for production reliability
+// Pool automatically handles connection reuse and recovery
+let db = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
@@ -390,6 +392,21 @@ db.connect((err) => {
 
         console.log('Vehicles table schema checked for isFeatured, views, featuredUntil, createdAt, fuelType, ownerId, images, location');
     }
+});
+
+// ✅ FIXED: Add pool error handler for connection drops
+db.on('error', (err) => {
+    console.error('❌ Unexpected database connection error:', err.message);
+    if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+        console.error('Database connection was closed.');
+    }
+    if (err.code === 'PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR') {
+        console.error('Database connection had a fatal error.');
+    }
+    if (err.code === 'PROTOCOL_ENQUEUE_AFTER_CLOSE') {
+        console.error('Database connection was manually closed.');
+    }
+    // Reconnect attempt is handled automatically by the pool
 });
 
 // Firebase Storage setup for image uploads
@@ -915,7 +932,32 @@ function normalizeVehicleRecord(vehicle) {
         record.images = [record.image];
     }
 
-    return record;
+    // ✅ ENSURE ALL FIELDS ARE NORMALIZED
+    return {
+        id:              record.id,
+        title:           record.title || '',
+        brand:           record.brand || '',
+        model:           record.model || '',
+        year:            record.year || '',
+        price:           record.price || 0,
+        phone:           record.phone || '',
+        image:           record.image || '',
+        images:          record.images,
+        fuelType:        record.fuelType || record.fuel_type || '',
+        vehicle_type:    record.vehicle_type || '',
+        condition:       record.condition || '',
+        transmission:    record.transmission || '',
+        engine_capacity: record.engine_capacity || null,
+        mileage:         record.mileage || null,
+        features:        record.features || '',
+        listing_type:    record.listing_type || 'sale',
+        location:        record.location || '',
+        description:     record.description || '',
+        isFeatured:      record.isFeatured === 1 || record.isFeatured === true,
+        is_approved:     record.is_approved === 1 || record.is_approved === true,
+        views:           record.views || 0,
+        createdAt:       record.createdAt || null
+    };
 }
 
 // test route
@@ -1008,8 +1050,14 @@ app.post('/add-vehicle', upload.array('images', 10), async (req, res) => {
     console.log("FILES RECEIVED:", req.files);
     
     try {
-        // Extract form data
-        const { title, brand, year, price, fuelType, location, phone, description } = req.body;
+        // Extract form data - including ALL new fields
+        const { 
+            title, brand, model, year, price, 
+            fuelType, location, phone, description,
+            vehicle_type, condition, transmission,
+            engine_capacity, mileage, features,
+            listing_type
+        } = req.body;
         
         // Validate required fields
         if (!title || !brand || !year || !price || !fuelType || !location || !phone) {
@@ -1048,37 +1096,55 @@ app.post('/add-vehicle', upload.array('images', 10), async (req, res) => {
         console.log('📝 Vehicle form data:', {
             title,
             brand,
+            model,
             year: parseInt(year),
             price: parseFloat(price),
             fuelType,
+            vehicle_type,
+            condition,
+            transmission,
             location,
             phone,
             description: description || null,
             image_url: image_url.substring(0, 80) + '...'
         });
         
-        // Insert into database
+        // Insert into database - with ALL new columns
         const sql = `
             INSERT INTO vehicles 
-            (title, price, brand, year, phone, image, images, fuelType, ownerId, location, isFeatured, views, featuredUntil, description, createdAt)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+            (title, brand, model, year, price, phone, 
+             image, images, fuelType, vehicle_type, condition,
+             transmission, engine_capacity, mileage, features,
+             listing_type, ownerId, location, description,
+             isFeatured, is_approved, views, featuredUntil, createdAt)
+            VALUES 
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
         `;
         
         const values = [
-            title,                                   // title
-            parseFloat(price),                       // price
-            brand,                                   // brand
-            parseInt(year),                          // year
-            phone,                                   // phone
-            image_url,                               // image
-            JSON.stringify(imageUrls),               // images (JSON array)
-            fuelType,                                // fuelType
-            null,                                    // ownerId
-            location,                                // location
-            0,                                       // isFeatured
-            0,                                       // views
-            null,                                    // featuredUntil
-            description || null                      // description
+            title,                                   // 1. title
+            brand,                                   // 2. brand
+            model || null,                           // 3. model
+            parseInt(year),                          // 4. year
+            parseFloat(price),                       // 5. price
+            phone,                                   // 6. phone
+            image_url,                               // 7. image
+            JSON.stringify(imageUrls),               // 8. images (JSON array)
+            fuelType,                                // 9. fuelType
+            vehicle_type || null,                    // 10. vehicle_type
+            condition || null,                       // 11. condition
+            transmission || null,                    // 12. transmission
+            engine_capacity ? parseInt(engine_capacity) : null,  // 13. engine_capacity
+            mileage ? parseInt(mileage) : null,      // 14. mileage
+            features || null,                        // 15. features
+            listing_type || 'sale',                  // 16. listing_type
+            null,                                    // 17. ownerId (add auth later)
+            location,                                // 18. location
+            description || null,                     // 19. description
+            0,                                       // 20. isFeatured
+            0,                                       // 21. is_approved (pending admin approval)
+            0,                                       // 22. views
+            null                                     // 23. featuredUntil
         ];
         
         db.query(sql, values, (err, result) => {
@@ -1160,7 +1226,7 @@ app.get('/get-vehicles', (req, res) => {
     }
 });
 
-// 🟢 Get Vehicle by ID
+// 🟢 Get Vehicle by ID (with view counter increment)
 app.get('/vehicle/:id', (req, res) => {
     const id = req.params.id;
     const sql = "SELECT * FROM vehicles WHERE id = ? LIMIT 1";
@@ -1182,8 +1248,20 @@ app.get('/vehicle/:id', (req, res) => {
                 message: 'Vehicle not found' 
             });
         }
+        
+        // ✅ FIXED: Increment view counter
+        const updateViewsSql = "UPDATE vehicles SET views = views + 1 WHERE id = ?";
+        db.query(updateViewsSql, [id], (updateErr) => {
+            if (updateErr) {
+                console.warn(`⚠️ [/vehicle/${id}] Failed to increment views:`, updateErr.message);
+                // Don't fail the response, just log warning
+            } else {
+                console.log(`👁️ [/vehicle/${id}] View count incremented`);
+            }
+        });
+        
         const normalized = normalizeVehicleRecord(results[0]);
-        console.log(`✅ [/vehicle/${id}] Vehicle fetched, images: ${normalized.images?.length || 0}`);
+        console.log(`✅ [/vehicle/${id}] Vehicle fetched, images: ${normalized.images?.length || 0}, current views: ${normalized.views || 0}`);
         return res.json(normalized);
     });
 });
@@ -1276,12 +1354,70 @@ app.get('/vehicles', (req, res) => {
                 console.error('Error expiring featured ads', err);
             }
 
-            const sql = "SELECT * FROM vehicles ORDER BY isFeatured DESC, views DESC, createdAt DESC, id DESC";
-            console.log('📤 [/vehicles] Fetching vehicles from database...');
-
-            db.query(sql, (err, results) => {
+            // Build dynamic filter query
+            const { 
+                search, type, location, brand, 
+                minPrice, maxPrice, year, 
+                fuel, transmission 
+            } = req.query;
+            
+            let conditions = ['is_approved = 1'];
+            let params = [];
+            
+            if (search) {
+                conditions.push(
+                    '(title LIKE ? OR brand LIKE ? OR model LIKE ?)'
+                );
+                const s = `%${search}%`;
+                params.push(s, s, s);
+            }
+            if (type) {
+                conditions.push('vehicle_type = ?');
+                params.push(type);
+            }
+            if (location) {
+                conditions.push('location LIKE ?');
+                params.push(`%${location}%`);
+            }
+            if (brand) {
+                conditions.push('brand LIKE ?');
+                params.push(`%${brand}%`);
+            }
+            if (minPrice) {
+                conditions.push('price >= ?');
+                params.push(parseFloat(minPrice));
+            }
+            if (maxPrice) {
+                conditions.push('price <= ?');
+                params.push(parseFloat(maxPrice));
+            }
+            if (year) {
+                conditions.push('year = ?');
+                params.push(parseInt(year));
+            }
+            if (fuel) {
+                conditions.push('fuelType = ?');
+                params.push(fuel);
+            }
+            if (transmission) {
+                conditions.push('transmission = ?');
+                params.push(transmission);
+            }
+            
+            const whereClause = conditions.join(' AND ');
+            const sql = `
+                SELECT * FROM vehicles 
+                WHERE ${whereClause}
+                ORDER BY isFeatured DESC, views DESC, 
+                         createdAt DESC, id DESC
+            `;
+            
+            console.log('📤 [/vehicles] SQL:', sql);
+            console.log('📤 [/vehicles] Params:', params);
+            
+            db.query(sql, params, (err, results) => {
                 if (err) {
-                    console.error('❌ [/vehicles] Database error:', err.message);
+                    console.error('❌ [/vehicles] Error:', err.message);
                     return res.status(500).json({ 
                         error: err.message,
                         message: 'Error fetching vehicles'
@@ -1379,6 +1515,39 @@ app.put('/toggle-feature/:id', authenticateToken, requireAdmin, (req, res) => {
 app.post('/toggle-feature/:id', authenticateToken, requireAdmin, (req, res, next) => {
     req.method = 'PUT';
     next();
+});
+
+// 🟢 ADMIN APPROVAL ROUTES
+app.put('/admin/approve/:id', authenticateToken, requireAdmin, (req, res) => {
+    const { id } = req.params;
+    db.query(
+        'UPDATE vehicles SET is_approved = 1 WHERE id = ?',
+        [id],
+        (err, result) => {
+            if (err) {
+                console.error('❌ Error approving vehicle:', err.message);
+                return res.status(500).json({ error: err.message });
+            }
+            console.log(`✅ Vehicle ${id} approved`);
+            res.json({ success: true, message: 'Vehicle approved' });
+        }
+    );
+});
+
+app.put('/admin/reject/:id', authenticateToken, requireAdmin, (req, res) => {
+    const { id } = req.params;
+    db.query(
+        'DELETE FROM vehicles WHERE id = ?',
+        [id],
+        (err) => {
+            if (err) {
+                console.error('❌ Error rejecting vehicle:', err.message);
+                return res.status(500).json({ error: err.message });
+            }
+            console.log(`✅ Vehicle ${id} rejected and deleted`);
+            res.json({ success: true, message: 'Vehicle rejected' });
+        }
+    );
 });
 
 

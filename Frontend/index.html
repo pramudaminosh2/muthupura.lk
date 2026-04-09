@@ -747,8 +747,9 @@
             }
 
             .hero-logo {
-                width: 110px;
-                margin-bottom: 16px;
+                width: 300px;
+                height: auto;
+                margin-bottom: 10px;
             }
 
             .hero-badge {
@@ -3214,8 +3215,35 @@
             }
             
             try {
-                console.log('🚗 Fetching vehicles from:', API_URL + '/vehicles');
-                const res = await fetch(`${API_URL}/vehicles`);
+                // ✅ BUILD QUERY STRING WITH ALL FILTER PARAMS
+                const searchVal = getEl('filter-search')?.value || '';
+                const typeVal = getEl('filter-vehicle-type')?.value || '';
+                const locationVal = getEl('filter-location')?.value || '';
+                const brandVal = getEl('filter-brand')?.value || '';
+                const minPrice = getEl('filter-min-price')?.value || '';
+                const maxPrice = getEl('filter-max-price')?.value || '';
+                const yearVal = getEl('filter-year')?.value || '';
+                const fuelVal = getEl('filter-fuel')?.value || '';
+                const transmissionVal = getEl('filter-transmission')?.value || '';
+
+                const params = new URLSearchParams();
+                if (searchVal) params.append('search', searchVal);
+                if (typeVal) params.append('type', typeVal);
+                if (locationVal) params.append('location', locationVal);
+                if (brandVal) params.append('brand', brandVal);
+                if (minPrice) params.append('minPrice', minPrice);
+                if (maxPrice) params.append('maxPrice', maxPrice);
+                if (yearVal) params.append('year', yearVal);
+                if (fuelVal) params.append('fuel', fuelVal);
+                if (transmissionVal) params.append('transmission', transmissionVal);
+
+                const queryString = params.toString();
+                const url = queryString 
+                    ? `${API_URL}/vehicles?${queryString}`
+                    : `${API_URL}/vehicles`;
+
+                console.log('🚗 Fetching vehicles from:', url);
+                const res = await fetch(url);
                 
                 if (!res.ok) {
                     throw new Error(`HTTP ${res.status}`);
@@ -3278,12 +3306,29 @@
         function createCard(v) {
             const img = getImageUrl(v.images);
             const isFeatured = v.isFeatured || v.featured; // Support both field names
-            const title = v.title || (v.brand ? `${v.brand} ${v.year || ''}`.trim() : 'Vehicle');
-            const location = v.location || 'N/A';
-            const isEV = v.type === 'EV' || (v.fuelType && (v.fuelType.toLowerCase() === 'electric' || v.fuelType.toLowerCase() === 'ev'));
             
-            const badgeClass = v.condition ? `badge-${getCondClass(v.condition)}` : '';
+            // ✅ USE BRAND + MODEL + YEAR as title
+            const title = v.brand && v.model && v.year 
+                ? `${v.brand} ${v.model} ${v.year}`
+                : (v.brand ? `${v.brand} ${v.year || ''}`.trim() : 'Vehicle');
+            
+            const location = v.location || 'N/A';
+            
+            // ✅ CONDITION BADGE COLORS
+            const conditionColors = {
+                'Brand New':   'badge-new',
+                'Used (Registered)': 'badge-used',
+                'Recondition (Unregistered)': 'badge-recon',
+                'Antique':     'badge-antique'
+            };
+            const condClass = conditionColors[v.condition] || 'badge-used';
             const badgeText = v.condition || '';
+            
+            // ✅ EV BADGE - ONLY if fuelType is Electric/EV
+            const isEV = v.fuelType && (
+                v.fuelType.toLowerCase() === 'electric' || 
+                v.fuelType.toLowerCase() === 'ev'
+            );
             
             return `
                 <div class="card${isFeatured ? ' featured' : ''}" data-vehicle-id="${v.id}">
@@ -3292,7 +3337,7 @@
                         <div class="card-img-overlay"></div>
                         <div class="card-badges-left">
                             ${isEV ? `<span class="badge badge-ev">⚡ EV</span>` : ''}
-                            ${badgeText ? `<span class="badge ${badgeClass}">${badgeText}</span>` : ''}
+                            ${badgeText ? `<span class="badge ${condClass}">${badgeText}</span>` : ''}
                         </div>
                         ${isFeatured ? `<div class="card-badges-right">
                             <span class="badge badge-featured">★ Featured</span>
@@ -3327,14 +3372,14 @@
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                 </svg>
-                                ${isEV ? 'Electric' : (v.fuelType || 'N/A')}
+                                ${isEV ? 'EV' : (v.fuelType || 'N/A')}
                             </span>
                             ${v.mileage ? `<span class="spec-divider">•</span>
                             <span class="spec-chip">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M5 12h14M5 12l2-4h10l2 4"></path>
                                 </svg>
-                                ${v.mileage} km
+                                ${v.mileage.toLocaleString()} km
                             </span>` : ''}
                         </div>
                         <div class="card-price">Rs ${(v.price || 0).toLocaleString()}</div>
