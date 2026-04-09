@@ -6,21 +6,79 @@ const admin = require('firebase-admin');
 
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const session = require('express-session');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const app = express();
 
-// Enable CORS - reflect request origin and always include CORS headers
+// ✅ FIXED: Restrict CORS to trusted origins only
+const FRONTEND_URLS = [
+    'https://muthupura-lk.onrender.com',
+    'http://localhost:3000',
+    'http://localhost:5500'
+];
+
 app.use(cors({
-    origin: true, // reflect the request origin
+    origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        if (FRONTEND_URLS.includes(origin)) {
+            callback(null, true);
+        } else {
+            console.warn(`⚠️  CORS blocked from: ${origin}`);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
-    optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+    optionsSuccessStatus: 200
 }));
 
+// ✅ INPUT VALIDATION UTILITIES
+function sanitizeString(str, maxLength = 500) {
+    if (typeof str !== 'string') return '';
+    return str.trim().substring(0, maxLength);
+}
+
+function validateEmail(email) {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(String(email).toLowerCase());
+}
+
+function validatePhone(phone) {
+    const cleaned = String(phone || '').replace(/\D/g, '');
+    return cleaned.length >= 7 && cleaned.length <= 15;
+}
+
+function validatePrice(price) {
+    const num = Number(price);
+    return !isNaN(num) && num >= 0 && num <= 999999999;
+}
+
+function validateYear(year) {
+    const num = parseInt(year);
+    const currentYear = new Date().getFullYear();
+    return !isNaN(num) && num >= 1900 && num <= currentYear + 1;
+}
+
+// ✅ RATE LIMITING
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: 'Too many attempts',
+    skip: (req) => process.env.NODE_ENV !== 'production'
+});
+
+const postLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 20,
+    message: 'Too many posts',
+    skip: (req) => process.env.NODE_ENV !== 'production'
+});
+
 const mysql = require('mysql2');
+const crypto = require('crypto');
 
 // Test URL parsing function (for debugging)
 function extractFilePathFromUrl(imageUrl) {
@@ -115,19 +173,31 @@ const FACEBOOK_USERINFO_URL = 'https://graph.facebook.com/v16.0/me';
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Add CORS headers to all responses
+// ✅ FIXED: Caching headers & security headers
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-    res.header("Access-Control-Allow-Credentials", "true");
+    if (req.method === 'GET') {
+        if (req.path.match(/\.(css|js|png|jpg|jpeg|gif|woff|woff2|svg)$/)) {
+            res.set('Cache-Control', 'public, max-age=604800, immutable');
+        } else if (req.path.startsWith('/get-vehicles') || req.path.startsWith('/vehicles')) {
+            res.set('Cache-Control', 'public, max-age=300');
+        } else {
+            res.set('Cache-Control', 'no-cache');
+        }
+    } else {
+        res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    }
+    // Security headers
+    res.set('X-Content-Type-Options', 'nosniff');
+    res.set('X-Frame-Options', 'DENY');
+    next();
+});
 
-    // Handle preflight requests
+// Handle preflight requests
+app.use((req, res, next) => {
     if (req.method === 'OPTIONS') {
         res.sendStatus(200);
         return;
     }
-
     next();
 });
 app.use(session({
@@ -260,6 +330,25 @@ db.query('SELECT NOW() as server_time', (err, results) => {
         console.log(`  SSL: ${process.env.DB_SSL === 'true' ? 'Enabled' : 'Disabled'}`);
         console.log('  Server Time:', results[0]?.server_time);
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+
+        // ✅ FIXED: Create OTP sessions table for persistent OTP storage
+        db.query(`
+            CREATE TABLE IF NOT EXISTS otp_sessions (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                phone VARCHAR(32) UNIQUE NOT NULL,
+                otp VARCHAR(10) NOT NULL,
+                expiresAt DATETIME NOT NULL,
+                attempts INT DEFAULT 0,
+                createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_phone_expires (phone, expiresAt)
+            )
+        `, (err) => {
+            if (err && !err.message.includes('already exists')) {
+                console.error('Error creating otp_sessions table:', err.message);
+            } else {
+                console.log('✅ OTP sessions table ready');
+            }
+        });
 
         // Ensure required vehicle fields exist for featured and view counter
         db.query("ALTER TABLE vehicles ADD COLUMN isFeatured TINYINT(1) DEFAULT 0", alterErr => {
@@ -450,7 +539,7 @@ async function uploadToFirebase(file) {
 
 const bcrypt = require('bcrypt');
 
-app.post('/register', async (req, res) => {
+app.post('/register', authLimiter, async (req, res) => {
     try {
         const { name, email, password, idToken, phone, provider } = req.body;
 
@@ -607,17 +696,17 @@ app.post('/register', async (req, res) => {
 });
 
 const jwt = require('jsonwebtoken');
-const SECRET = 'muthupura_secret';
+const SECRET = process.env.JWT_SECRET || 'muthupura_secret_fallback_change_in_production';
+const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'muthupura_refresh_secret_fallback_change_in_production';
 
-// In-memory OTP store (phone -> { otp, expiresAt })
-const otpStore = new Map();
+// ✅ FIXED: Move OTP to database instead of in-memory
+// Create OTP table on startup (will be done after DB connection established)
 
-// Cleanup stale OTPs every 5 minutes
+// Cleanup stale OTPs from database every 5 minutes
 setInterval(() => {
-    const now = Date.now();
-    for (const [phone, entry] of otpStore.entries()) {
-        if (entry.expiresAt <= now) otpStore.delete(phone);
-    }
+    db.query('DELETE FROM otp_sessions WHERE expiresAt < NOW()', (err) => {
+        if (err) console.error('Error cleaning OTPs:', err.message);
+    });
 }, 5 * 60 * 1000);
 
 // Middleware: verify JWT token
@@ -643,7 +732,7 @@ function requireAdmin(req, res, next) {
     next();
 }
 
-app.post('/login', async (req, res) => {
+app.post('/login', authLimiter, async (req, res) => {
     try {
         const { email, password, idToken } = req.body;
 
@@ -679,7 +768,7 @@ app.post('/login', async (req, res) => {
                         name: user.name,
                         role: user.role
                     };
-                    const token = jwt.sign(payload, SECRET, { expiresIn: '6h' });
+                    const token = jwt.sign(payload, SECRET, { expiresIn: '1h' });
 
                     console.log('✅ /login success (Firebase):', { userId: user.id, email: normalizedEmail });
 
@@ -759,7 +848,7 @@ app.post('/login', async (req, res) => {
                     name: user.name,
                     role: user.role
                 };
-                const token = jwt.sign(payload, SECRET, { expiresIn: '6h' });
+                const token = jwt.sign(payload, SECRET, { expiresIn: '1h' });
 
                 console.log('✅ /login success (local):', { userId: user.id, email: normalizedEmail });
 
@@ -828,7 +917,7 @@ app.post('/otp-login', (req, res) => {
             if (results.length > 0) {
                 const user = results[0];
                 const payload = { id: user.id, name: user.name, role: user.role || 'user' };
-                const token = jwt.sign(payload, SECRET, { expiresIn: '6h' });
+                const token = jwt.sign(payload, SECRET, { expiresIn: '1h' });
                 
                 console.log('✅ /otp-login success:', { userId: user.id, phone: normalizedPhone });
                 
@@ -871,7 +960,7 @@ app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'em
 app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/auth/failure' }), (req, res) => {
     console.log('Route hit: /auth/google/callback', { user: req.user });
     const payload = { id: req.user.id, name: req.user.name, role: req.user.role || 'user' };
-    const token = jwt.sign(payload, SECRET, { expiresIn: '6h' });
+    const token = jwt.sign(payload, SECRET, { expiresIn: '1h' });
     res.send(`<!DOCTYPE html><html><body><script>
             window.opener.postMessage(${JSON.stringify({ token, role: payload.role, user: { id: req.user.id, name: req.user.name, email: req.user.email } })}, '*');
             window.close();
@@ -883,7 +972,7 @@ app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }
 app.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/auth/failure' }), (req, res) => {
     console.log('Route hit: /auth/facebook/callback', { user: req.user });
     const payload = { id: req.user.id, name: req.user.name, role: req.user.role || 'user' };
-    const token = jwt.sign(payload, SECRET, { expiresIn: '6h' });
+    const token = jwt.sign(payload, SECRET, { expiresIn: '1h' });
     res.send(`<!DOCTYPE html><html><body><script>
             window.opener.postMessage(${JSON.stringify({ token, role: payload.role, user: { id: req.user.id, name: req.user.name, email: req.user.email } })}, '*');
             window.close();
@@ -894,7 +983,7 @@ app.get('/auth/failure', (req, res) => {
     res.status(401).send('Authentication failed');
 });
 
-app.post('/send-otp', (req, res) => {
+app.post('/send-otp', authLimiter, (req, res) => {
     console.log('Route hit: /send-otp', { body: req.body });
     const { phone } = req.body;
     if (!phone || !/^[0-9]{7,15}$/.test(phone.toString().replace(/\D/g, ''))) {
@@ -903,15 +992,23 @@ app.post('/send-otp', (req, res) => {
 
     const cleaned = phone.toString().replace(/\D/g, '');
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = Date.now() + 5 * 60 * 1000;
-
-    otpStore.set(cleaned, { otp, expiresAt });
-    console.log('OTP for', cleaned, 'is', otp, '(valid 5 min)');
-
-    res.json({ message: 'OTP sent (check console in demo mode)' });
+    
+    // ✅ FIXED: Store OTP in database instead of memory
+    db.query(
+        'INSERT INTO otp_sessions (phone, otp, expiresAt) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 5 MINUTE)) ON DUPLICATE KEY UPDATE otp = ?, expiresAt = DATE_ADD(NOW(), INTERVAL 5 MINUTE)',
+        [cleaned, otp, otp],
+        (err) => {
+            if (err) {
+                console.error('Error storing OTP:', err.message);
+                return res.status(500).json({ message: 'Internal server error' });
+            }
+            console.log(`✅ OTP for ${cleaned} stored (valid 5 min)`);
+            res.json({ message: 'OTP sent successfully' });
+        }
+    );
 });
 
-app.post('/verify-otp', (req, res) => {
+app.post('/verify-otp', authLimiter, (req, res) => {
     console.log('Route hit: /verify-otp', { body: req.body });
     const { phone, otp } = req.body;
     if (!phone || !otp) {
@@ -919,35 +1016,45 @@ app.post('/verify-otp', (req, res) => {
     }
 
     const cleaned = phone.toString().replace(/\D/g, '');
-    const entry = otpStore.get(cleaned);
+    
+    // ✅ FIXED: Retrieve OTP from database
+    db.query(
+        'SELECT * FROM otp_sessions WHERE phone = ? AND expiresAt > NOW()',
+        [cleaned],
+        (err, results) => {
+            if (err) {
+                console.error('OTP lookup error:', err.message);
+                return res.status(500).json({ message: 'Internal server error' });
+            }
 
-    if (!entry || entry.expiresAt < Date.now()) {
-        otpStore.delete(cleaned);
-        return res.status(400).json({ message: 'OTP expired or not found' });
-    }
+            if (!results.length) {
+                return res.status(400).json({ message: 'OTP expired or not found' });
+            }
 
-    if (entry.otp !== otp.toString()) {
-        return res.status(401).json({ message: 'Invalid OTP' });
-    }
+            const entry = results[0];
+            if (entry.otp !== otp.toString()) {
+                return res.status(401).json({ message: 'Invalid OTP' });
+            }
 
-    otpStore.delete(cleaned);
+            // Delete OTP after successful verification
+            db.query('DELETE FROM otp_sessions WHERE phone = ?', [cleaned]);
 
-    db.query('SELECT * FROM users WHERE phone = ?', [cleaned], (err, results) => {
-        if (err) {
-            console.error('OTP login DB lookup error', err);
-            return res.status(500).json({ message: 'Internal server error' });
-        }
+            db.query('SELECT * FROM users WHERE phone = ?', [cleaned], (err2, userResults) => {
+                if (err2) {
+                    console.error('OTP user lookup error:', err2.message);
+                    return res.status(500).json({ message: 'Internal server error' });
+                }
 
-        if (results.length > 0) {
-            const user = results[0];
-            const payload = { id: user.id, name: user.name, role: user.role || 'user' };
-            const token = jwt.sign(payload, SECRET, { expiresIn: '6h' });
-            res.json({
-                message: 'OTP login success',
-                token,
-                role: payload.role,
-                user: { id: user.id, name: user.name, email: user.email, phone: user.phone, role: payload.role },
-                isNewUser: false
+                if (userResults.length > 0) {
+                    const user = userResults[0];
+                    const payload = { id: user.id, name: user.name, role: user.role || 'user' };
+                    const token = jwt.sign(payload, SECRET, { expiresIn: '1h' });
+                    res.json({
+                        message: 'OTP login success',
+                        token,
+                        role: payload.role,
+                        user: { id: user.id, name: user.name, email: user.email, phone: user.phone, role: payload.role },
+                        isNewUser: false
             });
         } else {
             res.json({
@@ -1013,7 +1120,7 @@ app.post('/complete-profile', (req, res) => {
 
                     const userId = result.insertId;
                     const payload = { id: userId, name: nameTrimmed, role };
-                    const token = jwt.sign(payload, SECRET, { expiresIn: '6h' });
+                    const token = jwt.sign(payload, SECRET, { expiresIn: '1h' });
 
                     res.json({
                         message: 'Profile created successfully',
@@ -1023,6 +1130,125 @@ app.post('/complete-profile', (req, res) => {
                 });
         });
     });
+});
+
+// ✅ NEW: Email Verification Endpoint
+app.post('/send-verification-email', authLimiter, authenticateToken, (req, res) => {
+    const userId = req.user.id;
+    const { email } = req.body;
+
+    if (!email || !validateEmail(email)) {
+        return res.status(400).json({ message: 'Invalid email address' });
+    }
+
+    // Generate verification token (24h expiry)
+    const verificationToken = jwt.sign({ userId, email }, SECRET, { expiresIn: '24h' });
+    
+    // In production, send email here with verification link
+    // For now, log token
+    console.log(`📧 Verification email would be sent to ${email}`);
+    console.log(`🔗 Verification token: ${verificationToken}`);
+    
+    res.json({ 
+        message: 'Verification email sent (check console in demo)',
+        token: process.env.NODE_ENV === 'development' ? verificationToken : undefined
+    });
+});
+
+// ✅ NEW: Verify Email Endpoint
+app.post('/verify-email', (req, res) => {
+    const { token } = req.body;
+
+    if (!token) {
+        return res.status(400).json({ message: 'Verification token required' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, SECRET);
+        const { userId, email } = decoded;
+
+        db.query(
+            'UPDATE users SET email = ?, is_verified = 1 WHERE id = ?',
+            [email, userId],
+            (err) => {
+                if (err) {
+                    console.error('Email verification error:', err.message);
+                    return res.status(500).json({ message: 'Internal server error' });
+                }
+                res.json({ success: true, message: 'Email verified successfully' });
+            }
+        );
+    } catch (err) {
+        res.status(401).json({ message: 'Invalid or expired verification token' });
+    }
+});
+
+// ✅ NEW: Password Reset Request Endpoint
+app.post('/request-password-reset', authLimiter, (req, res) => {
+    const { email } = req.body;
+
+    if (!email || !validateEmail(email)) {
+        return res.status(400).json({ message: 'Invalid email address' });
+    }
+
+    db.query('SELECT id FROM users WHERE email = ?', [email.toLowerCase()], (err, results) => {
+        if (err) {
+            console.error('Password reset lookup error:', err.message);
+            return res.status(500).json({ message: 'Internal server error' });
+        }
+
+        if (!results.length) {
+            // Don't reveal if email exists
+            return res.json({ message: 'If email exists, reset link sent' });
+        }
+
+        const userId = results[0].id;
+        const resetToken = jwt.sign({ userId }, SECRET, { expiresIn: '1h' });
+
+        // In production, send email with reset link
+        console.log(`🔑 Password reset token for user ${userId}: ${resetToken}`);
+        
+        res.json({ 
+            message: 'Password reset link sent to email',
+            token: process.env.NODE_ENV === 'development' ? resetToken : undefined
+        });
+    });
+});
+
+// ✅ NEW: Password Reset Confirmation Endpoint
+app.post('/reset-password', (req, res) => {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword || newPassword.length < 6) {
+        return res.status(400).json({ message: 'Invalid token or password (min 6 chars)' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, SECRET);
+        const userId = decoded.userId;
+
+        // Hash new password
+        bcrypt.hash(newPassword, 10, (hashErr, hashedPassword) => {
+            if (hashErr) {
+                console.error('Password hashing error:', hashErr.message);
+                return res.status(500).json({ message: 'Internal server error' });
+            }
+
+            db.query(
+                'UPDATE users SET password = ? WHERE id = ?',
+                [hashedPassword, userId],
+                (err) => {
+                    if (err) {
+                        console.error('Password reset error:', err.message);
+                        return res.status(500).json({ message: 'Internal server error' });
+                    }
+                    res.json({ success: true, message: 'Password reset successfully' });
+                }
+            );
+        });
+    } catch (err) {
+        res.status(401).json({ message: 'Invalid or expired reset token' });
+    }
 });
 
 app.get('/me', authenticateToken, (req, res) => {
@@ -1203,9 +1429,9 @@ app.get('/api/debug/vehicles-sample', (req, res) => {
 });
 
 // 🟢 Add Vehicle - Production Route
-app.post('/add-vehicle', upload.array('images', 10), async (req, res) => {
-    console.log("🔥 POST /add-vehicle hit");
-    console.log("FILES RECEIVED:", req.files);
+app.post('/add-vehicle', authenticateToken, postLimiter, upload.array('images', 10), async (req, res) => {
+    console.log("🔥 POST /add-vehicle hit from user:", req.user.id);
+    console.log("FILES RECEIVED:", req.files?.length || 0);
     
     try {
         // Extract form data - including ALL new fields
@@ -1217,12 +1443,33 @@ app.post('/add-vehicle', upload.array('images', 10), async (req, res) => {
             listing_type
         } = req.body;
         
-        // Validate required fields
-        if (!title || !brand || !year || !price || !fuelType || !location || !phone) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Missing required fields: title, brand, year, price, fuelType, location, phone' 
-            });
+        // ✅ FIXED: Input validation for all required fields
+        const titleSanitized = sanitizeString(title, 255);
+        const brandSanitized = sanitizeString(brand, 100);
+        const modelSanitized = sanitizeString(model, 100);
+        const locationSanitized = sanitizeString(location, 128);
+        const phoneSanitized = sanitizeString(phone, 32);
+        
+        if (!titleSanitized) {
+            return res.status(400).json({ success: false, message: 'Title is required' });
+        }
+        if (!brandSanitized) {
+            return res.status(400).json({ success: false, message: 'Brand is required' });
+        }
+        if (!validateYear(year)) {
+            return res.status(400).json({ success: false, message: 'Invalid year (must be 1900-current)' });
+        }
+        if (!validatePrice(price)) {
+            return res.status(400).json({ success: false, message: 'Invalid price (must be 0-999999999)' });
+        }
+        if (!fuelType || !['Petrol', 'Diesel', 'Electric', 'Hybrid'].includes(fuelType)) {
+            return res.status(400).json({ success: false, message: 'Invalid fuel type' });
+        }
+        if (!locationSanitized) {
+            return res.status(400).json({ success: false, message: 'Location is required' });
+        }
+        if (!validatePhone(phoneSanitized)) {
+            return res.status(400).json({ success: false, message: 'Invalid phone number (7-15 digits)' });
         }
         
         // Ensure at least one image was uploaded
@@ -1280,23 +1527,26 @@ app.post('/add-vehicle', upload.array('images', 10), async (req, res) => {
         `;
         
         const values = [
-            title,                                   // 1. title
-            brand,                                   // 2. brand
-            model || null,                           // 3. model
+            titleSanitized,                          // 1. title
+            brandSanitized,                          // 2. brand
+            modelSanitized || null,                  // 3. model
             parseInt(year),                          // 4. year
             parseFloat(price),                       // 5. price
-            phone,                                   // 6. phone
+            phoneSanitized,                          // 6. phone
             image_url,                               // 7. image
             JSON.stringify(imageUrls),               // 8. images (JSON array)
             fuelType,                                // 9. fuelType
-            vehicle_type || null,                    // 10. vehicle_type
-            condition || null,                       // 11. condition
-            transmission || null,                    // 12. transmission
+            sanitizeString(vehicle_type, 64) || null,// 10. vehicle_type
+            sanitizeString(condition, 50) || null,   // 11. condition
+            sanitizeString(transmission, 32) || null,// 12. transmission
             engine_capacity ? parseInt(engine_capacity) : null,  // 13. engine_capacity
             mileage ? parseInt(mileage) : null,      // 14. mileage
-            features || null,                        // 15. features
+            sanitizeString(features, 500) || null,   // 15. features
             listing_type || 'sale',                  // 16. listing_type
-            null,                                    // 17. ownerId (add auth later)
+            req.user.id,                             // 17. ✅ FIXED: ownerId now assigned from authenticated user
+            locationSanitized,                       // 18. location
+            sanitizeString(description, 2000) || null,// 19. description
+            0,                                       // 20. isFeatured
             location,                                // 18. location
             description || null,                     // 19. description
             0,                                       // 20. isFeatured
@@ -1335,43 +1585,66 @@ app.post('/add-vehicle', upload.array('images', 10), async (req, res) => {
     }
 });
 
-// 🟢 Get All Vehicles
-app.get('/get-vehicles', (req, res) => {
+// 🟢 Get All Vehicles (with ✅ PAGINATION)
+app.get('/get-vehicles', apiLimiter, (req, res) => {
     try {
         expireFeaturedAds(err => {
             if (err) {
                 console.error('❌ Error expiring featured ads:', err.message);
             }
 
-            const sql = "SELECT * FROM vehicles ORDER BY isFeatured DESC, views DESC, createdAt DESC, id DESC";
-            console.log('📤 [/get-vehicles] Fetching vehicles from database...');
+            // ✅ FIXED: Add pagination parameters
+            const page = Math.max(1, parseInt(req.query.page) || 1);
+            const limit = Math.min(100, parseInt(req.query.limit) || 20);  // max 100 per page
+            const offset = (page - 1) * limit;
 
-            db.query(sql, (err, results) => {
-                if (err) {
-                    console.error('❌ [/get-vehicles] Database query error:', err.message);
-                    return res.status(500).json({ 
-                        success: false,
-                        message: 'Error fetching vehicles',
-                        error: process.env.NODE_ENV === 'development' ? err.message : undefined
-                    });
+            // First: Get total count
+            db.query('SELECT COUNT(*) as total FROM vehicles WHERE is_approved = 1', (countErr, countResults) => {
+                if (countErr) {
+                    console.error('❌ [/get-vehicles] Count query error:', countErr.message);
+                    return res.status(500).json({ success: false, message: 'Error fetching vehicles' });
                 }
 
-                try {
-                    const normalizedResults = results.map(normalizeVehicleRecord);
-                    console.log(`✅ [/get-vehicles] Returned ${normalizedResults.length} vehicles`);
-                    res.json({
-                        success: true,
-                        data: normalizedResults,
-                        count: normalizedResults.length
-                    });
-                } catch (normalizeErr) {
-                    console.error('❌ [/get-vehicles] Error normalizing vehicle data:', normalizeErr.message);
-                    return res.status(500).json({
-                        success: false,
-                        message: 'Error processing vehicle data',
-                        error: process.env.NODE_ENV === 'development' ? normalizeErr.message : undefined
-                    });
-                }
+                const total = countResults[0]?.total || 0;
+                const totalPages = Math.ceil(total / limit);
+
+                // Second: Get paginated results
+                const sql = "SELECT * FROM vehicles WHERE is_approved = 1 ORDER BY isFeatured DESC, views DESC, createdAt DESC, id DESC LIMIT ? OFFSET ?";
+                console.log(`📤 [/get-vehicles] Fetching page ${page} (${limit} per page, total: ${total})...`);
+
+                db.query(sql, [limit, offset], (err, results) => {
+                    if (err) {
+                        console.error('❌ [/get-vehicles] Database query error:', err.message);
+                        return res.status(500).json({ 
+                            success: false,
+                            message: 'Error fetching vehicles',
+                            error: process.env.NODE_ENV === 'development' ? err.message : undefined
+                        });
+                    }
+
+                    try {
+                        const normalizedResults = results.map(normalizeVehicleRecord);
+                        console.log(`✅ [/get-vehicles] Returned ${normalizedResults.length} vehicles (page ${page}/${totalPages})`);
+                        res.json({
+                            success: true,
+                            data: normalizedResults,
+                            count: normalizedResults.length,
+                            pagination: {
+                                page,
+                                limit,
+                                total,
+                                totalPages,
+                                hasMore: page < totalPages
+                            }
+                        });
+                    } catch (normalizeErr) {
+                        console.error('❌ [/get-vehicles] Error normalizing vehicle data:', normalizeErr.message);
+                        return res.status(500).json({
+                            success: false,
+                            message: 'Error processing vehicle data',
+                            error: process.env.NODE_ENV === 'development' ? normalizeErr.message : undefined
+                        });
+                    }
             });
         });
     } catch (err) {

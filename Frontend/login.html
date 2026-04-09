@@ -785,8 +785,11 @@
         // AFTER LOGIN SUCCESS
         // ============================================
         function onLoginSuccess(userData, token) {
-            localStorage.setItem('authToken', token);
-            localStorage.setItem('userData', JSON.stringify(userData));
+            // ✅ FIXED: Set localStorage keys that auth-ui.js expects
+            localStorage.setItem('jwt_token', token);
+            localStorage.setItem('user_role', userData.is_admin ? 'admin' : 'user');
+            localStorage.setItem('user_name', userData.name || userData.email || 'User');
+            localStorage.setItem('userData', JSON.stringify(userData)); // Keep for backward compatibility
 
             document.getElementById('panel-login').style.display = 'none';
             document.getElementById('panel-register').style.display = 'none';
@@ -824,8 +827,11 @@
                     throw new Error(data.message || "Login failed");
                 }
 
-                // Save user session
+                // ✅ FIXED: Save auth state in format auth-ui.js expects
                 localStorage.setItem("user", JSON.stringify(data.user));
+                localStorage.setItem("jwt_token", data.token);
+                localStorage.setItem("user_role", data.user.is_admin ? "admin" : "user");
+                localStorage.setItem("user_name", data.user.name || data.user.email || "User");
 
                 // Redirect
                 if (data.user.is_admin) {
@@ -1108,5 +1114,8 @@
             }
         });
     </script>
+
+    <!-- ✅ Auth UI Manager - Handles login state display -->
+    <script src="auth-ui.js"></script>
 </body>
 </html>
