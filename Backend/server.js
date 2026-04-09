@@ -1,5 +1,9 @@
 require('dotenv').config();
 
+// Firebase Admin SDK - use existing firebase.js setup
+const bucket = require('./firebase');
+const admin = require('firebase-admin');
+
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
@@ -450,64 +454,159 @@ async function uploadToFirebase(file) {
 const bcrypt = require('bcrypt');
 
 app.post('/register', async (req, res) => {
-    const { name, email, password } = req.body;
+    try {
+        const { name, email, password, idToken, phone, provider } = req.body;
 
-    if (!name || !email || !password) {
-        return res.status(400).json({ message: 'Name, email, and password are required' });
-    }
+        // If idToken is provided (from Firebase Auth), verify it
+        let firebaseUser = null;
+        let normalizedEmail = null;
+        let normalizedName = null;
+        let normalizedPhone = null;
+        let authProvider = provider || 'local';
 
-    const normalizedEmail = email.trim().toLowerCase();
-    const normalizedName = name.trim();
-    const username = normalizedName.split(' ').filter(Boolean).join('.').toLowerCase() || normalizedEmail.split('@')[0];
+        if (idToken) {
+            try {
+                // Verify Firebase idToken with Admin SDK
+                firebaseUser = await admin.auth().verifyIdToken(idToken);
+                normalizedEmail = (firebaseUser.email || '').trim().toLowerCase();
+                normalizedName = (name || firebaseUser.name || firebaseUser.email.split('@')[0]).trim();
+                normalizedPhone = (phone || '').replace(/\D/g, '');
+                authProvider = provider || (firebaseUser.provider === 'anonymous' ? 'local' : firebaseUser.provider);
+            } catch (tokenErr) {
+                console.error('Firebase idToken verification failed:', tokenErr);
+                return res.status(401).json({ 
+                    success: false,
+                    message: 'Invalid Firebase token' 
+                });
+            }
+        } else {
+            // Local auth (email/password)
+            if (!name || !email || !password) {
+                return res.status(400).json({ 
+                    success: false,
+                    message: 'Name, email, and password are required' 
+                });
+            }
 
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailPattern.test(normalizedEmail)) {
-        return res.status(400).json({ message: 'Invalid email format' });
-    }
+            normalizedEmail = email.trim().toLowerCase();
+            normalizedName = name.trim();
+            normalizedPhone = (phone || '').replace(/\D/g, '');
 
-    if (password.length < 8) {
-        return res.status(400).json({ message: 'Password too short' });
-    }
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(normalizedEmail)) {
+                return res.status(400).json({ 
+                    success: false,
+                    message: 'Invalid email format' 
+                });
+            }
 
-    db.query('SELECT id, email, username FROM users WHERE email = ? OR username = ?', [normalizedEmail, username], async (err, results) => {
-        if (err) {
-            console.error('Register query error:', err);
-            return res.status(500).json({ message: 'Internal server error' });
+            if (password.length < 8) {
+                return res.status(400).json({ 
+                    success: false,
+                    message: 'Password must be at least 8 characters' 
+                });
+            }
         }
 
-        if (results.length > 0) {
-            const existingEmail = results.find(r => r.email === normalizedEmail);
-            const existingName = results.find(r => r.username === username);
-            if (existingEmail) {
-                return res.status(409).json({ message: 'Email already exists' });
-            }
-            if (existingName) {
-                return res.status(409).json({ message: 'Username already exists' });
-            }
-            return res.status(409).json({ message: 'User already exists' });
+        if (!normalizedEmail) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'Email is required' 
+            });
         }
 
-        try {
-            const hashedPassword = await bcrypt.hash(password, 10);
-            const role = 'user';
-            const insertSql = 'INSERT INTO users (name, username, email, password, role, auth_provider) VALUES (?, ?, ?, ?, ?, ?)';
+        // Generate username from name
+        const username = (normalizedName || normalizedEmail.split('@')[0])
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, '')
+            .substring(0, 20) || 'user' + Math.floor(Math.random() * 10000);
 
-            db.query(insertSql, [normalizedName, username, normalizedEmail, hashedPassword, role, 'local'], (insertErr, insertResult) => {
-                if (insertErr) {
-                    if (insertErr.code === 'ER_DUP_ENTRY') {
-                        return res.status(409).json({ message: 'Email already exists' });
+        // UPSERT: Try to find existing user by email, or insert new one
+        db.query(
+            `INSERT INTO users (firebase_uid, name, username, email, phone, password, role, auth_provider, createdAt)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+             ON DUPLICATE KEY UPDATE
+                name = IF(VALUES(name) != '', VALUES(name), name),
+                phone = IF(VALUES(phone) != '', VALUES(phone), phone),
+                auth_provider = IF(VALUES(auth_provider) != 'local', VALUES(auth_provider), auth_provider),
+                firebase_uid = IF(VALUES(firebase_uid) != '', VALUES(firebase_uid), firebase_uid)`,
+            [
+                firebaseUser?.uid || null,
+                normalizedName,
+                username,
+                normalizedEmail,
+                normalizedPhone || null,
+                idToken ? null : (password ? await bcrypt.hash(password, 10) : null),
+                'user',
+                authProvider
+            ],
+            (err, result) => {
+                if (err) {
+                    if (err.code === 'ER_DUP_ENTRY') {
+                        // Email already exists - return success anyway so OAuth flows work
+                        db.query('SELECT id, name, email, role FROM users WHERE email = ?', [normalizedEmail], (selectErr, users) => {
+                            if (selectErr || !users.length) {
+                                return res.status(500).json({ 
+                                    success: false,
+                                    message: 'Database error' 
+                                });
+                            }
+                            const user = users[0];
+                            const token = jwt.sign(
+                                { id: user.id, name: user.name, email: user.email, role: user.role },
+                                SECRET,
+                                { expiresIn: '6h' }
+                            );
+                            return res.status(200).json({
+                                success: true,
+                                message: 'User already exists',
+                                user: { id: user.id, name: user.name, email: user.email, role: user.role },
+                                token
+                            });
+                        });
+                        return;
                     }
-                    console.error('Register insert error:', insertErr);
-                    return res.status(500).json({ message: 'Internal server error' });
+                    console.error('Register upsert error:', err);
+                    return res.status(500).json({ 
+                        success: false,
+                        message: 'Internal server error' 
+                    });
                 }
 
-                res.status(201).json({ message: 'User registered', userId: insertResult.insertId });
-            });
-        } catch (hashErr) {
-            console.error('Password hashing error:', hashErr);
-            res.status(500).json({ message: 'Internal server error' });
-        }
-    });
+                const userId = result.insertId || result.affectedRows > 0;
+                
+                // Get the user record
+                db.query('SELECT id, name, email, role FROM users WHERE email = ?', [normalizedEmail], (selectErr, users) => {
+                    if (selectErr || !users.length) {
+                        return res.status(500).json({ 
+                            success: false,
+                            message: 'Failed to retrieve user' 
+                        });
+                    }
+
+                    const user = users[0];
+                    const token = jwt.sign(
+                        { id: user.id, name: user.name, email: user.email, role: user.role },
+                        SECRET,
+                        { expiresIn: '6h' }
+                    );
+
+                    res.status(201).json({
+                        success: true,
+                        message: 'User registered successfully',
+                        user: { id: user.id, name: user.name, email: user.email, role: user.role },
+                        token
+                    });
+                });
+            }
+        );
+    } catch (err) {
+        console.error('Unexpected error in /register:', err);
+        res.status(500).json({
+            success: false,
+            message: 'Unexpected server error'
+        });
+    }
 });
 
 const jwt = require('jsonwebtoken');
@@ -547,38 +646,92 @@ function requireAdmin(req, res, next) {
     next();
 }
 
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, idToken } = req.body;
 
+        // If idToken is provided, verify it with Firebase Admin SDK
+        if (idToken) {
+            try {
+                const firebaseUser = await admin.auth().verifyIdToken(idToken);
+                const normalizedEmail = (firebaseUser.email || '').trim().toLowerCase();
+
+                console.log('🔐 /login with Firebase idToken:', normalizedEmail);
+
+                // Find user in database
+                db.query('SELECT * FROM users WHERE email = ?', [normalizedEmail], (err, results) => {
+                    if (err) {
+                        console.error('❌ /login - Database query error:', err.message);
+                        return res.status(500).json({
+                            success: false,
+                            message: 'Internal server error'
+                        });
+                    }
+
+                    if (results.length === 0) {
+                        console.log('❌ /login - User not found:', normalizedEmail);
+                        return res.status(404).json({
+                            success: false,
+                            message: 'User account does not exist'
+                        });
+                    }
+
+                    const user = results[0];
+                    const payload = {
+                        id: user.id,
+                        name: user.name,
+                        role: user.role
+                    };
+                    const token = jwt.sign(payload, SECRET, { expiresIn: '6h' });
+
+                    console.log('✅ /login success (Firebase):', { userId: user.id, email: normalizedEmail });
+
+                    res.json({
+                        success: true,
+                        message: 'Login success',
+                        token,
+                        role: user.role,
+                        user: {
+                            id: user.id,
+                            name: user.name,
+                            email: user.email,
+                            role: user.role
+                        }
+                    });
+                });
+                return;
+            } catch (tokenErr) {
+                console.error('❌ Firebase idToken verification failed:', tokenErr);
+                // Fall through to local auth
+            }
+        }
+
+        // Local auth (email/password)
         if (!email || !password) {
             console.log('❌ /login - Missing email or password');
-            return res.status(400).json({ 
+            return res.status(400).json({
                 success: false,
-                message: 'Email and password are required' 
+                message: 'Email and password are required'
             });
         }
 
         const normalizedEmail = email.trim().toLowerCase();
-        console.log('🔐 /login attempt:', normalizedEmail);
+        console.log('🔐 /login attempt (local):', normalizedEmail);
 
-        const sql = 'SELECT * FROM users WHERE email = ?';
-
-        db.query(sql, [normalizedEmail], async (err, results) => {
+        db.query('SELECT * FROM users WHERE email = ?', [normalizedEmail], async (err, results) => {
             if (err) {
                 console.error('❌ /login - Database query error:', err.message);
-                return res.status(500).json({ 
+                return res.status(500).json({
                     success: false,
-                    message: 'Internal server error',
-                    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+                    message: 'Internal server error'
                 });
             }
 
             if (results.length === 0) {
                 console.log('❌ /login failed - User not found:', normalizedEmail);
-                return res.status(404).json({ 
+                return res.status(404).json({
                     success: false,
-                    message: 'User account does not exist' 
+                    message: 'User account does not exist'
                 });
             }
 
@@ -586,13 +739,21 @@ app.post('/login', (req, res) => {
             console.log('✅ /login - User found:', { id: user.id, email: user.email });
 
             try {
+                if (!user.password) {
+                    console.log('❌ /login - User has no password (OAuth only):', normalizedEmail);
+                    return res.status(401).json({
+                        success: false,
+                        message: 'This account uses OAuth. Please login with Google or Facebook.'
+                    });
+                }
+
                 const match = await bcrypt.compare(password, user.password);
-                
+
                 if (!match) {
                     console.log('❌ /login - Invalid password for:', normalizedEmail);
-                    return res.status(401).json({ 
+                    return res.status(401).json({
                         success: false,
-                        message: 'Invalid password' 
+                        message: 'Invalid password'
                     });
                 }
 
@@ -603,7 +764,7 @@ app.post('/login', (req, res) => {
                 };
                 const token = jwt.sign(payload, SECRET, { expiresIn: '6h' });
 
-                console.log('✅ /login success:', { userId: user.id, email: normalizedEmail });
+                console.log('✅ /login success (local):', { userId: user.id, email: normalizedEmail });
 
                 res.json({
                     success: true,
@@ -621,8 +782,7 @@ app.post('/login', (req, res) => {
                 console.error('❌ /login - Password comparison error:', bcryptErr.message);
                 return res.status(500).json({
                     success: false,
-                    message: 'Internal server error',
-                    error: process.env.NODE_ENV === 'development' ? bcryptErr.message : undefined
+                    message: 'Internal server error'
                 });
             }
         });
@@ -630,8 +790,7 @@ app.post('/login', (req, res) => {
         console.error('❌ Unexpected error in /login:', err.message);
         res.status(500).json({
             success: false,
-            message: 'Unexpected server error',
-            error: process.env.NODE_ENV === 'development' ? err.message : undefined
+            message: 'Unexpected server error'
         });
     }
 });
