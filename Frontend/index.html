@@ -35,6 +35,8 @@
             --text-dark: #1e2a4a;
             --text-muted: #64748b;
             --border-light: rgba(220,230,255,0.7);
+            --border-color: rgba(226,232,245,0.8);
+            --card-radius: 20px;
             --navbar-height: 70px;
         }
 
@@ -499,380 +501,327 @@
             }
         }
 
-        /* ===== PREMIUM HERO SECTION ===== */
-        .hero-wrapper {
-            width: 100%;
-            max-width: 100%;
-            margin: 0;
-            padding: 0;
+        /* ===== HERO SECTION (PART A) ===== */
+        .hero-section {
             position: relative;
-            z-index: 1;
-        }
-
-        .premium-hero {
-            position: relative;
-            z-index: 1;
             width: 100%;
             min-height: 100vh;
-            max-width: 100%;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            margin: 0;
-            padding-top: var(--navbar-height);
-        }
-
-        .hero-background {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 1;
-            background-image: url('hero-bg.png');
-            background-size: cover;
-            background-position: center center;
-            background-repeat: no-repeat;
-            background-attachment: scroll;
-            background-color: #1a2a4a;
-        }
-
-        @media (max-width: 767px) {
-            .premium-hero {
-                min-height: 100svh;
-            }
-
-            .hero-background {
-                background-attachment: scroll;
-            }
-        }
-
-        .hero-bg-image {
-            display: none;
-        }
-
-        .hero-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(
-                160deg,
-                rgba(4, 8, 25, 0.80) 0%,
-                rgba(8, 16, 45, 0.65) 50%,
-                rgba(2, 5, 18, 0.78) 100%
-            );
-            z-index: 1;
-            backdrop-filter: blur(0px);
-        }
-
-        .hero-container {
-            position: relative;
-            z-index: 2;
-            max-width: 1200px;
-            width: 100%;
-            padding: 40px 24px;
-            margin: 0 auto;
+            min-height: 100svh;        /* modern mobile viewport */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: calc(100vh - var(--navbar-height));
+            overflow: hidden;          /* critical — no overflow */
+            
+            background-image: url('hero-bg.png');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: scroll;  /* NEVER fixed — breaks iOS */
         }
 
-        @media (max-width: 767px) {
-            .hero-container {
-                padding-top: 20px;
-                padding-left: 16px;
-                padding-right: 16px;
-                padding-bottom: 40px;
-                min-height: calc(100svh - var(--navbar-height));
-            }
+        /* Dark overlay — using ::before NOT inline */
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;                  /* top:0 right:0 bottom:0 left:0 */
+            z-index: 1;
+            background: linear-gradient(
+                158deg,
+                rgba(3, 7, 22, 0.82) 0%,
+                rgba(7, 15, 42, 0.68) 45%,
+                rgba(2, 5, 18, 0.80) 100%
+            );
         }
 
-        .hero-content-block {
-            text-align: center;
-            animation: heroFadeInUp 0.8s ease both;
-            max-width: 700px;
-        }
-
-        .hero-logo {
-            height: auto;
-            width: clamp(100px, 25vw, 350px);
-            margin: 0 auto 10px;
-            display: block;
-            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.4))
-                    drop-shadow(0 4px 15px rgba(0, 0, 0, 0.5));
-            animation: heroLogoScale 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-        }
-
-        @keyframes heroLogoScale {
-            from {
-                opacity: 0;
-                transform: scale(0.85);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        @media (max-width: 640px) {
-            .hero-logo {
-                width: 120px;
-            }
-        }
-
-        .hero-tagline-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(167, 139, 250, 0.1) 100%);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1.2px solid rgba(255, 255, 255, 0.25);
-            border-radius: 30px;
-            padding: 12px 28px;
-            color: rgba(255, 255, 255, 0.95);
-            font-family: 'Poppins', sans-serif;
-            font-size: 15px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            margin: 0 auto 32px;
-            backdrop-filter: blur(15px);
-            animation: heroFadeInUp 0.8s ease both 0.05s backwards;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-        }
-
-        @media (max-width: 640px) {
-            .hero-tagline-badge {
-                font-size: 13px;
-                padding: 10px 20px;
-                margin: 0 auto 24px;
-            }
-        }
-
-        @keyframes heroFadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .hero-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: clamp(26px, 7vw, 52px);
-            font-weight: 800;
-            color: #ffffff;
-            margin: 0 0 16px 0;
-            line-height: 1.2;
-            letter-spacing: -0.8px;
-            text-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            animation: heroFadeInUp 0.8s ease both 0.1s backwards;
-        }
-
-        .hero-subtitle {
-            font-family: 'Inter', sans-serif;
-            font-size: clamp(13px, 3.5vw, 18px);
-            color: rgba(255, 255, 255, 0.92);
-            margin: 0 0 40px 0;
-            font-weight: 400;
-            line-height: 1.6;
-            letter-spacing: 0.2px;
-            text-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-            animation: heroFadeInUp 0.8s ease both 0.15s backwards;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 50px;
-            flex-wrap: wrap;
-            animation: heroFadeInUp 0.8s ease both 0.2s backwards;
-        }
-
-        @media (max-width: 640px) {
-            .hero-buttons {
-                flex-direction: column;
-                width: 85%;
-                gap: 12px;
-                margin-bottom: 40px;
-            }
-        }
-
-        .hero-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 16px 36px;
-            border-radius: 14px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.05rem;
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-            border: none;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        /* HERO CONTENT WRAPPER */
+        .hero-content {
             position: relative;
-            overflow: hidden;
-            letter-spacing: 0.3px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-            min-width: 200px;
-        }
-
-        @media (max-width: 640px) {
-            .hero-btn {
-                width: 100%;
-                min-width: unset;
-                padding: 14px 28px;
-                font-size:1rem;
-            }
-        }
-
-        .hero-btn-primary {
-            background: linear-gradient(135deg, var(--accent), #6366f1);
-            color: #ffffff;
-            border: 2px solid transparent;
-        }
-
-        .hero-btn-primary:hover {
-            background: linear-gradient(135deg, #395ae8, #4f46e5);
-            transform: translateY(-4px);
-            box-shadow: 0 16px 40px rgba(79, 110, 247, 0.35);
-        }
-
-        .hero-btn-primary:active {
-            transform: translateY(-2px);
-        }
-
-        .hero-btn-secondary {
-            background: transparent;
-            color: #ffffff;
-            border: 2.2px solid rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(10px);
-        }
-
-        .hero-btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.9);
-            color: #ffffff;
-            transform: translateY(-4px);
-            box-shadow: 0 16px 40px rgba(255, 255, 255, 0.15);
-        }
-
-        .hero-btn-secondary:active {
-            transform: translateY(-2px);
-        }
-
-        .btn-icon {
-            width: 20px;
-            height: 20px;
-        }
-
-        .hero-stats-bar {
+            z-index: 2;               /* above overlay */
+            width: 100%;
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 100px 24px 60px; /* top pad accounts for navbar */
+            text-align: center;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             gap: 0;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(167, 139, 250, 0.08) 100%);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1.4px solid rgba(255, 255, 255, 0.25);
-            border-radius: 24px;
-            padding: 28px 32px;
-            max-width: 500px;
-            margin: 0 auto;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.3);
-            animation: heroFadeInUp 0.8s ease both 0.25s backwards;
         }
 
-        @media (max-width: 640px) {
-            .hero-stats-bar {
-                flex-direction: column;
-                gap: 16px;
-                padding: 20px;
-                max-width: 100%;
-            }
+        /* HERO LOGO */
+        .hero-logo {
+            width: 300px;
+            height: auto;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 18px rgba(255,255,255,0.35))
+                    drop-shadow(0 4px 12px rgba(0,0,0,0.45));
+            animation: heroLogoIn 0.8s ease-out both;
+        }
+
+        @keyframes heroLogoIn {
+            from { opacity: 0; transform: translateY(-16px) scale(0.9); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* HERO BADGE */
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.10);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.20);
+            border-radius: 50px;
+            padding: 7px 18px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.90);
+            font-weight: 500;
+            margin-bottom: 22px;
+            letter-spacing: 0.3px;
+        }
+
+        /* HEADLINE + SUBHEADLINE */
+        .hero-headline {
+            font-size: clamp(28px, 6.5vw, 62px);
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.15;
+            margin: 0 0 16px;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+
+        .hero-sub {
+            font-size: clamp(14px, 3vw, 19px);
+            color: rgba(255,255,255,0.78);
+            line-height: 1.65;
+            margin: 0 0 32px;
+            max-width: 560px;
+            font-weight: 400;
+        }
+
+        /* CTA BUTTONS */
+        .hero-buttons {
+            display: flex;
+            flex-direction: row;
+            gap: 14px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;        /* wraps on very small screens */
+            margin-bottom: 40px;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 15px 32px;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: Poppins;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 20px rgba(79,110,247,0.45);
+            transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 28px rgba(79,110,247,0.55);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.10);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.45);
+            border-radius: 12px;
+            padding: 13px 30px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: Poppins;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(8px);
+            transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+        }
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.18);
+            border-color: rgba(255,255,255,0.70);
+            transform: translateY(-3px);
+        }
+
+        /* STATS BAR */
+        .hero-stats {
+            display: flex;
+            flex-direction: row;
+            gap: 0;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 16px;
+            padding: 16px 28px;
+            flex-wrap: wrap;
+            gap: 4px;
         }
 
         .stat-item {
-            flex: 1;
-            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             padding: 0 24px;
+            border-right: 1px solid rgba(255,255,255,0.15);
         }
-
-        @media (max-width: 640px) {
-            .stat-item {
-                padding: 8px 0;
-            }
-        }
+        .stat-item:last-child { border-right: none; }
 
         .stat-number {
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 22px;
+            font-weight: 800;
             color: #ffffff;
-            margin-bottom: 6px;
-            letter-spacing: -0.3px;
+            line-height: 1;
         }
-
         .stat-label {
-            font-family: 'Inter', sans-serif;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.8);
-            font-weight: 500;
-            letter-spacing: 0.2px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.60);
+            font-weight: 400;
+            margin-top: 3px;
+            white-space: nowrap;
         }
 
-        .stat-divider {
-            width: 1px;
-            height: 50px;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0) 100%);
-        }
-
-        @media (max-width: 640px) {
-            .stat-divider {
-                width: 80%;
-                height: 1px;
-                margin: 0 auto;
-            }
-        }
-
-        .scroll-indicator {
+        /* SCROLL ARROW */
+        .hero-scroll-arrow {
             position: absolute;
-            bottom: 24px;
+            bottom: 28px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 3;
-            animation: bounce 2.5s infinite;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
             cursor: pointer;
+            opacity: 0.65;
+            transition: opacity 0.2s;
+            animation: bounceArrow 2s ease-in-out infinite;
+        }
+        .hero-scroll-arrow:hover { opacity: 1; }
+        .hero-scroll-arrow span {
+            display: block;
+            width: 10px; height: 10px;
+            border-right: 2px solid white;
+            border-bottom: 2px solid white;
+            transform: rotate(45deg);
         }
 
-        .scroll-indicator svg {
-            width: 28px;
-            height: 28px;
-            color: rgba(255, 255, 255, 0.7);
-            stroke: rgba(255, 255, 255, 0.7);
+        @keyframes bounceArrow {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50%       { transform: translateX(-50%) translateY(6px); }
         }
 
-        .scroll-indicator:hover svg {
-            color: rgba(255, 255, 255, 0.95);
-            stroke: rgba(255, 255, 255, 0.95);
-        }
-
-        @keyframes bounce {
-            0%, 100% {
-                transform: translateX(-50%) translateY(0);
-                opacity: 0.8;
+        /* MOBILE OVERRIDES (@media max-width: 767px) */
+        @media (max-width: 767px) {
+            .hero-section {
+                min-height: 100svh;
+                background-attachment: scroll;
+                background-position: center center;
+                background-size: cover;
             }
-            50% {
-                transform: translateX(-50%) translateY(12px);
-                opacity: 1;
+
+            .hero-content {
+                padding: 80px 20px 50px;  /* 80px top for fixed navbar */
+                gap: 0;
+                justify-content: center;
+            }
+
+            .hero-logo {
+                width: 110px;
+                margin-bottom: 16px;
+            }
+
+            .hero-badge {
+                font-size: 12px;
+                padding: 6px 14px;
+                margin-bottom: 18px;
+            }
+
+            .hero-headline {
+                font-size: clamp(26px, 8vw, 38px);
+                margin-bottom: 12px;
+                letter-spacing: -0.3px;
+            }
+
+            .hero-sub {
+                font-size: clamp(13px, 4vw, 16px);
+                margin-bottom: 26px;
+                padding: 0 4px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;  /* stack on mobile */
+                width: 100%;
+                max-width: 300px;
+                gap: 12px;
+                margin-bottom: 30px;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                width: 100%;
+                justify-content: center;
+                padding: 14px 24px;
+                font-size: 15px;
+            }
+
+            .hero-stats {
+                padding: 14px 16px;
+                gap: 0;
+                border-radius: 14px;
+                width: 100%;
+            }
+
+            .stat-item {
+                padding: 0 14px;
+                flex: 1;
+            }
+
+            .stat-number {
+                font-size: 18px;
+            }
+
+            .stat-label {
+                font-size: 10px;
+            }
+
+            .hero-scroll-arrow {
+                bottom: 18px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .hero-headline {
+                font-size: 24px;
+            }
+            .hero-sub {
+                font-size: 13px;
+            }
+            .stat-item {
+                padding: 0 10px;
+            }
+            .stat-number {
+                font-size: 16px;
             }
         }
 
@@ -1267,273 +1216,393 @@
             to { transform: translate(-50%, -50%) rotate(360deg); } 
         }
 
-        /* ===== SKELETON LOADING ===== */
-        .skeleton-card {
-            background: linear-gradient(90deg, #e8edf5 25%, #f0f4fb 50%, #e8edf5 75%);
+        /* ===== SKELETON LOADING (PART B-B9) ===== */
+        @keyframes shimmer {
+            0%   { background-position: 200% center; }
+            100% { background-position: -200% center; }
+        }
+
+        .skeleton-card { 
+            pointer-events: none;
+            background: linear-gradient(
+                90deg,
+                #e8edf5 25%, #f0f4fb 50%, #e8edf5 75%
+            );
             background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
+            animation: shimmer 1.6s infinite linear;
             border-radius: 20px;
             height: 380px;
-            border: 1px solid rgba(220, 230, 255, 0.7);
+            border: 1px solid var(--border-color);
         }
 
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+        /* ===== VEHICLE GRID (PART B-B1) ===== */
+        .vehicles-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 22px;
+            padding: 8px 0 40px;
+            align-items: start;
+            width: 100%;
         }
 
-        /* ===== VEHICLE CARDS ===== */
+        @media (max-width: 1280px) {
+            .vehicles-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (max-width: 900px) {
+            .vehicles-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+        }
+        @media (max-width: 520px) {
+            .vehicles-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+
+        /* Update .vehicle-grid to use new .vehicles-grid for compatibility */
+        .vehicle-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 22px;
+            padding: 8px 0 40px;
+            align-items: start;
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            width: 100%;
+            margin-top: 40px;
+        }
+
+        .vehicle-grid.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 1280px) {
+            .vehicle-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .vehicle-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .vehicle-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+
+        /* ===== VEHICLE CARD BASE (PART B-B2) ===== */
         .card {
-            background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(248,250,255,0.88) 100%);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            background: #ffffff;
             border-radius: 20px;
-            border: 1px solid rgba(220,230,255,0.7);
-            box-shadow: 
-                0 2px 20px rgba(100,120,255,0.08),
-                0 1px 4px rgba(0,0,0,0.04);
+            border: 1px solid rgba(226, 232, 245, 0.8);
+            box-shadow:
+                0 1px 3px rgba(0,0,0,0.05),
+                0 4px 16px rgba(100,120,200,0.07);
             overflow: hidden;
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease;
             cursor: pointer;
+            position: relative;
             display: flex;
             flex-direction: column;
+            transition:
+                transform 0.28s cubic-bezier(0.34, 1.4, 0.64, 1),
+                box-shadow 0.28s ease,
+                border-color 0.28s ease;
+            text-decoration: none;
+            color: inherit;
             height: 100%;
-            position: relative;
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 10%;
-            right: 10%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
-            z-index: 2;
         }
 
         .card:hover {
-            transform: translateY(-6px);
+            transform: translateY(-7px);
             box-shadow:
-                0 12px 40px rgba(100,120,255,0.18),
-                0 4px 12px rgba(0,0,0,0.08);
-            border-color: rgba(79, 110, 247, 0.4);
+                0 4px 6px rgba(0,0,0,0.04),
+                0 16px 40px rgba(79,110,247,0.14),
+                0 6px 16px rgba(0,0,0,0.08);
+            border-color: rgba(79,110,247,0.25);
         }
 
-        .card.featured {
-            border: 2px solid rgba(245, 158, 11, 0.6);
-            box-shadow:
-                0 0 0 1px rgba(245,158,11,0.2),
-                0 8px 32px rgba(245,158,11,0.15),
-                0 2px 8px rgba(0,0,0,0.06);
-        }
-
-        .card.featured::after {
-            content: '⭐ FEATURED';
+        /* Top highlight line — premium detail */
+        .card::before {
+            content: '';
             position: absolute;
-            top: 16px;
-            right: -1px;
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: 0.8px;
-            padding: 5px 14px 5px 10px;
-            border-radius: 4px 0 0 4px;
-            box-shadow: -2px 2px 8px rgba(0,0,0,0.2);
-            text-transform: uppercase;
-            z-index: 4;
+            top: 0; left: 12%; right: 12%;
+            height: 1px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255,255,255,0.95),
+                transparent
+            );
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        /* ===== FEATURED CARD (PART B-B3) ===== */
+        .card.featured {
+            border: 1.5px solid rgba(245, 158, 11, 0.55);
+            box-shadow:
+                0 0 0 1px rgba(245,158,11,0.12),
+                0 4px 24px rgba(245,158,11,0.12),
+                0 1px 4px rgba(0,0,0,0.05);
         }
 
         .card.featured:hover {
-            box-shadow: 
-                0 0 0 1px rgba(245,158,11,0.3),
-                0 12px 40px rgba(245,158,11,0.25),
-                0 2px 8px rgba(0,0,0,0.06);
-            border-color: rgba(245, 158, 11, 0.9);
+            box-shadow:
+                0 0 0 2px rgba(245,158,11,0.30),
+                0 16px 40px rgba(245,158,11,0.18),
+                0 6px 16px rgba(0,0,0,0.08);
+            border-color: rgba(245,158,11,0.70);
+        }
+
+        /* ===== CARD IMAGE SECTION (PART B-B4) ===== */
+        .card-image-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 3;       /* FIXED RATIO — no jumping */
+            overflow: hidden;
+            background: #e8edf5;
+            flex-shrink: 0;
         }
 
         .card-image {
             position: relative;
             width: 100%;
-            height: 210px;
+            height: 100%;
             background: linear-gradient(90deg, #e8edf5 0%, #f0f4fb 50%, #e8edf5 100%);
             background-size: 200% 100%;
             animation: shimmer 1.5s infinite;
             overflow: hidden;
         }
 
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
         .card-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.5s ease;
+            object-position: center;
+            display: block;
+            transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .card:hover .card-image img {
             transform: scale(1.05);
         }
 
-        .card-image::after {
-            content: '';
+        /* Gradient overlay — bottom dark fade */
+        .card-img-overlay {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
-            background: linear-gradient(transparent, rgba(0,0,0,0.35));
+            inset: 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(0,0,0,0.00) 35%,
+                rgba(0,0,0,0.05) 55%,
+                rgba(0,0,0,0.55) 100%
+            );
             pointer-events: none;
         }
 
-        .card-badge {
+        /* Price on image — bottom left */
+        .card-price-overlay {
             position: absolute;
-            top: 12px;
-            left: 12px;
-            background: rgba(255, 255, 255, 0.95);
-            color: var(--text-dark);
-            padding: 4px 12px;
-            border-radius: 20px;
+            bottom: 12px;
+            left: 14px;
+            font-size: 19px;
+            font-weight: 800;
+            color: #ffffff;
+            text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+            letter-spacing: -0.3px;
+            line-height: 1;
+            font-family: Poppins;
+        }
+
+        /* Image count — bottom right */
+        .card-img-count {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(4px);
+            color: white;
             font-size: 11px;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ===== BADGE SYSTEM (PART B-B5) ===== */
+        .badge {
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            z-index: 2;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .card-badge.brand-new {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .card-badge.used {
-            background: rgba(0,0,0,0.55);
-            color: white;
-        }
-
-        .card-badge.recondition {
-            background: #8b5cf6;
-            color: white;
-        }
-
-        .card-badge.antique {
-            background: #d97706;
-            color: white;
-        }
-
-        .featured-ribbon {
-            position: absolute;
-            top: 14px;
-            left: -32px;
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            padding: 5px 40px;
-            transform: rotate(-45deg);
-            box-shadow: 0 2px 10px rgba(217, 119, 6, 0.5);
-            text-transform: uppercase;
-            z-index: 3;
-        }
-
-        .card-badge.ev-badge {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            left: auto;
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
             padding: 4px 10px;
             border-radius: 20px;
-            box-shadow: 0 2px 10px rgba(16, 185, 129, 0.45);
-            animation: evPulse 2.5s ease-in-out infinite;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            line-height: 1;
+            font-family: Poppins;
         }
 
-        @keyframes evPulse {
-            0%, 100% { box-shadow: 0 2px 10px rgba(16,185,129,0.45); }
-            50% { 
-                box-shadow: 0 2px 20px rgba(16,185,129,0.75), 
-                            0 0 0 4px rgba(16,185,129,0.15); 
-            }
+        .card-badges-left {
+            position: absolute;
+            top: 11px;
+            left: 11px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
 
-        .card-content {
+        .card-badges-right {
+            position: absolute;
+            top: 11px;
+            right: 11px;
+        }
+
+        /* EV badge */
+        .badge-ev {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 2px 8px rgba(16,185,129,0.40);
+            animation: evGlow 2.8s ease-in-out infinite;
+        }
+        @keyframes evGlow {
+            0%,100% { box-shadow: 0 2px 8px rgba(16,185,129,0.40); }
+            50%      { box-shadow: 0 2px 16px rgba(16,185,129,0.70),
+                                   0 0 0 3px rgba(16,185,129,0.12); }
+        }
+
+        /* Featured badge */
+        .badge-featured {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            box-shadow: 0 2px 8px rgba(245,158,11,0.40);
+        }
+
+        /* Condition badges */
+        .badge-new    { background: #3b82f6; color: white; }
+        .badge-used   { background: rgba(30,30,30,0.60); 
+                        backdrop-filter: blur(4px); color: white; }
+        .badge-recon  { background: #8b5cf6; color: white; }
+        .badge-antique{ background: #d97706; color: white; }
+
+        /* ===== CARD INFO SECTION (PART B-B6) ===== */
+        .card-info {
+            padding: 14px 16px 0;
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 18px 20px 20px;
-            gap: 8px;
+            gap: 6px;
         }
 
         .card-title {
-            margin: 0;
-            font-size: 17px;
+            font-size: 16px;
             font-weight: 700;
-            color: var(--text-dark);
+            color: #1e2a4a;
             line-height: 1.3;
-            white-space: nowrap;
+            margin: 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
             overflow: hidden;
-            text-overflow: ellipsis;
+            font-family: Poppins;
         }
 
-        .card-year-location {
+        .card-location {
+            font-size: 12.5px;
+            color: #94a3b8;
+            margin: 0;
             display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-bottom: 12px;
+            align-items: center;
+            gap: 4px;
+            font-weight: 400;
+        }
+
+        .card-location svg {
+            width: 12px; height: 12px;
+            color: #94a3b8;
+            flex-shrink: 0;
         }
 
         .card-specs {
             display: flex;
-            gap: 8px;
+            align-items: center;
+            gap: 4px;
             flex-wrap: wrap;
-            margin-bottom: 14px;
+            margin-top: 2px;
         }
 
-        .card-spec {
-            background: rgba(99,130,255,0.08);
-            border: 1px solid rgba(99,130,255,0.15);
-            border-radius: 8px;
-            padding: 4px 10px;
+        .spec-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
             font-size: 12px;
             color: #475569;
             font-weight: 500;
+            font-family: Poppins;
+        }
+
+        .spec-chip svg {
+            width: 13px; height: 13px;
+            color: #94a3b8;
+        }
+
+        .spec-divider {
+            color: #cbd5e1;
+            font-size: 12px;
+            user-select: none;
         }
 
         .card-price {
             font-size: 22px;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--accent), #818cf8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 14px;
+            color: var(--accent);
+            margin: 0;
+            line-height: 1;
         }
 
+        /* ===== CARD FOOTER (PART B-B7) ===== */
         .card-footer {
             display: flex;
-            gap: 8px;
             align-items: center;
-            border-top: 1px solid rgba(220,230,255,0.6);
-            padding-top: 14px;
-            margin-top: 2px;
             justify-content: space-between;
+            padding: 12px 16px 14px;
+            margin-top: 10px;
+            border-top: 1px solid rgba(226,232,245,0.7);
         }
 
         .card-seller {
             display: flex;
             align-items: center;
             gap: 8px;
+            min-width: 0;
+        }
+
+        .seller-avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4f6ef7, #8b5cf6);
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-family: Poppins;
         }
 
         .card-seller-avatar {
@@ -1549,16 +1618,95 @@
             font-size: 12px;
         }
 
+        .seller-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            min-width: 0;
+        }
+
+        .seller-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #334155;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         .card-seller-name {
             font-size: 13px;
             color: var(--text-muted);
         }
 
-        .card-actions {
+        .seller-verified {
+            font-size: 10px;
+            color: #10b981;
             display: flex;
-            gap: 6px;
+            align-items: center;
+            gap: 2px;
+            font-weight: 500;
         }
 
+        .seller-verified svg {
+            width: 10px; height: 10px;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 7px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        /* WhatsApp icon button */
+        .btn-whatsapp {
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            background: #25d366;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.22s ease;
+            flex-shrink: 0;
+            border: none;
+            cursor: pointer;
+            color: inherit;
+        }
+        .btn-whatsapp svg {
+            width: 18px; height: 18px;
+            fill: white;
+        }
+        .btn-whatsapp:hover {
+            background: #1da851;
+            transform: scale(1.08);
+        }
+
+        /* View button */
+        .btn-view {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 7px 14px;
+            font-size: 12.5px;
+            font-weight: 700;
+            font-family: Poppins;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.22s ease;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        .btn-view:hover {
+            opacity: 0.88;
+            transform: scale(1.04);
+        }
+
+        /* Support legacy card action buttons */
         .card-action-btn {
             border: none;
             border-radius: 10px;
@@ -1568,12 +1716,9 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
             gap: 4px;
             white-space: nowrap;
         }
@@ -1598,34 +1743,140 @@
             transform: scale(1.03);
         }
 
-        .vehicle-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 24px;
-            opacity: 0;
-            transform: translateY(16px);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            width: 100%;
-            margin-top: 40px;
-            padding: 20px 0;
-        }
-
-        .vehicle-grid.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        @media (max-width: 1024px) {
-            .vehicle-grid {
-                grid-template-columns: repeat(2, 1fr);
+        /* ===== MOBILE CARD OVERRIDES (PART B-B8) ===== */
+        @media (max-width: 520px) {
+            .card {
+                border-radius: 16px;
+            }
+            
+            .card-image-wrap {
+                aspect-ratio: 16 / 10;  /* slightly wider on mobile */
+            }
+            
+            .card-price-overlay {
+                font-size: 18px;
+                bottom: 10px;
+                left: 12px;
+            }
+            
+            .card-info {
+                padding: 12px 14px 0;
+            }
+            
+            .card-title {
+                font-size: 15px;
+            }
+            
+            .card-footer {
+                padding: 10px 14px 12px;
+            }
+            
+            .seller-avatar {
+                width: 28px; height: 28px;
+                font-size: 11px;
+            }
+            
+            .btn-view {
+                padding: 6px 12px;
+                font-size: 12px;
             }
         }
 
-        @media (max-width: 640px) {
-            .vehicle-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
+        /* ===== SECTION HEADERS (PART B-B10) ===== */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(226,232,245,0.8);
+        }
+
+        .section-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-accent-bar {
+            width: 4px;
+            height: 28px;
+            background: linear-gradient(180deg, var(--accent), #8b5cf6);
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1e2a4a;
+            margin: 0;
+            font-family: Poppins;
+        }
+
+        .section-count {
+            font-size: 13px;
+            color: #94a3b8;
+            font-weight: 400;
+            margin-top: 1px;
+        }
+
+        .section-view-all {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: gap 0.2s ease;
+        }
+        .section-view-all:hover { gap: 8px; }
+
+        /* Legacy section-head support */
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 40px 0 20px;
+            padding: 0 4px;
+            position: relative;
+        }
+
+        .section-head h2 {
+            margin: 0;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-head h2::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 28px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        .section-head small {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .section-head a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .section-head a:hover {
+            opacity: 0.8;
         }
 
         .featured-scroll {
@@ -2096,66 +2347,54 @@
         <a href="admin.html" class="mobile-menu-link mobile-menu-admin" id="admin-link-mobile" style="display:none;">Admin</a>
     </div>
 
-    <!-- Hero Section -->
-    <div class="hero-wrapper">
-        <section class="premium-hero">
-            <div class="hero-background">
-                <div class="hero-overlay"></div>
+    <!-- Hero Section (PART A) -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <img src="logo.PNG" alt="Muthupura.lk" class="hero-logo">
+            
+            <div class="hero-badge">
+                🇱🇰 Sri Lanka's #1 Vehicle Marketplace
             </div>
             
-            <div class="hero-container">
-                <div class="hero-content-block">
-                    <img src="logo.PNG" alt="Muthupura.lk" class="hero-logo">
-                    
-                    <div class="hero-tagline-badge">
-                        🇱🇰 Sri Lanka's #1 Vehicle Marketplace
-                    </div>
-                    
-                    <h1 class="hero-title">Find Your Perfect Vehicle</h1>
-                    
-                    <p class="hero-subtitle">Sri Lanka's trusted marketplace to buy, sell & lease vehicles with confidence</p>
-                    
-                    <div class="hero-buttons">
-                        <a href="#vehicles-section" class="hero-btn hero-btn-primary">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
-                                <path d="M19 12H5M12 19l-7-7 7-7"></path>
-                            </svg>
-                            Browse Vehicles
-                        </a>
-                        <a href="post.html" class="hero-btn hero-btn-secondary">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
-                                <path d="M12 5v14M5 12h14"></path>
-                            </svg>
-                            Post Your Ad
-                        </a>
-                    </div>
-                    
-                    <div class="hero-stats-bar">
-                        <div class="stat-item">
-                            <div class="stat-number">500+</div>
-                            <div class="stat-label">Vehicles Listed</div>
-                        </div>
-                        <div class="stat-divider"></div>
-                        <div class="stat-item">
-                            <div class="stat-number">1000+</div>
-                            <div class="stat-label">Happy Users</div>
-                        </div>
-                        <div class="stat-divider"></div>
-                        <div class="stat-item">
-                            <div class="stat-number">Trusted</div>
-                            <div class="stat-label">Since 2026</div>
-                        </div>
-                    </div>
+            <h1 class="hero-headline">Find Your Perfect Vehicle</h1>
+            
+            <p class="hero-sub">Sri Lanka's trusted marketplace to buy, sell & lease vehicles with confidence</p>
+            
+            <div class="hero-buttons">
+                <a href="#vehicles-section" class="btn-primary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;">
+                        <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                    </svg>
+                    Browse Vehicles
+                </a>
+                <a href="post.html" class="btn-secondary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px; height:20px;">
+                        <path d="M12 5v14M5 12h14"></path>
+                    </svg>
+                    Post Your Ad
+                </a>
+            </div>
+            
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Vehicles Listed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">1000+</div>
+                    <div class="stat-label">Happy Users</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">Trusted</div>
+                    <div class="stat-label">Since 2026</div>
                 </div>
             </div>
-            
-            <div class="scroll-indicator">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 5v14M19 12l-7 7-7-7"></path>
-                </svg>
-            </div>
-        </section>
-    </div>
+        </div>
+        
+        <div class="hero-scroll-arrow">
+            <span></span>
+        </div>
+    </section>
 
     <!-- Filter Section -->
     <div class="filter-section-wrapper">
@@ -2307,189 +2546,453 @@
             <div id="demo-cards" class="vehicle-grid" style="opacity: 1; transform: none;">
                 <!-- Card 1: Featured, EV -->
                 <div class="card featured" onclick="openVehicleDetail(1)">
-                    <div class="card-image">
-                        <img src="https://placehold.co/400x210/e2e8f0/94a3b8?text=Toyota+Prius+EV" alt="Toyota Prius EV">
-                        <div class="featured-ribbon">⭐ FEATURED</div>
-                        <div class="card-badge ev-badge">⚡ EV</div>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">Toyota Prius EV 2023</h3>
-                        <div class="card-year-location">
-                            <span>2023</span>
-                            <span>📍 Colombo</span>
+                    <div class="card-image-wrap">
+                        <img src="https://placehold.co/400x300/e2e8f0/94a3b8?text=Toyota+Prius+EV" alt="Toyota Prius EV" class="card-image" loading="lazy">
+                        <div class="card-img-overlay"></div>
+                        <div class="card-badges-left">
+                            <span class="badge badge-ev">⚡ EV</span>
                         </div>
+                        <div class="card-badges-right">
+                            <span class="badge badge-featured">★ Featured</span>
+                        </div>
+                        <div class="card-price-overlay">Rs. 14,500,000</div>
+                        <div class="card-img-count">
+                            <svg viewBox="0 0 24 24" fill="white" style="width:12px;height:12px;">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
+                            6
+                        </div>
+                    </div>
+                    <div class="card-info">
+                        <h3 class="card-title">Toyota Prius EV 2023</h3>
+                        <p class="card-location">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            Colombo, Sri Lanka
+                        </p>
                         <div class="card-specs">
-                            <span class="card-spec">⚡ Electric</span>
-                            <span class="card-spec">⚙️ Automatic</span>
-                            <span class="card-spec">12,000 km</span>
+                            <span class="spec-chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="1"></circle>
+                                    <path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m2.12 2.12l4.24 4.24"></path>
+                                </svg>
+                                Automatic
+                            </span>
+                            <span class="spec-divider">•</span>
+                            <span class="spec-chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                </svg>
+                                Electric
+                            </span>
+                            <span class="spec-divider">•</span>
+                            <span class="spec-chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 12h14M5 12l2-4h10l2 4"></path>
+                                </svg>
+                                12,000 km
+                            </span>
                         </div>
                         <div class="card-price">Rs 14,500,000</div>
-                        <div class="card-footer">
-                            <div class="card-seller">
-                                <div class="card-seller-avatar">T</div>
-                                <span class="card-seller-name">Toyota Ltd</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-seller">
+                            <div class="seller-avatar">T</div>
+                            <div class="seller-info">
+                                <span class="seller-name">Toyota Ltd</span>
+                                <span class="seller-verified">
+                                    <svg viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path>
+                                    </svg>
+                                    Verified
+                                </span>
                             </div>
-                            <div class="card-actions">
-                                <button class="card-action-btn card-whatsapp-btn">💬 WhatsApp</button>
-                                <button class="card-action-btn card-view-btn">View →</button>
-                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-whatsapp" onclick="contactSeller(1)" title="WhatsApp">
+                                <svg viewBox="0 0 24 24" fill="white">
+                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-4.947 1.26l-.356.187-.369-.032c-1.296-.023-2.514-.27-3.554-.802l-.424-.226-.436.159C1.97 6.438 1 7.75 1 9.288c0 5.224 4.212 9.466 9.4 9.466 5.187 0 9.4-4.242 9.4-9.466 0-5.224-4.212-9.466-9.4-9.466z"></path>
+                                </svg>
+                            </button>
+                            <button class="btn-view" onclick="openVehicleDetail(1)">View →</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Card 2: Featured -->
                 <div class="card featured" onclick="openVehicleDetail(2)">
-                    <div class="card-image">
-                        <img src="https://placehold.co/400x210/e2e8f0/94a3b8?text=Honda+Vezel" alt="Honda Vezel">
-                        <div class="featured-ribbon">⭐ FEATURED</div>
-                        <div class="card-badge recondition">Recondition</div>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">Honda Vezel 2022</h3>
-                        <div class="card-year-location">
-                            <span>2022</span>
-                            <span>📍 Kandy</span>
+                    <div class="card-image-wrap">
+                        <img src="https://placehold.co/400x300/e2e8f0/94a3b8?text=Honda+Vezel" alt="Honda Vezel" class="card-image" loading="lazy">
+                        <div class="card-img-overlay"></div>
+                        <div class="card-badges-left">
+                            <span class="badge badge-recon">Recondition</span>
                         </div>
+                        <div class="card-badges-right">
+                            <span class="badge badge-featured">★ Featured</span>
+                        </div>
+                        <div class="card-price-overlay">Rs. 10,800,000</div>
+                        <div class="card-img-count">
+                            <svg viewBox="0 0 24 24" fill="white" style="width:12px;height:12px;">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
+                            8
+                        </div>
+                    </div>
+                    <div class="card-info">
+                        <h3 class="card-title">Honda Vezel 2022</h3>
+                        <p class="card-location">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            Kandy, Sri Lanka
+                        </p>
                         <div class="card-specs">
-                            <span class="card-spec">🔋 Hybrid</span>
-                            <span class="card-spec">⚙️ Automatic</span>
-                            <span class="card-spec">28,000 km</span>
+                            <span class="spec-chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="1"></circle>
+                                    <path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m2.12 2.12l4.24 4.24"></path>
+                                </svg>
+                                Automatic
+                            </span>
+                            <span class="spec-divider">•</span>
+                            <span class="spec-chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                </svg>
+                                Hybrid
+                            </span>
+                            <span class="spec-divider">•</span>
+                            <span class="spec-chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 12h14M5 12l2-4h10l2 4"></path>
+                                </svg>
+                                28,000 km
+                            </span>
                         </div>
                         <div class="card-price">Rs 10,800,000</div>
-                        <div class="card-footer">
-                            <div class="card-seller">
-                                <div class="card-seller-avatar">H</div>
-                                <span class="card-seller-name">Honda Motors</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-seller">
+                            <div class="seller-avatar">H</div>
+                            <div class="seller-info">
+                                <span class="seller-name">Honda Motors</span>
+                                <span class="seller-verified">
+                                    <svg viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path>
+                                    </svg>
+                                    Verified
+                                </span>
                             </div>
-                            <div class="card-actions">
-                                <button class="card-action-btn card-whatsapp-btn">💬 WhatsApp</button>
-                                <button class="card-action-btn card-view-btn">View →</button>
-                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-whatsapp" onclick="contactSeller(2)" title="WhatsApp">
+                                <svg viewBox="0 0 24 24" fill="white">
+                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-4.947 1.26l-.356.187-.369-.032c-1.296-.023-2.514-.27-3.554-.802l-.424-.226-.436.159C1.97 6.438 1 7.75 1 9.288c0 5.224 4.212 9.466 9.4 9.466 5.187 0 9.4-4.242 9.4-9.466 0-5.224-4.212-9.466-9.4-9.466z"></path>
+                                </svg>
+                            </button>
+                            <button class="btn-view" onclick="openVehicleDetail(2)">View →</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Card 3: Used -->
                 <div class="card" onclick="openVehicleDetail(3)">
-                    <div class="card-image">
-                        <img src="https://placehold.co/400x210/e2e8f0/94a3b8?text=Suzuki+Alto" alt="Suzuki Alto">
-                        <div class="card-badge used">Used</div>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">Suzuki Alto 2020</h3>
-                        <div class="card-year-location">
-                            <span>2020</span>
-                            <span>📍 Matara</span>
+                    <div class="card-image-wrap">
+                        <img src="https://placehold.co/400x300/e2e8f0/94a3b8?text=Suzuki+Alto" alt="Suzuki Alto" class="card-image" loading="lazy">
+                        <div class="card-img-overlay"></div>
+                        <div class="card-badges-left">
+                            <span class="badge badge-used">Used</span>
                         </div>
+                        <div class="card-price-overlay">Rs. 4,200,000</div>
+                        <div class="card-img-count">
+                            <svg viewBox="0 0 24 24" fill="white" style="width:12px;height:12px;">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
+                            5
+                        </div>
+                    </div>
+                    <div class="card-info">
+                        <h3 class="card-title">Suzuki Alto 2020</h3>
+                        <p class="card-location">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            Matara, Sri Lanka
+                        </p>
                         <div class="card-specs">
-                            <span class="card-spec">⛽ Petrol</span>
-                            <span class="card-spec">⚙️ Manual</span>
-                            <span class="card-spec">45,000 km</span>
+                            <span class="spec-chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="1"></circle>
+                                </svg>
+                                Manual
+                            </span>
+                            <span class="spec-divider">•</span>
+                            <span class="spec-chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                </svg>
+                                Petrol
+                            </span>
+                            <span class="spec-divider">•</span>
+                            <span class="spec-chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 12h14M5 12l2-4h10l2 4"></path>
+                                </svg>
+                                45,000 km
+                            </span>
                         </div>
                         <div class="card-price">Rs 4,200,000</div>
-                        <div class="card-footer">
-                            <div class="card-seller">
-                                <div class="card-seller-avatar">S</div>
-                                <span class="card-seller-name">Suzuki Dealer</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-seller">
+                            <div class="seller-avatar">S</div>
+                            <div class="seller-info">
+                                <span class="seller-name">Suzuki Dealer</span>
+                                <span class="seller-verified">
+                                    <svg viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path>
+                                    </svg>
+                                    Verified
+                                </span>
                             </div>
-                            <div class="card-actions">
-                                <button class="card-action-btn card-whatsapp-btn">💬 WhatsApp</button>
-                                <button class="card-action-btn card-view-btn">View →</button>
-                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-whatsapp" onclick="contactSeller(3)" title="WhatsApp">
+                                <svg viewBox="0 0 24 24" fill="white">
+                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-4.947 1.26l-.356.187-.369-.032c-1.296-.023-2.514-.27-3.554-.802l-.424-.226-.436.159C1.97 6.438 1 7.75 1 9.288c0 5.224 4.212 9.466 9.4 9.466 5.187 0 9.4-4.242 9.4-9.466 0-5.224-4.212-9.466-9.4-9.466z"></path>
+                                </svg>
+                            </button>
+                            <button class="btn-view" onclick="openVehicleDetail(3)">View →</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Card 4: Bike -->
                 <div class="card" onclick="openVehicleDetail(4)">
-                    <div class="card-image">
-                        <img src="https://placehold.co/400x210/e2e8f0/94a3b8?text=Bajaj+Pulsar" alt="Bajaj Pulsar">
-                        <div class="card-badge used">Used</div>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">Bajaj Pulsar 150 2021</h3>
-                        <div class="card-year-location">
-                            <span>2021</span>
-                            <span>📍 Galle</span>
+                    <div class="card-image-wrap">
+                        <img src="https://placehold.co/400x300/e2e8f0/94a3b8?text=Bajaj+Pulsar" alt="Bajaj Pulsar" class="card-image" loading="lazy">
+                        <div class="card-img-overlay"></div>
+                        <div class="card-badges-left">
+                            <span class="badge badge-used">Used</span>
                         </div>
+                        <div class="card-price-overlay">Rs. 780,000</div>
+                        <div class="card-img-count">
+                            <svg viewBox="0 0 24 24" fill="white" style="width:12px;height:12px;">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
+                            4
+                        </div>
+                    </div>
+                    <div class="card-info">
+                        <h3 class="card-title">Bajaj Pulsar 150 2021</h3>
+                        <p class="card-location">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            Galle, Sri Lanka
+                        </p>
                         <div class="card-specs">
-                            <span class="card-spec">⛽ Petrol</span>
-                            <span class="card-spec">⚙️ Manual</span>
-                            <span class="card-spec">18,000 km</span>
+                            <span class="spec-chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="1"></circle>
+                                </svg>
+                                Manual
+                            </span>
+                            <span class="spec-divider">•</span>
+                            <span class="spec-chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                </svg>
+                                Petrol
+                            </span>
+                            <span class="spec-divider">•</span>
+                            <span class="spec-chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 12h14M5 12l2-4h10l2 4"></path>
+                                </svg>
+                                18,000 km
+                            </span>
                         </div>
                         <div class="card-price">Rs 780,000</div>
-                        <div class="card-footer">
-                            <div class="card-seller">
-                                <div class="card-seller-avatar">B</div>
-                                <span class="card-seller-name">Bajaj Motors</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-seller">
+                            <div class="seller-avatar">B</div>
+                            <div class="seller-info">
+                                <span class="seller-name">Bajaj Motors</span>
+                                <span class="seller-verified">
+                                    <svg viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path>
+                                    </svg>
+                                    Verified
+                                </span>
                             </div>
-                            <div class="card-actions">
-                                <button class="card-action-btn card-whatsapp-btn">💬 WhatsApp</button>
-                                <button class="card-action-btn card-view-btn">View →</button>
-                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-whatsapp" onclick="contactSeller(4)" title="WhatsApp">
+                                <svg viewBox="0 0 24 24" fill="white">
+                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-4.947 1.26l-.356.187-.369-.032c-1.296-.023-2.514-.27-3.554-.802l-.424-.226-.436.159C1.97 6.438 1 7.75 1 9.288c0 5.224 4.212 9.466 9.4 9.466 5.187 0 9.4-4.242 9.4-9.466 0-5.224-4.212-9.466-9.4-9.466z"></path>
+                                </svg>
+                            </button>
+                            <button class="btn-view" onclick="openVehicleDetail(4)">View →</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Card 5: Van -->
                 <div class="card" onclick="openVehicleDetail(5)">
-                    <div class="card-image">
-                        <img src="https://placehold.co/400x210/e2e8f0/94a3b8?text=Toyota+KDH+Van" alt="Toyota KDH Van">
-                        <div class="card-badge used">Used</div>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">Toyota KDH Van 2019</h3>
-                        <div class="card-year-location">
-                            <span>2019</span>
-                            <span>📍 Negombo</span>
+                    <div class="card-image-wrap">
+                        <img src="https://placehold.co/400x300/e2e8f0/94a3b8?text=Toyota+KDH+Van" alt="Toyota KDH Van" class="card-image" loading="lazy">
+                        <div class="card-img-overlay"></div>
+                        <div class="card-badges-left">
+                            <span class="badge badge-used">Used</span>
                         </div>
+                        <div class="card-price-overlay">Rs. 8,900,000</div>
+                        <div class="card-img-count">
+                            <svg viewBox="0 0 24 24" fill="white" style="width:12px;height:12px;">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
+                            7
+                        </div>
+                    </div>
+                    <div class="card-info">
+                        <h3 class="card-title">Toyota KDH Van 2019</h3>
+                        <p class="card-location">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            Negombo, Sri Lanka
+                        </p>
                         <div class="card-specs">
-                            <span class="card-spec">⛽ Diesel</span>
-                            <span class="card-spec">⚙️ Manual</span>
-                            <span class="card-spec">95,000 km</span>
+                            <span class="spec-chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="1"></circle>
+                                </svg>
+                                Manual
+                            </span>
+                            <span class="spec-divider">•</span>
+                            <span class="spec-chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                </svg>
+                                Diesel
+                            </span>
+                            <span class="spec-divider">•</span>
+                            <span class="spec-chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 12h14M5 12l2-4h10l2 4"></path>
+                                </svg>
+                                95,000 km
+                            </span>
                         </div>
                         <div class="card-price">Rs 8,900,000</div>
-                        <div class="card-footer">
-                            <div class="card-seller">
-                                <div class="card-seller-avatar">T</div>
-                                <span class="card-seller-name">Toyota Ltd</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-seller">
+                            <div class="seller-avatar">T</div>
+                            <div class="seller-info">
+                                <span class="seller-name">Toyota Ltd</span>
+                                <span class="seller-verified">
+                                    <svg viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path>
+                                    </svg>
+                                    Verified
+                                </span>
                             </div>
-                            <div class="card-actions">
-                                <button class="card-action-btn card-whatsapp-btn">💬 WhatsApp</button>
-                                <button class="card-action-btn card-view-btn">View →</button>
-                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-whatsapp" onclick="contactSeller(5)" title="WhatsApp">
+                                <svg viewBox="0 0 24 24" fill="white">
+                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-4.947 1.26l-.356.187-.369-.032c-1.296-.023-2.514-.27-3.554-.802l-.424-.226-.436.159C1.97 6.438 1 7.75 1 9.288c0 5.224 4.212 9.466 9.4 9.466 5.187 0 9.4-4.242 9.4-9.466 0-5.224-4.212-9.466-9.4-9.466z"></path>
+                                </svg>
+                            </button>
+                            <button class="btn-view" onclick="openVehicleDetail(5)">View →</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Card 6: EV -->
                 <div class="card" onclick="openVehicleDetail(6)">
-                    <div class="card-image">
-                        <img src="https://placehold.co/400x210/e2e8f0/94a3b8?text=MG+ZS+EV" alt="MG ZS EV">
-                        <div class="card-badge brand-new">Brand New</div>
-                        <div class="card-badge ev-badge">⚡ EV</div>
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">MG ZS EV 2024</h3>
-                        <div class="card-year-location">
-                            <span>2024</span>
-                            <span>📍 Colombo</span>
+                    <div class="card-image-wrap">
+                        <img src="https://placehold.co/400x300/e2e8f0/94a3b8?text=MG+ZS+EV" alt="MG ZS EV" class="card-image" loading="lazy">
+                        <div class="card-img-overlay"></div>
+                        <div class="card-badges-left">
+                            <span class="badge badge-ev">⚡ EV</span>
+                            <span class="badge badge-new">Brand New</span>
                         </div>
+                        <div class="card-price-overlay">Rs. 19,500,000</div>
+                        <div class="card-img-count">
+                            <svg viewBox="0 0 24 24" fill="white" style="width:12px;height:12px;">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
+                            9
+                        </div>
+                    </div>
+                    <div class="card-info">
+                        <h3 class="card-title">MG ZS EV 2024</h3>
+                        <p class="card-location">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            Colombo, Sri Lanka
+                        </p>
                         <div class="card-specs">
-                            <span class="card-spec">⚡ Electric</span>
-                            <span class="card-spec">⚙️ Automatic</span>
-                            <span class="card-spec">5,000 km</span>
+                            <span class="spec-chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="1"></circle>
+                                </svg>
+                                Automatic
+                            </span>
+                            <span class="spec-divider">•</span>
+                            <span class="spec-chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                </svg>
+                                Electric
+                            </span>
+                            <span class="spec-divider">•</span>
+                            <span class="spec-chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 12h14M5 12l2-4h10l2 4"></path>
+                                </svg>
+                                5,000 km
+                            </span>
                         </div>
                         <div class="card-price">Rs 19,500,000</div>
-                        <div class="card-footer">
-                            <div class="card-seller">
-                                <div class="card-seller-avatar">M</div>
-                                <span class="card-seller-name">MG Motors</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-seller">
+                            <div class="seller-avatar">M</div>
+                            <div class="seller-info">
+                                <span class="seller-name">MG Motors</span>
+                                <span class="seller-verified">
+                                    <svg viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path>
+                                    </svg>
+                                    Verified
+                                </span>
                             </div>
-                            <div class="card-actions">
-                                <button class="card-action-btn card-whatsapp-btn">💬 WhatsApp</button>
-                                <button class="card-action-btn card-view-btn">View →</button>
-                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-whatsapp" onclick="contactSeller(6)" title="WhatsApp">
+                                <svg viewBox="0 0 24 24" fill="white">
+                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-4.947 1.26l-.356.187-.369-.032c-1.296-.023-2.514-.27-3.554-.802l-.424-.226-.436.159C1.97 6.438 1 7.75 1 9.288c0 5.224 4.212 9.466 9.4 9.466 5.187 0 9.4-4.242 9.4-9.466 0-5.224-4.212-9.466-9.4-9.466z"></path>
+                                </svg>
+                            </button>
+                            <button class="btn-view" onclick="openVehicleDetail(6)">View →</button>
                         </div>
                     </div>
                 </div>
@@ -2779,39 +3282,108 @@
             const location = v.location || 'N/A';
             const isEV = v.type === 'EV' || (v.fuelType && (v.fuelType.toLowerCase() === 'electric' || v.fuelType.toLowerCase() === 'ev'));
             
+            const badgeClass = v.condition ? `badge-${getCondClass(v.condition)}` : '';
+            const badgeText = v.condition || '';
+            
             return `
                 <div class="card${isFeatured ? ' featured' : ''}" data-vehicle-id="${v.id}">
-                    <div class="card-image">
-                        <img src="${img}" alt="${title}" loading="lazy">
-                        ${isFeatured ? `<div class="featured-ribbon">⭐ FEATURED</div>` : ''}
-                        ${isEV ? `<div class="card-badge ev-badge">⚡ EV</div>` : ''}
-                        ${v.condition ? `<div class="card-badge ${getCondClass(v.condition)}">${v.condition}</div>` : ''}
-                    </div>
-                    <div class="card-content">
-                        <h3 class="card-title">${title}</h3>
-                        <div class="card-year-location">
-                            <span>${v.year || ''}</span>
-                            <span>📍 ${location}</span>
+                    <div class="card-image-wrap">
+                        <img src="${img}" alt="${title}" class="card-image" loading="lazy" onerror="this.src='https://placehold.co/400x300/e8edf5/94a3b8?text=No+Photo'">
+                        <div class="card-img-overlay"></div>
+                        <div class="card-badges-left">
+                            ${isEV ? `<span class="badge badge-ev">⚡ EV</span>` : ''}
+                            ${badgeText ? `<span class="badge ${badgeClass}">${badgeText}</span>` : ''}
                         </div>
+                        ${isFeatured ? `<div class="card-badges-right">
+                            <span class="badge badge-featured">★ Featured</span>
+                        </div>` : ''}
+                        <div class="card-price-overlay">Rs ${(v.price || 0).toLocaleString()}</div>
+                        <div class="card-img-count">
+                            <svg viewBox="0 0 24 24" fill="white" style="width:12px;height:12px;">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
+                            ${getImageCount(v.images)}
+                        </div>
+                    </div>
+                    <div class="card-info">
+                        <h3 class="card-title">${title}</h3>
+                        <p class="card-location">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            ${location}
+                        </p>
                         <div class="card-specs">
-                            <span class="card-spec">${isEV ? '⚡ Electric' : '⛽ ' + (v.fuelType || 'N/A')}</span>
-                            ${v.transmission ? `<span class="card-spec">⚙️ ${v.transmission}</span>` : ''}
-                            ${v.mileage ? `<span class="card-spec">${v.mileage} km</span>` : ''}
+                            <span class="spec-chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="1"></circle>
+                                </svg>
+                                ${v.transmission || 'N/A'}
+                            </span>
+                            <span class="spec-divider">•</span>
+                            <span class="spec-chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                </svg>
+                                ${isEV ? 'Electric' : (v.fuelType || 'N/A')}
+                            </span>
+                            ${v.mileage ? `<span class="spec-divider">•</span>
+                            <span class="spec-chip">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 12h14M5 12l2-4h10l2 4"></path>
+                                </svg>
+                                ${v.mileage} km
+                            </span>` : ''}
                         </div>
                         <div class="card-price">Rs ${(v.price || 0).toLocaleString()}</div>
-                        <div class="card-footer">
-                            <div class="card-seller">
-                                <div class="card-seller-avatar">S</div>
-                                <span class="card-seller-name">Seller</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-seller">
+                            <div class="seller-avatar">${(v.sellerName || 'S')[0].toUpperCase()}</div>
+                            <div class="seller-info">
+                                <span class="seller-name">${v.sellerName || 'Seller'}</span>
+                                <span class="seller-verified">
+                                    <svg viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path>
+                                    </svg>
+                                    Verified
+                                </span>
                             </div>
-                            <div class="card-actions">
-                                <button class="card-action-btn card-whatsapp-btn" onclick="contactSeller(${v.id})">💬 WhatsApp</button>
-                                <button class="card-action-btn card-view-btn" onclick="openVehicleDetail(${v.id})">View →</button>
-                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-whatsapp" onclick="contactSeller(${v.id})" title="WhatsApp">
+                                <svg viewBox="0 0 24 24" fill="white">
+                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-4.947 1.26l-.356.187-.369-.032c-1.296-.023-2.514-.27-3.554-.802l-.424-.226-.436.159C1.97 6.438 1 7.75 1 9.288c0 5.224 4.212 9.466 9.4 9.466 5.187 0 9.4-4.242 9.4-9.466 0-5.224-4.212-9.466-9.4-9.466z"></path>
+                                </svg>
+                            </button>
+                            <button class="btn-view" onclick="openVehicleDetail(${v.id})">View →</button>
                         </div>
                     </div>
                 </div>
             `;
+        }
+
+        function getImageCount(images) {
+            try {
+                let imageArray = [];
+                if (typeof images === 'string') {
+                    try {
+                        imageArray = JSON.parse(images);
+                        if (!Array.isArray(imageArray)) {
+                            imageArray = [images];
+                        }
+                    } catch (parseError) {
+                        imageArray = [images];
+                    }
+                } else if (Array.isArray(images)) {
+                    imageArray = images;
+                }
+                return imageArray.length || 1;
+            } catch (e) {
+                return 1;
+            }
         }
 
         function getCondClass(condition) {
