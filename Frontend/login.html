@@ -6,222 +6,431 @@
     <title>Login - Muthupura.lk</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
     <style>
         :root {
-            --accent: #4f6ef7;
-            --accent-rgb: 79, 110, 247;
-            --dark-bg: #0a0f2e;
+            --bg: #eef2f8;
+            --surface: #ffffff;
+            --text: #1f2f4f;
+            --muted: #5b6d8a;
+            --accent1: #3a6ff8;
+            --accent2: #8e52f8;
+            --shadow-strong: 0 32px 90px rgba(25, 73, 145, 0.14);
         }
 
-        * {
+        /* ===== NAVBAR FIXED POSITIONING ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            width: 81%;
             box-sizing: border-box;
-            margin: 0;
+            background: linear-gradient(135deg, rgba(58,111,248,0.08) 0%, rgba(142,82,248,0.06) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1.2px solid rgba(58,111,248,0.15);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(58,111,248,0.08), inset 0 1px 1px rgba(255,255,255,0.9);
             padding: 0;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #f5f7ff;
-            min-height: 100vh;
-        }
-
-        .auth-container {
+            height: 70px;
             display: flex;
-            min-height: 100vh;
+            align-items: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .navbar:hover {
+            box-shadow: 0 12px 40px rgba(58,111,248,0.12), inset 0 1px 1px rgba(255,255,255,0.95);
+            border-color: rgba(58,111,248,0.22);
+        }
+
+        .nav-container {
+            max-width: 1200px;
             width: 100%;
+            margin: 0 auto;
+            padding: 0 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 24px;
         }
 
-        /* LEFT PANEL */
-        .auth-left {
-            flex: 1;
-            background: linear-gradient(145deg, #050a1e 0%, #0f1f5c 50%, #1a0a3c 100%);
+        .nav-left {
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 60px 40px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .auth-left::before {
-            content: '';
-            position: absolute;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(79,110,247,0.25) 0%, transparent 70%);
-            top: -100px;
-            right: -100px;
-            border-radius: 50%;
-        }
-
-        .auth-left::after {
-            content: '';
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(139,92,246,0.20) 0%, transparent 70%);
-            bottom: -50px;
-            left: -50px;
-            border-radius: 50%;
-        }
-
-        .auth-left-content {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-            color: white;
-            max-width: 380px;
-        }
-
-        .auth-logo {
-            width: 400px;
-            height: auto;
-            margin-bottom: 32px;
-            filter: drop-shadow(0 0 20px rgba(255,255,255,0.3));
-        }
-
-        .auth-left-content h2 {
-            font-size: 30px;
-            font-weight: 800;
-            line-height: 1.25;
-            margin-bottom: 16px;
-            color: white;
-        }
-
-        .auth-left-content p {
-            font-size: 15px;
-            color: rgba(255,255,255,0.65);
-            line-height: 1.7;
-            margin-bottom: 40px;
-        }
-
-        .auth-stats {
-            display: flex;
-            gap: 32px;
-            justify-content: center;
-            background: rgba(255,255,255,0.07);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 16px;
-            padding: 20px 28px;
-        }
-
-        .auth-stat {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .stat-num {
-            font-size: 24px;
-            font-weight: 800;
-            color: white;
-        }
-
-        .stat-lbl {
-            font-size: 12px;
-            color: rgba(255,255,255,0.55);
-        }
-
-        /* RIGHT PANEL */
-        .auth-right {
-            width: 480px;
+            gap: 8px;
             flex-shrink: 0;
-            background: white;
+        }
+
+        .nav-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #1f2d52;
+            font-weight: 700;
+            font-size: 1.05rem;
+            transition: all 0.22s ease;
+            flex-shrink: 0;
+        }
+
+        .nav-brand:hover {
+            opacity: 0.85;
+            transform: translateY(-1px);
+        }
+
+        .nav-brand img {
+            height: 46px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .nav-brand span {
+            display: none;
+        }
+
+        @media (min-width: 640px) {
+            .nav-brand span {
+                display: inline;
+            }
+        }
+
+        .nav-center a {
+            text-decoration: none;
+            color: #1f2d52;
+            font-weight: 600;
+            font-size: 1.05rem;
+            letter-spacing: 0.4px;
+            padding: 10px 18px;
+            border-radius: 14px;
+            transition: all 0.22s ease;
+            position: relative;
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .nav-center a:hover {
+            color: #fff;
+            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(58, 111, 248, 0.25);
+        }
+
+        #auth-link {
+            padding: 9px 18px;
+            background: rgba(58, 111, 248, 0.08);
+            color: #1f2f4f;
+            border-radius: 12px;
+            border: 1px solid rgba(58, 111, 248, 0.15);
+            transition: all 0.22s ease;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+
+        #auth-link:hover {
+            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(58, 111, 248, 0.25);
+            border-color: #3a6ff8;
+        }
+
+        #admin-link {
+            padding: 9px 18px;
+            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
+            color: #fff;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            box-shadow: 0 6px 20px rgba(58, 111, 248, 0.2);
+            transition: all 0.22s ease;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        #admin-link:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(142, 82, 248, 0.35);
+        }
+
+        .hamburger {
             display: flex;
             flex-direction: column;
-            padding: 40px 44px;
-            overflow-y: auto;
-            max-height: 100vh;
-        }
-
-        /* TABS */
-        .auth-tabs {
-            display: flex;
-            background: #f1f5f9;
-            border-radius: 12px;
-            padding: 4px;
-            margin-bottom: 32px;
-            gap: 4px;
-        }
-
-        .auth-tab {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            background: transparent;
-            border-radius: 9px;
-            font-family: Poppins;
-            font-size: 14px;
-            font-weight: 600;
-            color: #64748b;
+            gap: 5px;
             cursor: pointer;
-            transition: all 0.25s ease;
+            background: none;
+            border: none;
+            padding: 8px;
+            transition: all 0.2s ease;
         }
 
-        .auth-tab.active {
-            background: white;
-            color: var(--accent);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        @media (min-width: 768px) {
+            .hamburger {
+                display: none;
+            }
         }
 
-        /* FORM ELEMENTS */
-        .auth-title {
-            font-size: 26px;
-            font-weight: 800;
-            color: #1e2a4a;
-            margin-bottom: 6px;
+        .hamburger span {
+            width: 24px;
+            height: 2px;
+            background: #1f2d52;
+            border-radius: 2px;
+            transition: all 0.3s ease;
         }
 
-        .auth-subtitle {
-            font-size: 14px;
-            color: #94a3b8;
-            margin-bottom: 28px;
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
         }
 
-        .form-group {
-            margin-bottom: 18px;
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
         }
 
-        .form-group label {
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        /* Mobile menu */
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(248, 250, 255, 0.95) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(200, 210, 230, 0.3);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            flex-direction: column;
+            padding: 16px;
+            gap: 8px;
+            z-index: 999;
+            max-height: calc(100vh - 70px);
+            overflow-y: auto;
+            animation: slideDown 0.25s ease forwards;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .mobile-menu a {
             display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 7px;
-        }
-
-        .auth-input {
-            width: 100%;
-            padding: 13px 16px;
-            border: 1.5px solid #e2e8f0;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: #1f2d52;
+            font-weight: 500;
             border-radius: 12px;
-            font-family: Poppins;
-            font-size: 14px;
-            color: #1e2a4a;
-            background: #fafbff;
-            transition: all 0.25s ease;
-            outline: none;
+            transition: all 0.22s ease;
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(58, 111, 248, 0.1);
         }
 
-        .auth-input:focus {
-            border-color: var(--accent);
-            background: white;
-            box-shadow: 0 0 0 3px rgba(79,110,247,0.12);
+        .mobile-menu a:hover {
+            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(58, 111, 248, 0.2);
+            border-color: #3a6ff8;
         }
 
-        .auth-input::placeholder {
-            color: #cbd5e1;
+        #admin-link-mobile {
+            display: block;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            box-shadow: 0 6px 20px rgba(58, 111, 248, 0.15);
+            transition: all 0.22s ease;
         }
 
-        .input-password-wrap {
+        #admin-link-mobile:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(142, 82, 248, 0.35);
+        }
+
+        @media (max-width: 768px) {
+            .nav-center {
+                display: none;
+            }
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .frame {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+            padding: 16px;
+            flex: 1;
+            justify-content: center;
+            margin-top: 100px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.96) 100%);
+            margin-top: 28px;
+            border-radius: 18px;
+            box-shadow: var(--shadow-strong);
+            border: 1.2px solid rgba(58, 111, 248, 0.14);
+            padding: 32px;
+            animation: fadeInUp 0.45s ease both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .mode-switch {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid rgba(58, 111, 248, 0.1);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px 16px;
+            background: none;
+            border: none;
+            font-weight: 600;
+            color: var(--muted);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .tab.active {
+            color: var(--accent1);
+            border-bottom-color: var(--accent1);
+        }
+
+        .panel {
+            display: none;
+        }
+
+        .panel.active {
+            display: block;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .panel.hidden {
+            display: none;
+        }
+
+        .panel h1 {
+            margin: 0 0 8px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1f2f4f 0%, #3a6ff8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .panel > p {
+            margin: 0 0 24px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .form {
+            display: grid;
+            gap: 14px;
+        }
+
+        .input-wrapper {
             position: relative;
+            display: grid;
         }
 
-        .input-password-wrap .auth-input {
-            padding-right: 46px;
+        .input-wrapper input {
+            width: 100%;
+            border: 1.1px solid rgba(58, 111, 248, 0.22);
+            background: linear-gradient(to bottom, rgba(255,255,255,0.96), rgba(255,255,255,0.92));
+            border-radius: 14px;
+            padding: 14px 16px;
+            font-size: 1rem;
+            color: var(--text);
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+            font-family: inherit;
+        }
+
+        .input-wrapper input::placeholder {
+            color: rgba(91, 109, 138, 0.6);
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: var(--accent1);
+            box-shadow: 0 0 0 4px rgba(58,111,248,0.14), inset 0 0 0 1px rgba(58,111,248,0.06);
+        }
+
+        .input-wrapper input.invalid {
+            border-color: #d12845;
+            box-shadow: 0 0 0 4px rgba(209,40,69,0.15), inset 0 0 0 1px rgba(209,40,69,0.08);
+        }
+
+        .error-message {
+            display: block;
+            min-height: 18px;
+            font-size: 0.84rem;
+            color: #d12845;
+            margin-top: 4px;
         }
 
         .toggle-password {
@@ -232,475 +441,236 @@
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 16px;
-            color: #94a3b8;
-            padding: 4px;
+            font-size: 1.1rem;
+            opacity: 0.6;
+            transition: opacity 0.2s ease;
         }
 
-        .auth-options {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            font-size: 13px;
+        .toggle-password:hover {
+            opacity: 1;
         }
 
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            color: #64748b;
-            cursor: pointer;
-        }
-
-        .forgot-link {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .forgot-link:hover {
-            text-decoration: underline;
-        }
-
-        /* PRIMARY BUTTON */
-        .btn-auth-primary {
+        .btn {
             width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #4f6ef7, #6366f1);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-family: Poppins;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.28s ease;
-            box-shadow: 0 4px 16px rgba(79,110,247,0.35);
-            margin-bottom: 16px;
-        }
-
-        .btn-auth-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(79,110,247,0.45);
-        }
-
-        .btn-auth-primary:disabled {
-            opacity: 0.65;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* DIVIDER */
-        .auth-divider {
-            text-align: center;
-            position: relative;
-            margin: 16px 0;
-        }
-
-        .auth-divider::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: #e2e8f0;
-        }
-
-        .auth-divider span {
-            background: white;
-            padding: 0 12px;
-            font-size: 12px;
-            color: #94a3b8;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* SOCIAL BUTTONS */
-        .btn-social {
-            width: 100%;
-            padding: 13px;
-            border-radius: 12px;
-            border: 1.5px solid #e2e8f0;
-            background: white;
-            font-family: Poppins;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            transition: all 0.22s ease;
-            color: #374151;
-        }
-
-        .btn-social:hover {
-            background: #f8faff;
-            border-color: var(--accent);
-            transform: translateY(-1px);
-        }
-
-        .btn-facebook {
-            background: #1877f2;
-            border-color: #1877f2;
-            color: white;
-        }
-
-        .btn-facebook:hover {
-            background: #166fe5;
-            border-color: #166fe5;
-        }
-
-        /* PHONE OTP */
-        .phone-input-wrap {
-            display: flex;
-            align-items: center;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #fafbff;
-            transition: all 0.25s ease;
-        }
-
-        .phone-input-wrap:focus-within {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(79,110,247,0.12);
-            background: white;
-        }
-
-        .phone-prefix {
-            padding: 13px 12px;
-            font-size: 14px;
-            font-weight: 600;
-            color: #374151;
-            border-right: 1px solid #e2e8f0;
-            background: #f1f5f9;
-            white-space: nowrap;
-        }
-
-        .phone-input {
-            flex: 1;
-            border: none !important;
-            box-shadow: none !important;
-            background: transparent !important;
-            border-radius: 0 !important;
-        }
-
-        .btn-send-otp {
-            padding: 10px 16px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            font-family: Poppins;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: background 0.2s;
-        }
-
-        .btn-send-otp:hover {
-            background: #3d5ce5;
-        }
-
-        .btn-send-otp:disabled {
-            background: #94a3b8;
-            cursor: not-allowed;
-        }
-
-        .otp-input {
-            letter-spacing: 4px;
-            text-align: center;
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        /* TERMS */
-        .terms-check {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            font-size: 13px;
-            color: #64748b;
-            margin-bottom: 20px;
-            cursor: pointer;
-            line-height: 1.5;
-        }
-
-        .terms-check a {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .terms-check input[type="checkbox"] {
-            margin-top: 2px;
-            flex-shrink: 0;
-            accent-color: var(--accent);
-        }
-
-        .auth-switch-text {
-            text-align: center;
-            font-size: 13px;
-            color: #64748b;
-            margin-top: 20px;
-        }
-
-        .auth-switch-text a {
-            color: var(--accent);
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        /* ERROR/SUCCESS */
-        .auth-error-msg {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            border-radius: 10px;
             padding: 12px 16px;
-            font-size: 13px;
-            color: #dc2626;
-            margin-bottom: 16px;
-            display: none;
-        }
-
-        .auth-success {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .success-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-        }
-
-        .auth-success h2 {
-            font-size: 24px;
+            border: none;
+            border-radius: 12px;
             font-weight: 700;
-            color: #1e2a4a;
-            margin-bottom: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            min-height: 48px;
         }
 
-        .auth-success p {
-            color: #64748b;
+        .btn.primary {
+            background: linear-gradient(110deg, var(--accent1), var(--accent2));
+            color: #fff;
+            box-shadow: 0 20px 56px rgba(58,111,248,0.18);
         }
 
-        /* SPINNER */
-        .btn-loading {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
+        .btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 26px 66px rgba(58,111,248,0.26);
         }
 
-        .spinner {
-            width: 18px;
-            height: 18px;
-            border: 2.5px solid rgba(255,255,255,0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
+        .btn.secondary {
+            background: linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.96));
+            color: #2f4f82;
+            border: 1.2px solid rgba(58,111,248,0.22);
+            box-shadow: 0 10px 28px rgba(58,111,248,0.09);
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .btn.secondary:hover {
+            background: linear-gradient(135deg, #f9faff 0%, #ffffff 100%);
+            border-color: rgba(58,111,248,0.4);
+            transform: translateY(-2px);
         }
 
-        /* MOBILE RESPONSIVE */
-        @media (max-width: 768px) {
-            .auth-left {
-                display: none;
+        .note {
+            text-align: center;
+            margin-top: 16px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .note .btn {
+            display: inline;
+            width: auto;
+            padding: 0;
+            background: none;
+            box-shadow: none;
+            color: var(--accent1);
+            font-weight: 600;
+            min-height: auto;
+        }
+
+        .alert {
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            border: 1.2px solid;
+        }
+
+        .alert.success {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05));
+            color: #166534;
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .alert.error {
+            background: linear-gradient(135deg, rgba(209, 40, 69, 0.1), rgba(209, 40, 69, 0.05));
+            color: #8b1538;
+            border-color: rgba(209, 40, 69, 0.3);
+        }
+
+        @media (max-width: 640px) {
+            .card {
+                padding: 24px;
             }
-            .auth-right {
-                width: 100%;
-                padding: 32px 24px;
-                max-height: none;
-            }
-            .auth-container {
-                min-height: 100vh;
-            }
-        }
 
-        @media (max-width: 380px) {
-            .auth-right {
-                padding: 24px 16px;
-            }
-            .auth-title {
-                font-size: 22px;
+            .frame {
+                padding: 12px;
             }
         }
     </style>
 </head>
-<body data-light-nav="true">
-    <div class="auth-container">
-        <!-- LEFT PANEL -->
-        <div class="auth-left">
-            <div class="auth-left-content">
-                <img src="logo.PNG" class="auth-logo" alt="Muthupura.lk">
-                <h2>Sri Lanka's Premium<br>Vehicle Marketplace</h2>
-                <p>Buy, sell and lease vehicles with complete transparency and trust.</p>
-                <div class="auth-stats">
-                    <div class="auth-stat">
-                        <span class="stat-num">500+</span>
-                        <span class="stat-lbl">Vehicles Listed</span>
-                    </div>
-                    <div class="auth-stat">
-                        <span class="stat-num">1000+</span>
-                        <span class="stat-lbl">Happy Users</span>
-                    </div>
-                </div>
+<body>
+    <!-- Fixed Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a class="nav-brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk"><span>Muthupura.lk</span></a>
+            </div>
+            <div class="nav-center">
+                <a href="index.html">Home</a>
+                <a href="post.html">Post Ad</a>
+                <a href="dashboard.html" id="mylistings-link" style="display:none;">My Listings</a>
+                <a href="about.html">About Us</a>
+                <a href="contact.html">Contact Us</a>
+            </div>
+            <div class="nav-right">
+                <span id="user-greeting" style="display:none;"></span>
+                <a id="auth-link" href="login.html">Login</a>
+                <a id="admin-link" href="admin.html" style="display:none;">Admin</a>
+                <button class="hamburger" id="navbar-hamburger" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
             </div>
         </div>
+    </nav>
 
-        <!-- RIGHT PANEL -->
-        <div class="auth-right">
-            <!-- TAB SWITCHER -->
-            <div class="auth-tabs">
-                <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Login</button>
-                <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Register</button>
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="index.html">Home</a>
+        <a href="post.html">Post Ad</a>
+        <a href="dashboard.html" id="mylistings-link-mobile" style="display:none;">My Listings</a>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact Us</a>
+        <hr style="border: none; border-top: 1px solid rgba(200, 210, 230, 0.3); margin: 8px 0;">
+        <a id="auth-link-mobile" href="login.html">Login</a>
+        <a id="admin-link-mobile" href="admin.html" style="display:none;">Admin</a>
+    </div>
+
+    <div class="frame">
+
+        <div class="card">
+            <div class="mode-switch">
+                <button class="tab active" id="login-mode-btn" type="button">Login</button>
+                <button class="tab" id="register-mode-btn" type="button">Register</button>
             </div>
+            <div id="alert-box" class="alert"></div>
 
-            <!-- LOGIN FORM -->
-            <div class="auth-form-panel" id="panel-login">
-                <h1 class="auth-title">Welcome Back</h1>
-                <p class="auth-subtitle">Login to manage your listings</p>
-
-                <div id="auth-error" class="auth-error-msg"></div>
-
-                <!-- Email/Password - PRIMARY LOGIN -->
-                <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" id="email" placeholder="you@example.com" class="auth-input">
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <div class="input-password-wrap">
-                        <input type="password" id="login-password" placeholder="Enter your password" class="auth-input">
-                        <button class="toggle-password" onclick="togglePassword('login-password')">👁️</button>
+            <div id="login-panel" class="panel">
+                <h1>Welcome Back</h1>
+                <p>Login to manage your ads and post faster.</p>
+                <div class="form">
+                    <div class="input-wrapper">
+                        <input type="email" id="login-email" placeholder="Email" autocomplete="username" />
+                        <small id="login-email-error" class="error-message"></small>
                     </div>
-                </div>
+                    <div class="input-wrapper">
+                        <input type="password" id="login-password" placeholder="Password" autocomplete="current-password" />
+                        <button type="button" class="toggle-password" data-target="login-password">👁️</button>
+                        <small id="login-password-error" class="error-message"></small>
+                    </div>
+                    <button class="btn primary" id="login-submit" type="button">Login</button>
 
-                <div class="auth-options">
-                    <label class="remember-me">
-                        <input type="checkbox" id="remember-me">
-                        Remember me
-                    </label>
-                    <a href="#" class="forgot-link" onclick="showForgotPassword()">Forgot password?</a>
-                </div>
+                    <div class="button-group" style="margin-top: 16px;">
+                        <button class="btn secondary" id="google-login-btn" type="button">Continue with Google</button>
+                        <button class="btn secondary" id="facebook-login-btn" type="button" style="margin-top: 8px;">Continue with Facebook</button>
+                    </div>
 
-                <button class="btn-auth-primary" id="login-btn" onclick="handleEmailLogin()">Login</button>
+                    <div class="divider" style="margin: 20px 0; border-top: 1px solid rgba(58,111,248,0.1); position: relative;">
+                        <span style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: white; padding: 0 12px; color: var(--muted); font-size: 0.85rem;">or</span>
+                    </div>
 
-                <div class="auth-divider"><span>or continue with</span></div>
-
-                <button class="btn-social btn-google" onclick="handleGoogleLogin()">Google Login</button>
-                <button class="btn-social btn-facebook" onclick="handleFacebookLogin()">Facebook Login</button>
-
-                <div class="auth-divider"><span>or</span></div>
-
-                <!-- Phone OTP - AT THE BOTTOM -->
-                <div class="phone-otp-section">
-                    <p style="text-align: center; color: #666; font-size: 13px; margin-bottom: 15px;">Login with Phone Number (OTP)</p>
-                    <div class="form-group">
-                        <label>Phone Number</label>
-                        <div class="phone-input-wrap">
-                            <span class="phone-prefix">+94</span>
-                            <input type="tel" id="otp-phone" placeholder="771234567" maxlength="9" class="auth-input phone-input">
-                            <button class="btn-send-otp" id="send-otp-btn" onclick="sendOTP()">Send OTP</button>
+                    <div class="otp-section" style="margin-top: 16px;">
+                        <label for="otp-phone" style="display:block; font-weight:600; margin-bottom:8px; color: var(--text);">Login with Phone OTP</label>
+                        <div class="input-wrapper" style="margin-bottom: 12px;">
+                            <input type="text" id="otp-phone" placeholder="Enter phone number" style="width:100%; padding:12px 16px; border:1.1px solid var(--border-strong); border-radius:12px; font-size:1rem;" />
+                        </div>
+                        <button class="btn secondary" id="send-otp-btn" type="button">Send OTP</button>
+                        <div id="recaptcha-container" style="margin-top: 16px;"></div>
+                        <div id="otp-verification" style="display:none; margin-top:16px;">
+                            <div class="input-wrapper" style="margin-bottom: 12px;">
+                                <input type="text" id="otp-code" placeholder="Enter OTP" style="width:100%; padding:12px 16px; border:1.1px solid var(--border-strong); border-radius:12px; font-size:1rem;" />
+                            </div>
+                            <button class="btn secondary" id="verify-otp-btn" type="button">Verify OTP</button>
                         </div>
                     </div>
-                    <div class="form-group otp-verify-group" id="otp-verify-group" style="display:none">
-                        <label>Enter OTP</label>
-                        <input type="text" id="otp-code" placeholder="6-digit code" maxlength="6" class="auth-input otp-input">
-                        <button class="btn-auth-primary" onclick="verifyOTP()">Verify OTP</button>
-                    </div>
                 </div>
-
-                <!-- reCAPTCHA container for phone auth -->
-                <div id="recaptcha-container"></div>
-
-                <p class="auth-switch-text">
-                    Don't have an account?
-                    <a onclick="switchTab('register')">Register here</a>
-                </p>
+                <div class="switch-prompt" style="text-align: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(58,111,248,0.1);">
+                    <p style="margin: 0; color: var(--muted); font-size: 0.9rem;">Don't have an account?
+                        <button class="btn secondary" id="switch-to-register" type="button" style="display: inline; width: auto; padding: 4px 12px; margin-left: 8px; font-size: 0.9rem; min-height: auto;">Register</button>
+                    </p>
+                </div>
             </div>
 
-            <!-- REGISTER FORM -->
-            <div class="auth-form-panel" id="panel-register" style="display:none">
-                <h1 class="auth-title">Create Account</h1>
-                <p class="auth-subtitle">Start posting vehicle listings in minutes</p>
-
-                <div id="auth-error-reg" class="auth-error-msg"></div>
-
-                <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" id="reg-name" placeholder="Your full name" class="auth-input">
-                </div>
-                <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" id="reg-email" placeholder="you@example.com" class="auth-input">
-                </div>
-                <div class="form-group">
-                    <label>Phone Number</label>
-                    <div class="phone-input-wrap">
-                        <span class="phone-prefix">+94</span>
-                        <input type="tel" id="reg-phone" placeholder="771234567" maxlength="9" class="auth-input phone-input">
+            <div id="register-panel" class="panel hidden">
+                <h1>Create Account</h1>
+                <p>Register and start posting vehicle listings in minutes.</p>
+                <div class="form">
+                    <div class="input-wrapper">
+                        <input type="text" id="register-name" placeholder="Full Name" autocomplete="name" />
+                        <small id="register-name-error" class="error-message"></small>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <div class="input-password-wrap">
-                        <input type="password" id="reg-password" placeholder="Min 8 characters" class="auth-input">
-                        <button class="toggle-password" onclick="togglePassword('reg-password')">👁️</button>
+                    <div class="input-wrapper">
+                        <input type="email" id="register-email" placeholder="Email" autocomplete="email" />
+                        <small id="register-email-error" class="error-message"></small>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label>Confirm Password</label>
-                    <div class="input-password-wrap">
-                        <input type="password" id="reg-confirm" placeholder="Repeat your password" class="auth-input">
-                        <button class="toggle-password" onclick="togglePassword('reg-confirm')">👁️</button>
+                    <div class="input-wrapper">
+                        <input type="password" id="register-password" placeholder="Password" autocomplete="new-password" />
+                        <button type="button" class="toggle-password" data-target="register-password">👁️</button>
+                        <small id="register-password-error" class="error-message"></small>
                     </div>
+                    <div class="input-wrapper">
+                        <input type="password" id="register-confirm" placeholder="Confirm Password" autocomplete="new-password" />
+                        <button type="button" class="toggle-password" data-target="register-confirm">👁️</button>
+                        <small id="register-confirm-error" class="error-message"></small>
+                    </div>
+                    <button class="btn primary" id="register-submit" type="button">Register</button>
                 </div>
-
-                <label class="terms-check">
-                    <input type="checkbox" id="terms-agree">
-                    I agree to the
-                    <a href="#" target="_blank">Terms of Service</a>
-                    and
-                    <a href="#" target="_blank">Privacy Policy</a>
-                </label>
-
-                <button class="btn-auth-primary" id="register-btn" onclick="handleRegister()">Create Account</button>
-
-                <div class="auth-divider"><span>or register with</span></div>
-
-                <button class="btn-social btn-google" onclick="handleGoogleLogin()">Google Register</button>
-
-                <p class="auth-switch-text">
-                    Already have an account?
-                    <a onclick="switchTab('login')">Login here</a>
-                </p>
+                <div class="switch-prompt" style="text-align: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(58,111,248,0.1);">
+                    <p style="margin: 0; color: var(--muted); font-size: 0.9rem;">Already have an account?
+                        <button class="btn secondary" id="switch-to-login" type="button" style="display: inline; width: auto; padding: 4px 12px; margin-left: 8px; font-size: 0.9rem; min-height: auto;">Login</button>
+                    </p>
+                </div>
             </div>
 
-            <!-- SUCCESS STATE -->
-            <div class="auth-success" id="auth-success" style="display:none">
-                <div class="success-icon">✅</div>
-                <h2>You're logged in!</h2>
-                <p>Redirecting you now...</p>
-            </div>
-        </div>
-    </div>
 
     <script src="config.js"></script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, signInWithPhoneNumber, RecaptchaVerifier, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-        // ════════════════════════════════
-        // FIREBASE CONFIGURATION
-        // ════════════════════════════════
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
+        import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         const firebaseConfig = {
             apiKey: "AIzaSyD6APHZMfX39NE3D0QmqhM9CYcJLEYAq7A",
             authDomain: "muthupuralk.firebaseapp.com",
@@ -711,509 +681,562 @@
             measurementId: "G-SFW03YC9X1"
         };
 
+        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
         const auth = getAuth(app);
 
-        // ════════════════════════════════
-        // BACKEND URL - CRITICAL
-        // ════════════════════════════════
-        const API_BASE = API_BASE_URL || 'https://muthupura-lk.onrender.com';
-
+        let recaptchaVerifier = null;
         let confirmationResult = null;
 
-        // ════════════════════════════════
-        // TAB SWITCHING
-        // ════════════════════════════════
-        window.switchTab = function(tab) {
-            const panels = {
-                login:    document.getElementById('panel-login'),
-                register: document.getElementById('panel-register')
-            };
-            const tabs = {
-                login:    document.getElementById('tab-login'),
-                register: document.getElementById('tab-register')
-            };
-
-            Object.keys(panels).forEach(key => {
-                if (panels[key]) {
-                    panels[key].style.display = key === tab ? 'block' : 'none';
-                }
-                if (tabs[key]) {
-                    tabs[key].classList.toggle('active', key === tab);
-                }
-            });
-            clearError();
-        };
-
-        // ════════════════════════════════
-        // UI HELPERS
-        // ════════════════════════════════
-        function showError(message) {
-            let el = document.getElementById('auth-error');
-            if (!el) {
-                el = document.createElement('div');
-                el.id = 'auth-error';
-                el.className = 'auth-error-msg';
-                const activePanel = document.querySelector('.auth-form-panel:not([style*="none"])');
-                if (activePanel) activePanel.prepend(el);
-            }
-            el.style.display = 'flex';
-            el.innerHTML = '⚠️ ' + message;
-        }
-
-        function clearError() {
-            const el = document.getElementById('auth-error');
-            if (el) {
-                el.style.display = 'none';
-                el.innerHTML = '';
-            }
-        }
-
-        function setButtonLoading(btnId, isLoading, originalText) {
-            const btn = document.getElementById(btnId);
-            if (!btn) return;
-            btn.disabled = isLoading;
-            if (isLoading) {
-                btn.dataset.originalText = btn.textContent;
-                btn.innerHTML = `
-                    <span style="display:inline-flex;align-items:center;gap:8px">
-                        <span style="width:16px;height:16px;border:2px solid rgba(255,255,255,0.35);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;"></span>
-                        Please wait...
-                    </span>`;
-            } else {
-                btn.textContent = originalText || btn.dataset.originalText || 'Submit';
-            }
-        }
-
-        function showSuccessAndRedirect(userData, token) {
-            if (token) localStorage.setItem('authToken', token);
-            if (userData) {
-                localStorage.setItem('userData', JSON.stringify(userData));
+        function initRecaptcha() {
+            if (window.recaptchaVerifier) {
+                console.log('✅ RecaptchaVerifier already initialized');
+                recaptchaVerifier = window.recaptchaVerifier;
+                return;
             }
 
-        // ============================================
-        // AFTER LOGIN SUCCESS
-        // ============================================
-        function onLoginSuccess(userData, token) {
-            // ✅ FIXED: Set localStorage keys that auth-ui.js expects
-            localStorage.setItem('jwt_token', token);
-            localStorage.setItem('user_role', userData.is_admin ? 'admin' : 'user');
-            localStorage.setItem('user_name', userData.name || userData.email || 'User');
-            localStorage.setItem('userData', JSON.stringify(userData)); // Keep for backward compatibility
-
-            let successEl = document.getElementById('auth-success');
-            if (!successEl) {
-                successEl = document.createElement('div');
-                successEl.id = 'auth-success';
-                successEl.style.cssText = 'text-align:center;padding:60px 20px;';
-                const authRight = document.querySelector('.auth-right');
-                if (authRight) authRight.appendChild(successEl);
-            }
-            successEl.innerHTML = `
-                <div style="font-size:56px;margin-bottom:16px">✅</div>
-                <h2 style="font-size:22px;font-weight:800;color:#1e2a4a;margin-bottom:8px;font-family:Poppins">You're logged in!</h2>
-                <p style="color:#64748b;font-family:Poppins;font-size:14px">Redirecting you now...</p>
-            `;
-            successEl.style.display = 'block';
-
-            setTimeout(() => {
-                const redirect = sessionStorage.getItem('redirectAfterLogin');
-                sessionStorage.removeItem('redirectAfterLogin');
-                window.location.href = redirect || 'index.html';
-            }, 1500);
-        }
-
-        window.togglePassword = function(inputId) {
-            const input = document.getElementById(inputId);
-            if (!input) return;
-            input.type = input.type === 'password' ? 'text' : 'password';
-        };
-
-        // ════════════════════════════════
-        // SYNC USER TO BACKEND DB
-        // ════════════════════════════════
-        async function syncUserToBackend(idToken, extraData = {}) {
             try {
-                const email = document.querySelector("#email").value.trim();
-                const password = document.querySelector("#password").value.trim();
-
-                if (!email || !password) {
-                    showError("Please fill all fields");
-                    return;
-                }
-
-                setLoading('login-btn', true, 'Logging in...');
-
-                const res = await fetch(`${API_BASE}/login`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
+                console.log('🔏 Initializing RecaptchaVerifier...');
+                window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+                    size: 'normal',
+                    callback: (response) => {
+                        console.log('✅ Recaptcha verified successfully');
                     },
+                    onExpired: () => {
+                        console.warn('⚠️ Recaptcha expired, will re-initialize on next OTP attempt');
+                        window.recaptchaVerifier = null;                        window.recaptchaVerifier = null;                    }
+                }, auth);
+                recaptchaVerifier = window.recaptchaVerifier;
+
+                console.log('✅ RecaptchaVerifier initialized successfully');
+            } catch (err) {
+                console.error('❌ RecaptchaVerifier initialization failed:', err);
+                recaptchaVerifier = null;
+                window.recaptchaVerifier = null;
+                throw err;
+            }
+        }
+
+        // Initialize recaptcha once Firebase is loaded
+        try {
+            initRecaptcha();
+        } catch (err) {
+            console.warn('⚠️ Recaptcha will initialize on first OTP attempt:', err.message);
+        }
+
+        const API_URL = API_BASE_URL;
+        const getEl = (id) => document.getElementById(id);
+
+        function getToken() {
+            return localStorage.getItem('token');
+        }
+
+        function setToken(token, userName) {
+            if (token) {
+                localStorage.setItem('token', token);
+            }
+            if (userName) {
+                localStorage.setItem('userName', userName);
+            }
+        }
+
+        function clearToken() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userName');
+        }
+
+        function updateNav(user) {
+            const adminLink = getEl('admin-link');
+            const userGreeting = getEl('user-greeting');
+            const logoutBtn = getEl('logout-btn');
+
+            if (user) {
+                if (userGreeting) {
+                    userGreeting.textContent = `Hello, ${user.name || user.email}`;
+                    userGreeting.style.display = 'inline-flex';
+                }
+                if (logoutBtn) logoutBtn.style.display = 'inline-flex';
+                if (adminLink) adminLink.style.display = user.role === 'admin' ? 'inline-flex' : 'none';
+            } else {
+                if (userGreeting) userGreeting.style.display = 'none';
+                if (logoutBtn) logoutBtn.style.display = 'none';
+                if (adminLink) adminLink.style.display = 'none';
+            }
+        }
+
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function showFieldError(id, message) {
+            const el = getEl(id);
+            if (el) {
+                el.textContent = message;
+                el.style.display = message ? 'block' : 'none';
+            }
+        }
+
+        function clearFieldErrors() {
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.textContent = '';
+                el.style.display = 'none';
+            });
+        }
+
+        function showAlert(message, type = 'error') {
+            const alertBox = getEl('alert-box');
+            if (!alertBox) return;
+            alertBox.textContent = message;
+            alertBox.className = `alert ${type}`;
+            alertBox.style.display = 'block';
+        }
+
+        function hideAlert() {
+            const alertBox = getEl('alert-box');
+            if (alertBox) alertBox.style.display = 'none';
+        }
+
+        function setMode(mode) {
+            const isLogin = mode === 'login';
+            const loginPanel = getEl('login-panel');
+            const registerPanel = getEl('register-panel');
+            const loginBtn = getEl('login-mode-btn');
+            const registerBtn = getEl('register-mode-btn');
+            
+            if (isLogin) {
+                if (loginPanel) loginPanel.classList.add('active');
+                if (loginPanel) loginPanel.classList.remove('hidden');
+                if (registerPanel) registerPanel.classList.remove('active');
+                if (registerPanel) registerPanel.classList.add('hidden');
+                if (loginBtn) loginBtn.classList.add('active');
+                if (registerBtn) registerBtn.classList.remove('active');
+            } else {
+                if (registerPanel) registerPanel.classList.add('active');
+                if (registerPanel) registerPanel.classList.remove('hidden');
+                if (loginPanel) loginPanel.classList.remove('active');
+                if (loginPanel) loginPanel.classList.add('hidden');
+                if (registerBtn) registerBtn.classList.add('active');
+                if (loginBtn) loginBtn.classList.remove('active');
+            }
+            hideAlert();
+            clearFieldErrors();
+        }
+
+        async function performLogin(email, password, redirect = true) {
+            try {
+                console.log('Calling API:', API_BASE_URL);
+                const res = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
-                
+
+                const data = await res.json();
                 if (!res.ok) {
-                    const errData = await res.json().catch(() => ({}));
-                    if (res.status === 409) {
-                        return { success: true, existing: true };
-                    }
-                    throw new Error(errData.message || `Server error ${res.status}`);
+                    showAlert(data.message || 'Login failed', 'error');
+                    return false;
                 }
 
-                // ✅ FIXED: Save auth state in format auth-ui.js expects
-                localStorage.setItem("user", JSON.stringify(data.user));
-                localStorage.setItem("jwt_token", data.token);
-                localStorage.setItem("user_role", data.user.is_admin ? "admin" : "user");
-                localStorage.setItem("user_name", data.user.name || data.user.email || "User");
+                setToken(data.token, data.user?.name || '');
+                const role = data.role || data.user?.role || 'user';
+                updateNav(data.user || { role });
+                showAlert('Login successful! Redirecting...', 'success');
 
-                // Show success message
-                document.getElementById('panel-login').style.display = 'none';
-                document.getElementById('panel-register').style.display = 'none';
-                document.getElementById('auth-success').style.display = 'block';
+                if (redirect) {
+                    setTimeout(() => {
+                        if (role === 'admin') {
+                            window.location.href = 'admin.html';
+                        } else {
+                            window.location.href = 'index.html';
+                        }
+                    }, 700);
+                }
 
-                // Redirect
-                setTimeout(() => {
-                    if (data.user.is_admin) {
-                        window.location.href = "admin.html";
-                    } else {
-                        window.location.href = "index.html";
-                    }
-                }, 1500);
-
-            } catch (err) {
-                console.error(err);
-                showError(err.message);
-                setLoading('login-btn', false, 'Login');
+                return true;
+            } catch (error) {
+                console.error('Login request error:', error);
+                showAlert('Unable to login now.', 'error');
+                return false;
             }
         }
 
-        // ════════════════════════════════
-        // EMAIL / PASSWORD LOGIN
-        // ════════════════════════════════
-        window.handleEmailLogin = async function() {
-            clearError();
-
-            const emailEl = document.getElementById('login-email');
-            const passwordEl = document.getElementById('login-password');
-
-            if (!emailEl || !passwordEl) {
-                showError('Form elements not found. Please refresh.');
-                return;
-            }
-
-            const email = emailEl.value.trim();
-            const password = passwordEl.value;
-
-            if (!email) {
-                showError('Please enter your email address.');
-                emailEl.focus();
-                return;
-            }
-            if (!password) {
-                showError('Please enter your password.');
-                passwordEl.focus();
-                return;
-            }
-
-            setButtonLoading('login-btn', true);
-
-            try {
-                const userCred = await signInWithEmailAndPassword(auth, email, password);
-                const idToken = await userCred.user.getIdToken();
-                const userData = {
-                    name: userCred.user.displayName || email.split('@')[0],
-                    email: userCred.user.email,
-                    uid: userCred.user.uid
-                };
-
-                syncUserToBackend(idToken, userData);
-                showSuccessAndRedirect(userData, idToken);
-
-            } catch (err) {
-                console.error('Email login error:', err.code, err.message);
-
-                const friendlyErrors = {
-                    'auth/user-not-found': 'No account found with this email. Please register.',
-                    'auth/wrong-password': 'Incorrect password. Please try again.',
-                    'auth/invalid-email': 'Please enter a valid email address.',
-                    'auth/invalid-credential': 'Invalid email or password. Please check and try again.',
-                    'auth/too-many-requests': 'Too many failed attempts. Please wait a few minutes.',
-                    'auth/user-disabled': 'This account has been disabled. Contact support.',
-                    'auth/network-request-failed': 'Network error. Please check your internet connection.'
-                };
-
-                showError(friendlyErrors[err.code] || err.message);
-                setButtonLoading('login-btn', false, 'Login');
-            }
-        };
-
-        // ════════════════════════════════
-        // REGISTER
-        // ════════════════════════════════
-        window.handleRegister = async function() {
-            clearError();
-
-            const name = document.getElementById('reg-name')?.value.trim();
-            const email = document.getElementById('reg-email')?.value.trim();
-            const phone = document.getElementById('reg-phone')?.value.trim();
-            const password = document.getElementById('reg-password')?.value;
-            const confirm = document.getElementById('reg-confirm')?.value;
-            const agreed = document.getElementById('terms-agree')?.checked;
-
-            if (!name) {
-                showError('Please enter your full name.');
-                return;
-            }
-            if (!email) {
-                showError('Please enter your email address.');
-                return;
-            }
-            if (!password) {
-                showError('Please enter a password.');
-                return;
-            }
-            if (password.length < 8) {
-                showError('Password must be at least 8 characters long.');
-                return;
-            }
-            if (password !== confirm) {
-                showError('Passwords do not match. Please check again.');
-                return;
-            }
-            if (agreed === false) {
-                showError('Please agree to the Terms of Service to continue.');
-                return;
-            }
-
-            setButtonLoading('register-btn', true, 'Creating Account...');
-
-            try {
-                const userCred = await createUserWithEmailAndPassword(auth, email, password);
-                await userCred.user.updateProfile({ displayName: name });
-
-                const idToken = await userCred.user.getIdToken();
-                const userData = {
-                    name,
-                    email,
-                    phone: phone || '',
-                    uid: userCred.user.uid
-                };
-
-                const backendRes = await syncUserToBackend(idToken, userData);
-
-                if (backendRes && backendRes.success === false) {
-                    await userCred.user.delete();
-                    throw new Error(backendRes.message || 'Registration failed');
-                }
-
-                showSuccessAndRedirect(userData, idToken);
-
-            } catch (err) {
-                console.error('Register error:', err.code, err.message);
-
-                const friendlyErrors = {
-                    'auth/email-already-in-use': 'An account with this email already exists. Try logging in.',
-                    'auth/weak-password': 'Password is too weak. Use at least 8 characters.',
-                    'auth/invalid-email': 'Please enter a valid email address.',
-                    'auth/network-request-failed': 'Network error. Please check your internet connection.'
-                };
-
-                showError(friendlyErrors[err.code] || err.message);
-                setButtonLoading('register-btn', false, 'Create Account');
-            }
-        };
-
-        // ════════════════════════════════
-        // GOOGLE LOGIN
-        // ════════════════════════════════
-        window.handleGoogleLogin = async function() {
-            clearError();
-            try {
-                const provider = new GoogleAuthProvider();
-                provider.setCustomParameters({ prompt: 'select_account' });
-
-                const result = await signInWithPopup(auth, provider);
-                const idToken = await result.user.getIdToken();
-                const userData = {
-                    name: result.user.displayName || '',
-                    email: result.user.email || '',
-                    uid: result.user.uid,
-                    provider: 'google'
-                };
-
-                await syncUserToBackend(idToken, userData);
-                showSuccessAndRedirect(userData, idToken);
-
-            } catch (err) {
-                console.error('Google login error:', err);
-                if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') return;
-                showError(err.message || 'Google login failed. Try again.');
-            }
-        };
-
-        // ════════════════════════════════
-        // FACEBOOK LOGIN
-        // ════════════════════════════════
-        window.handleFacebookLogin = async function() {
-            clearError();
-            try {
-                const provider = new FacebookAuthProvider();
-                provider.addScope('email');
-
-                const result = await signInWithPopup(auth, provider);
-                const idToken = await result.user.getIdToken();
-                const userData = {
-                    name: result.user.displayName || '',
-                    email: result.user.email || '',
-                    uid: result.user.uid,
-                    provider: 'facebook'
-                };
-
-                await syncUserToBackend(idToken, userData);
-                showSuccessAndRedirect(userData, idToken);
-
-            } catch (err) {
-                console.error('Facebook login error:', err);
-                if (err.code === 'auth/popup-closed-by-user') return;
-                showError(err.message || 'Facebook login failed. Try again.');
-            }
-        };
-
-        // ════════════════════════════════
-        // PHONE OTP
-        // ════════════════════════════════
-        window.sendOTP = function() {
-            clearError();
-            const phoneInput = document.getElementById('otp-phone');
-            if (!phoneInput) return;
-
-            const raw = phoneInput.value.trim().replace(/^0/, '');
-            if (!raw || raw.length < 9) {
-                showError('Please enter a valid 9-digit phone number.');
-                return;
-            }
-
-            const phoneNumber = '+94' + raw;
-            const sendBtn = document.getElementById('send-otp-btn');
-
-            if (!window.recaptchaVerifier) {
-                window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-                    size: 'invisible',
-                    callback: () => { console.log('reCAPTCHA solved'); }
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Navbar element:', getEl('navbar'));
+            const googleBtn = getEl('google-login-btn');
+            if (googleBtn) {
+                googleBtn.addEventListener('click', () => {
+                    window.open(`${API_URL}/auth/google`, 'GoogleAuth', 'width=500,height=650');
                 });
             }
 
-            if (sendBtn) {
-                sendBtn.disabled = true;
-                sendBtn.textContent = 'Sending...';
+            const facebookBtn = getEl('facebook-login-btn');
+            if (facebookBtn) {
+                facebookBtn.addEventListener('click', () => {
+                    window.open(`${API_URL}/auth/facebook`, 'FacebookAuth', 'width=500,height=650');
+                });
             }
 
-            signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier)
-                .then(result => {
-                    confirmationResult = result;
-                    const verifyGroup = document.getElementById('otp-verify-group');
-                    if (verifyGroup) verifyGroup.style.display = 'block';
-                    if (sendBtn) {
-                        sendBtn.textContent = 'Resend';
-                        sendBtn.disabled = false;
+            const sendOtpBtn = getEl('send-otp-btn');
+            if (sendOtpBtn) {
+                sendOtpBtn.addEventListener('click', async () => {
+                    const phoneEl = getEl('otp-phone');
+                    const rawPhone = phoneEl?.value.trim() || '';
+
+                    if (!rawPhone || !/^\+?[0-9]{7,15}$/.test(rawPhone)) {
+                        showAlert('Please enter a valid phone number including country code (e.g., +94712345678)', 'error');
+                        return;
                     }
-                    console.log('OTP sent to', phoneNumber);
-                })
-                .catch(err => {
-                    console.error('OTP send error:', err);
-                    showError('Failed to send OTP: ' + err.message);
-                    if (sendBtn) {
-                        sendBtn.textContent = 'Send OTP';
-                        sendBtn.disabled = false;
-                    }
-                    if (window.recaptchaVerifier) {
-                        window.recaptchaVerifier.clear();
+
+                    try {
+                        console.log('📱 Sending OTP for phone:', rawPhone);
+
+                        if (!recaptchaVerifier || !window.recaptchaVerifier) {
+                            console.log('🔏 RecaptchaVerifier not ready, reinitializing...');
+                            initRecaptcha();
+                        }
+
+                        showAlert('Sending OTP...', 'success');
+                        console.log('📤 Calling signInWithPhoneNumber...');
+
+                        confirmationResult = await signInWithPhoneNumber(auth, rawPhone, recaptchaVerifier);
+
+                        console.log('✅ OTP sent successfully');
+                        showAlert('✅ OTP sent via Firebase. Check your phone.', 'success');
+                        const otpVerificationEl = getEl('otp-verification');
+                        if (otpVerificationEl) otpVerificationEl.style.display = 'block';
+                    } catch (err) {
+                        console.error('❌ Firebase OTP error:', err);
+                        console.error('Error code:', err.code);
+                        console.error('Error message:', err.message);
+
+                        recaptchaVerifier = null;
                         window.recaptchaVerifier = null;
+                        confirmationResult = null;
+
+                        let errorMsg = 'Unable to send OTP. Please try again.';
+                        if (err.code === 'auth/invalid-phone-number') {
+                            errorMsg = 'Invalid phone number. Please include country code (e.g., +94712345678)';
+                        } else if (err.code === 'auth/quota-exceeded') {
+                            errorMsg = 'Too many attempts. Please try again later.';
+                        } else if (err.code === 'auth/internal-error') {
+                            errorMsg = 'Firebase service error. Please check your phone number and try again.';
+                        }
+
+                        showAlert(errorMsg, 'error');
                     }
                 });
-        };
-
-        window.verifyOTP = async function() {
-            clearError();
-            const code = document.getElementById('otp-code')?.value.trim();
-
-            if (!code || code.length < 6) {
-                showError('Please enter the 6-digit OTP code.');
-                return;
-            }
-            if (!confirmationResult) {
-                showError('Please request an OTP first.');
-                return;
             }
 
-            try {
-                const result = await confirmationResult.confirm(code);
-                const idToken = await result.user.getIdToken();
-                const phone = result.user.phoneNumber;
+            const verifyOtpBtn = getEl('verify-otp-btn');
+            if (verifyOtpBtn) {
+                verifyOtpBtn.addEventListener('click', async () => {
+                    const otpInput = getEl('otp-code');
+                    const otp = otpInput?.value.trim() || '';
 
-                const userData = { phone, uid: result.user.uid };
-                await syncUserToBackend(idToken, { phone, provider: 'phone' });
-                showSuccessAndRedirect(userData, idToken);
+                    if (!otp || otp.length < 6) {
+                        showAlert('Please enter the 6-digit OTP code', 'error');
+                        return;
+                    }
 
-            } catch (err) {
-                const msgs = {
-                    'auth/invalid-verification-code': 'Wrong OTP code. Please check and try again.',
-                    'auth/code-expired': 'OTP has expired. Please request a new one.'
-                };
-                showError(msgs[err.code] || 'Verification failed: ' + err.message);
+                    if (!confirmationResult) {
+                        showAlert('⚠️ OTP session expired. Press Send OTP again.', 'error');
+                        const otpVerificationEl = getEl('otp-verification');
+                        if (otpVerificationEl) otpVerificationEl.style.display = 'none';
+                        recaptchaVerifier = null;
+                        window.recaptchaVerifier = null;
+                        return;
+                    }
+
+                    try {
+                        console.log('🔐 Verifying OTP...');
+                        const result = await confirmationResult.confirm(otp);
+                        const firebasePhone = result.user?.phoneNumber;
+
+                        console.log('✅ OTP verified successfully');
+                        console.log('Firebase phone:', firebasePhone);
+
+                        if (!firebasePhone) {
+                            console.error('❌ No phone number from Firebase');
+                            showAlert('Could not determine phone from Firebase account', 'error');
+                            return;
+                        }
+
+                        console.log('📤 Logging in with phone:', firebasePhone);
+                        console.log('Calling API:', API_BASE_URL);
+                        const res = await fetch(`${API_URL}/otp-login`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ phone: firebasePhone })
+                        });
+
+                        const data = await res.json();
+                        if (!res.ok) {
+                            showAlert(data.message || 'OTP login failed', 'error');
+                            return;
+                        }
+
+                        if (data.isNewUser) {
+                            console.log('📋 New user detected, redirecting to complete profile');
+                            localStorage.setItem('pendingPhone', data.phone || firebasePhone.replace(/\D/g, ''));
+                            showAlert('Phone verified. Complete profile to continue.', 'success');
+                            setTimeout(() => {
+                                window.location.href = 'complete-profile.html';
+                            }, 700);
+                            return;
+                        }
+
+                        console.log('✅ OTP login successful');
+                        setToken(data.token, data.user?.name || '');
+                        updateNav(data.user || { role: data.role || 'user' });
+                        showAlert('Login successful! Redirecting...', 'success');
+                        setTimeout(() => {
+                            if (data.role === 'admin') {
+                                window.location.href = 'admin.html';
+                            } else {
+                                window.location.href = 'index.html';
+                            }
+                        }, 700);
+                    } catch (err) {
+                        console.error('❌ OTP verification failed:', err);
+                        console.error('Error code:', err.code);
+                        console.error('Error message:', err.message);
+
+                        let errorMsg = 'OTP verification failed. Check code and try again.';
+                        if (err.code === 'auth/invalid-verification-code') {
+                            errorMsg = 'Invalid OTP code. Please check and try again.';
+                        } else if (err.code === 'auth/code-expired') {
+                            errorMsg = 'OTP has expired. Press Send OTP to get a new code.';
+                        }
+
+                        showAlert(errorMsg, 'error');
+                    }
+                });
             }
-        };
 
-        // ════════════════════════════════
-        // FORGOT PASSWORD
-        // ============================================
-        async function showForgotPassword() {
-            const email = document.getElementById('email').value.trim();
-            const emailToReset = email || prompt('Enter your email address to reset password:');
-            
-            if (!emailToReset) return;
+            const loginModeBtn = getEl('login-mode-btn');
+            if (loginModeBtn) loginModeBtn.addEventListener('click', () => setMode('login'));
+            const registerModeBtn = getEl('register-mode-btn');
+            if (registerModeBtn) registerModeBtn.addEventListener('click', () => setMode('register'));
+            const switchToRegister = getEl('switch-to-register');
+            if (switchToRegister) switchToRegister.addEventListener('click', () => setMode('register'));
+            const switchToLogin = getEl('switch-to-login');
+            if (switchToLogin) switchToLogin.addEventListener('click', () => setMode('login'));
 
-            try {
-                await sendPasswordResetEmail(auth, target);
-                alert('✅ Password reset email sent! Please check your inbox.');
-            } catch (err) {
-                showError('Could not send reset email: ' + err.message);
+            const loginSubmit = getEl('login-submit');
+            if (loginSubmit) {
+                loginSubmit.addEventListener('click', async () => {
+                    const email = (getEl('login-email')?.value || '').trim();
+                    const password = getEl('login-password')?.value || '';
+
+                    hideAlert();
+                    clearFieldErrors();
+
+                    let isValid = true;
+                    if (!email || !isValidEmail(email)) {
+                        showFieldError('login-email-error', 'Invalid email format');
+                        isValid = false;
+                    }
+                    if (!password) {
+                        showFieldError('login-password-error', 'Password is required');
+                        isValid = false;
+                    }
+
+                    if (!isValid) {
+                        return showAlert('Please correct the highlighted fields', 'error');
+                    }
+
+                    await performLogin(email, password, true);
+                });
             }
-        };
 
-        // ════════════════════════════════
-        // AUTO REDIRECT IF ALREADY LOGGED IN
-        // ════════════════════════════════
-        onAuthStateChanged(auth, user => {
-            if (user) {
-                const redirect = sessionStorage.getItem('redirectAfterLogin');
-                sessionStorage.removeItem('redirectAfterLogin');
-                window.location.href = redirect || 'index.html';
+            const registerSubmit = getEl('register-submit');
+            if (registerSubmit) {
+                registerSubmit.addEventListener('click', async () => {
+                    const name = (getEl('register-name')?.value || '').trim();
+                    const email = (getEl('register-email')?.value || '').trim();
+                    const password = getEl('register-password')?.value || '';
+                    const confirm = getEl('register-confirm')?.value || '';
+
+                    hideAlert();
+                    clearFieldErrors();
+
+                    let isValid = true;
+                    if (!name) {
+                        showFieldError('register-name-error', 'Name is required');
+                        isValid = false;
+                    }
+                    if (!email || !isValidEmail(email)) {
+                        showFieldError('register-email-error', 'Invalid email format');
+                        isValid = false;
+                    }
+                    if (!password || password.length < 8) {
+                        showFieldError('register-password-error', 'Password must be at least 8 characters');
+                        isValid = false;
+                    }
+                    if (password !== confirm) {
+                        showFieldError('register-confirm-error', 'Passwords do not match');
+                        isValid = false;
+                    }
+
+                    if (!isValid) {
+                        return showAlert('Please fix errors before continuing', 'error');
+                    }
+
+                    try {
+                        console.log('Calling API:', API_BASE_URL);
+                        const res = await fetch(`${API_URL}/register`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name, email, password })
+                        });
+
+                        const data = await res.json();
+                        if (!res.ok) {
+                            showAlert(data.message || 'Registration failed', 'error');
+                            return;
+                        }
+
+                        showAlert('Registration successful! Logging in...', 'success');
+                        const loggedIn = await performLogin(email, password, true);
+                        if (!loggedIn) {
+                            setMode('login');
+                        }
+                    } catch (error) {
+                        console.error('Register request error:', error);
+                        showAlert('Unable to register now.', 'error');
+                    }
+                });
+            }
+
+            document.querySelectorAll('.toggle-password').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetId = btn.dataset.target;
+                    const input = getEl(targetId);
+                    if (!input) return;
+                    const hidden = input.type === 'password';
+                    input.type = hidden ? 'text' : 'password';
+                    btn.textContent = hidden ? '🙈' : '👁️';
+                });
+            });
+
+            const logoutBtn = getEl('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    clearToken();
+                    updateNav(null);
+                    window.location.href = 'index.html';
+                });
+            }
+
+            const mobileLogoutBtn = getEl('logout-btn-mobile');
+            if (mobileLogoutBtn) {
+                mobileLogoutBtn.addEventListener('click', () => {
+                    clearToken();
+                    updateNav(null);
+                    window.location.href = 'index.html';
+                });
+            }
+
+            setMode('login');
+            checkSession();
+            setTimeout(setupHamburgerMenu, 100);
+        });
+
+        window.addEventListener('message', (event) => {
+            if (!event.data || !event.data.token) return;
+            setToken(event.data.token);
+            updateNav(event.data.user || { role: event.data.role || 'user' });
+            if (event.data.role === 'admin') {
+                window.location.href = 'admin.html';
+            } else {
+                window.location.href = 'index.html';
             }
         });
 
-        // ============================================
-        // EXPOSE FUNCTIONS TO WINDOW/GLOBAL SCOPE
-        // ============================================
-        window.switchTab = switchTab;
-        window.performLogin = performLogin;
-        window.handleRegister = handleRegister;
-        window.handleGoogleLogin = handleGoogleLogin;
-        window.handleFacebookLogin = handleFacebookLogin;
-        window.togglePassword = togglePassword;
-        window.sendOTP = sendOTP;
-        window.verifyOTP = verifyOTP;
-        window.showForgotPassword = showForgotPassword;
-        window.clearError = clearError;
-        window.showError = showError;
-        
-        // ============================================
-        // EXPOSE WINDOW FUNCTIONS TO GLOBAL SCOPE
-        // ============================================
-    }
-    </script>
+        async function checkSession() {
+            const token = getToken();
+            if (!token) {
+                return updateNav(null);
+            }
 
-    <!-- ✅ Auth UI Manager - Handles login state display -->
-    <script src="auth-ui.js"></script>
+            try {
+                console.log('Calling API:', API_BASE_URL);
+                const res = await fetch(`${API_URL}/me`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!res.ok) {
+                    clearToken();
+                    updateNav(null);
+                    setMode('login');
+                    return;
+                }
+
+                const data = await res.json();
+                updateNav(data.user);
+                if (window.location.pathname.endsWith('login.html')) {
+                    if (data.user?.role === 'admin') {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                }
+            } catch (err) {
+                console.error('Session check failed', err);
+                clearToken();
+                updateNav(null);
+                setMode('login');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const logoutBtn = getEl('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    clearToken();
+                    updateNav(null);
+                    window.location.href = 'index.html';
+                });
+            }
+
+            const mobileLogoutBtn = getEl('logout-btn-mobile');
+            if (mobileLogoutBtn) {
+                mobileLogoutBtn.addEventListener('click', () => {
+                    clearToken();
+                    updateNav(null);
+                    window.location.href = 'index.html';
+                });
+            }
+
+            setMode('login');
+            checkSession();
+            setTimeout(setupHamburgerMenu, 100);
+        });
+
+        // ===== HAMBURGER MENU =====
+        function setupHamburgerMenu() {
+            const hamburger = getEl('navbar-hamburger');
+            const mobileMenu = getEl('mobile-menu');
+            if (!hamburger || !mobileMenu) return;
+
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+            });
+
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburger.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                });
+            });
+        }
+
+        setTimeout(setupHamburgerMenu, 100);
+    </script>
 </body>
 </html>

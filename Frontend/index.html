@@ -1242,7 +1242,7 @@
             grid-template-columns: repeat(4, 1fr);
             gap: 22px;
             padding: 8px 0 40px;
-            align-items: stretch;
+            align-items: start;
             width: 100%;
         }
 
@@ -1260,7 +1260,7 @@
         @media (max-width: 520px) {
             .vehicles-grid {
                 grid-template-columns: 1fr;
-                gap: 14px;
+                gap: 16px;
             }
         }
 
@@ -1270,7 +1270,7 @@
             grid-template-columns: repeat(4, 1fr);
             gap: 22px;
             padding: 8px 0 40px;
-            align-items: stretch;
+            align-items: start;
             opacity: 0;
             transform: translateY(16px);
             transition: opacity 0.3s ease, transform 0.3s ease;
@@ -1299,7 +1299,7 @@
         @media (max-width: 520px) {
             .vehicle-grid {
                 grid-template-columns: 1fr;
-                gap: 14px;
+                gap: 16px;
             }
         }
 
@@ -1507,7 +1507,6 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
-            min-height: 0;
         }
 
         .card-title {
@@ -1518,7 +1517,6 @@
             margin: 0;
             display: -webkit-box;
             -webkit-line-clamp: 2;
-            line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
             font-family: Poppins;
@@ -1583,14 +1581,8 @@
             align-items: center;
             justify-content: space-between;
             padding: 12px 16px 14px;
-            margin-top: auto;
-            border-top: 1px solid rgba(226, 232, 245, 0.7);
-            gap: 8px;
-            min-height: 58px;
-            flex-shrink: 0;
-            overflow: hidden;
-            width: 100%;
-            box-sizing: border-box;
+            margin-top: 10px;
+            border-top: 1px solid rgba(226,232,245,0.7);
         }
 
         .card-seller {
@@ -1598,8 +1590,6 @@
             align-items: center;
             gap: 8px;
             min-width: 0;
-            flex: 1;
-            overflow: hidden;
         }
 
         .seller-avatar {
@@ -1634,8 +1624,6 @@
             flex-direction: column;
             gap: 1px;
             min-width: 0;
-            overflow: hidden;
-            flex: 1;
         }
 
         .seller-name {
@@ -1645,8 +1633,6 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 100%;
-            display: block;
         }
 
         .card-seller-name {
@@ -1661,7 +1647,6 @@
             align-items: center;
             gap: 2px;
             font-weight: 500;
-            white-space: nowrap;
         }
 
         .seller-verified svg {
@@ -1670,10 +1655,9 @@
 
         .card-actions {
             display: flex;
-            gap: 6px;
+            gap: 7px;
             align-items: center;
             flex-shrink: 0;
-            margin-left: 8px;
         }
 
         /* WhatsApp icon button */
@@ -1706,17 +1690,16 @@
             color: white;
             border: none;
             border-radius: 10px;
-            padding: 7px 12px;
-            font-size: 12px;
+            padding: 7px 14px;
+            font-size: 12.5px;
             font-weight: 700;
             font-family: Poppins;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 3px;
+            gap: 4px;
             transition: all 0.22s ease;
             white-space: nowrap;
-            flex-shrink: 0;
             cursor: pointer;
         }
         .btn-view:hover {
@@ -2322,7 +2305,48 @@
 
     <div id="loader"></div>
 
-    <!-- Navbar will be injected by navbar.js -->
+    <!-- Premium Navbar -->
+    <nav class="premium-navbar" id="navbar">
+        <div class="navbar-container">
+            <div class="navbar-left">
+                <a href="index.html" class="navbar-logo">
+                    <img src="logo.PNG" alt="Muthupura.lk" class="navbar-logo-img">
+                    <span class="navbar-brand-text">Muthupura.lk</span>
+                </a>
+            </div>
+
+            <div class="navbar-center" id="navbar-center">
+                <a href="index.html" class="nav-link" data-page="home">Home</a>
+                <a href="post.html" class="nav-link" data-page="post">Post Ad</a>
+                <a href="dashboard.html" class="nav-link" id="mylistings-link" data-page="dashboard" style="display:none;">My Listings</a>
+                <a href="about.html" class="nav-link" data-page="about">About Us</a>
+                <a href="contact.html" class="nav-link" data-page="contact">Contact Us</a>
+            </div>
+
+            <div class="navbar-right">
+                <span id="user-greeting" class="user-greeting" style="display:none;"></span>
+                <a href="login.html" class="nav-link-auth" id="auth-link">Login</a>
+                <a href="admin.html" class="nav-link-admin" id="admin-link" style="display:none;">Admin</a>
+            </div>
+
+            <button class="hamburger-menu" id="hamburger-btn" aria-label="Toggle menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="mobile-menu-dropdown" id="mobile-menu">
+        <a href="index.html" class="mobile-menu-link" data-page="home">Home</a>
+        <a href="post.html" class="mobile-menu-link" data-page="post">Post Ad</a>
+        <a href="dashboard.html" class="mobile-menu-link" id="mylistings-link-mobile" data-page="dashboard" style="display:none;">My Listings</a>
+        <a href="about.html" class="mobile-menu-link" data-page="about">About Us</a>
+        <a href="contact.html" class="mobile-menu-link" data-page="contact">Contact Us</a>
+        <div class="mobile-menu-divider"></div>
+        <a href="login.html" class="mobile-menu-link mobile-menu-auth" id="auth-link-mobile">Login</a>
+        <a href="admin.html" class="mobile-menu-link mobile-menu-admin" id="admin-link-mobile" style="display:none;">Admin</a>
+    </div>
 
     <!-- Hero Section (PART A) -->
     <section class="hero-section">
@@ -2373,9 +2397,9 @@
         </div>
     </section>
 
-    <!-- Filter Section 2.0-->
+    <!-- Filter Section -->
     <div class="filter-section-wrapper" id="filter-section-wrapper">
-        <div class="filter-container"></div>
+        <div class="filter-container">
             <div class="quick-filter-pills">
                 <button class="quick-filter-btn" onclick="setVehicleType('Car')">🚗 Cars</button>
                 <button class="quick-filter-btn" onclick="setVehicleType('Bike')">🏍️ Bikes</button>
@@ -3044,144 +3068,6 @@
     </footer>
 
     <script src="config.js"></script>
-    <script type="module">
-        // Firebase imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyD6APHZMfX39NE3D0QmqhM9CYcJLEYAq7A",
-            authDomain: "muthupuralk.firebaseapp.com",
-            projectId: "muthupuralk",
-            storageBucket: "muthupuralk.firebasestorage.app",
-            messagingSenderId: "181421595643",
-            appId: "1:181421595643:web:20a29817ca1f7aa53a495e",
-            measurementId: "G-SFW03YC9X1"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-
-        // ==========================================
-        // UPDATE NAVBAR FOR LOGGED IN USERS
-        // ==========================================
-        (function updateAuthNavbar() {
-            const token = localStorage.getItem('authToken');
-            const userData = localStorage.getItem('userData');
-            const authLink = document.getElementById('auth-link');
-            const authLinkMobile = document.getElementById('auth-link-mobile');
-            const myListingsLink = document.getElementById('mylistings-link');
-            const myListingsMobile = document.getElementById('mylistings-link-mobile');
-
-            if (token && userData && authLink) {
-                try {
-                    const user = JSON.parse(userData);
-                    const name = user.name || user.email || 'Account';
-                    const initials = name.split(' ')
-                        .map(n => n[0])
-                        .join('')
-                        .toUpperCase()
-                        .slice(0, 2);
-
-                    // Desktop: Replace auth link with user menu
-                    const userMenuHTML = `
-                        <div class="nav-user-menu" style="position:relative">
-                            <button class="nav-user-btn" onclick="toggleUserMenu(this)"
-                                    style="display:flex;align-items:center;gap:8px;background:rgba(79,110,247,0.15);
-                                           border:1px solid rgba(79,110,247,0.3);border-radius:10px;padding:7px 14px;
-                                           color:#4f6ef7;font-family:Poppins;font-size:13px;font-weight:600;
-                                           cursor:pointer;transition:all 0.2s;">
-                                <span style="width:26px;height:26px;border-radius:50%;
-                                           background:linear-gradient(135deg, #4f6ef7, #6366f1);
-                                           display:flex;align-items:center;justify-content:center;
-                                           color:white;font-size:11px;font-weight:700;">
-                                    ${initials}
-                                </span>
-                                <span>${name.split(' ')[0]}</span>
-                            </button>
-                            <div class="user-dropdown" style="display:none;position:absolute;right:0;
-                                           top:calc(100%+8px);background:white;border-radius:14px;padding:0;
-                                           min-width:200px;box-shadow:0 8px 30px rgba(0,0,0,0.15);
-                                           z-index:1000;overflow:hidden;">
-                                <a href="dashboard.html" 
-                                   style="display:block;padding:12px 16px;font-size:13px;color:#374151;
-                                          text-decoration:none;border-radius:0;font-family:Poppins;
-                                          border-bottom:1px solid #f1f5f9;transition:all 0.2s;"
-                                   onmouseover="this.style.background='#f9faff'"
-                                   onmouseout="this.style.background='transparent'">
-                                    📋 My Listings
-                                </a>
-                                <a href="post.html"
-                                   style="display:block;padding:12px 16px;font-size:13px;color:#374151;
-                                          text-decoration:none;border-radius:0;font-family:Poppins;
-                                          border-bottom:1px solid #f1f5f9;transition:all 0.2s;"
-                                   onmouseover="this.style.background='#f9faff'"
-                                   onmouseout="this.style.background='transparent'">
-                                    ➕ Post Ad
-                                </a>
-                                <button onclick="handleLogout()"
-                                        style="width:100%;padding:12px 16px;font-size:13px;color:#dc2626;
-                                               background:none;border:none;text-align:left;border-radius:0;
-                                               font-family:Poppins;cursor:pointer;font-weight:600;
-                                               transition:all 0.2s;"
-                                        onmouseover="this.style.background='#fef2f2'"
-                                        onmouseout="this.style.background='transparent'">
-                                    🚪 Logout
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    authLink.outerHTML = userMenuHTML;
-
-                    // Mobile: Replace auth link
-                    authLinkMobile.innerHTML = `👤 Logged in as ${name.split(' ')[0]}`;
-                    authLinkMobile.href = '#';
-                    authLinkMobile.style.pointerEvents = 'none';
-                    authLinkMobile.style.opacity = '0.7';
-
-                    // Show My Listings links
-                    if (myListingsLink) myListingsLink.style.display = 'block';
-                    if (myListingsMobile) myListingsMobile.style.display = 'block';
-                } catch (e) {
-                    console.error('Failed to parse user data:', e);
-                }
-            }
-        })();
-
-        // Toggle user dropdown menu
-        window.toggleUserMenu = function(btn) {
-            const dropdown = btn.nextElementSibling;
-            if (dropdown) {
-                dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-            }
-        };
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.nav-user-menu')) {
-                const dropdowns = document.querySelectorAll('.user-dropdown');
-                dropdowns.forEach(dd => dd.style.display = 'none');
-            }
-        });
-
-        // Logout handler
-        window.handleLogout = function() {
-            // Sign out from Firebase
-            signOut(auth).then(() => {
-                // Clear localStorage
-                localStorage.removeItem('authToken');
-                localStorage.removeItem('userData');
-                // Redirect and reload
-                window.location.href = 'index.html';
-            }).catch((error) => {
-                console.error('Logout error:', error);
-                // Still clear storage even if Firebase logout fails
-                localStorage.removeItem('authToken');
-                localStorage.removeItem('userData');
-                window.location.href = 'index.html';
-            });
-        };
-    </script>
     <script>
         const API_URL = API_BASE_URL;
         console.log('Using API URL:', API_URL);
@@ -3739,12 +3625,5 @@
             }
         });
     </script>
-<<<<<<< HEAD
-    <script src="navbar.js"></script>
-=======
-
-    <!-- ✅ Auth UI Manager - Handles login state display -->
-    <script src="auth-ui.js"></script>
->>>>>>> temp-work
 </body>
 </html>
