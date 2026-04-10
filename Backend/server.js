@@ -18,6 +18,20 @@ const postLimiter = rateLimit({
     skip: (req) => process.env.NODE_ENV !== 'production'
 });
 
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // 5 attempts per windowMs
+    message: 'Too many authentication attempts, please try again later',
+    skip: (req) => process.env.NODE_ENV !== 'production'
+});
+
+const apiLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 30, // 30 requests per minute
+    message: 'Too many API requests, please try again later',
+    skip: (req) => process.env.NODE_ENV !== 'production'
+});
+
 const mysql = require('mysql2');
 const crypto = require('crypto');
 
