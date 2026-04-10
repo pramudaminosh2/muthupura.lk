@@ -570,10 +570,10 @@
 
                 <div id="auth-error" class="auth-error-msg"></div>
 
-                <!-- Phone/Password -->
+                <!-- Email/Password - PRIMARY LOGIN -->
                 <div class="form-group">
-                    <label>Phone Number</label>
-                    <input type="tel" id="phone" placeholder="771234567" class="auth-input">
+                    <label>Email Address</label>
+                    <input type="email" id="email" placeholder="you@example.com" class="auth-input">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
@@ -600,10 +600,11 @@
 
                 <div class="auth-divider"><span>or</span></div>
 
-                <!-- Phone OTP -->
+                <!-- Phone OTP - AT THE BOTTOM -->
                 <div class="phone-otp-section">
+                    <p style="text-align: center; color: #666; font-size: 13px; margin-bottom: 15px;">Login with Phone Number (OTP)</p>
                     <div class="form-group">
-                        <label>Phone Number (OTP Login)</label>
+                        <label>Phone Number</label>
                         <div class="phone-input-wrap">
                             <span class="phone-prefix">+94</span>
                             <input type="tel" id="otp-phone" placeholder="771234567" maxlength="9" class="auth-input phone-input">
@@ -805,20 +806,22 @@
         // ============================================
         async function performLogin() {
             try {
-                const phone = document.querySelector("#phone").value.trim();
+                const email = document.querySelector("#email").value.trim();
                 const password = document.querySelector("#password").value.trim();
 
-                if (!phone || !password) {
-                    alert("Please fill all fields");
+                if (!email || !password) {
+                    showError("Please fill all fields");
                     return;
                 }
+
+                setLoading('login-btn', true, 'Logging in...');
 
                 const res = await fetch(`${API_BASE}/login`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({ phone, password })
+                    body: JSON.stringify({ email, password })
                 });
 
                 const data = await res.json();
@@ -833,16 +836,24 @@
                 localStorage.setItem("user_role", data.user.is_admin ? "admin" : "user");
                 localStorage.setItem("user_name", data.user.name || data.user.email || "User");
 
+                // Show success message
+                document.getElementById('panel-login').style.display = 'none';
+                document.getElementById('panel-register').style.display = 'none';
+                document.getElementById('auth-success').style.display = 'block';
+
                 // Redirect
-                if (data.user.is_admin) {
-                    window.location.href = "admin.html";
-                } else {
-                    window.location.href = "index.html";
-                }
+                setTimeout(() => {
+                    if (data.user.is_admin) {
+                        window.location.href = "admin.html";
+                    } else {
+                        window.location.href = "index.html";
+                    }
+                }, 1500);
 
             } catch (err) {
                 console.error(err);
-                alert(err.message);
+                showError(err.message);
+                setLoading('login-btn', false, 'Login');
             }
         }
 
@@ -1091,7 +1102,7 @@
         // FORGOT PASSWORD
         // ============================================
         async function showForgotPassword() {
-            const email = document.getElementById('login-email').value.trim();
+            const email = document.getElementById('email').value.trim();
             const emailToReset = email || prompt('Enter your email address to reset password:');
             
             if (!emailToReset) return;
@@ -1113,6 +1124,21 @@
                 window.location.href = 'index.html';
             }
         });
+
+        // ============================================
+        // EXPOSE FUNCTIONS TO WINDOW/GLOBAL SCOPE
+        // ============================================
+        window.switchTab = switchTab;
+        window.performLogin = performLogin;
+        window.handleRegister = handleRegister;
+        window.handleGoogleLogin = handleGoogleLogin;
+        window.handleFacebookLogin = handleFacebookLogin;
+        window.togglePassword = togglePassword;
+        window.sendOTP = sendOTP;
+        window.verifyOTP = verifyOTP;
+        window.showForgotPassword = showForgotPassword;
+        window.clearError = clearError;
+        window.showError = showError;
     </script>
 
     <!-- ✅ Auth UI Manager - Handles login state display -->
