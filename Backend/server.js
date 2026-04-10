@@ -11,65 +11,6 @@ const session = require('express-session');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
-const app = express();
-
-// ✅ FIXED: Restrict CORS to trusted origins only
-const FRONTEND_URLS = [
-    'https://muthupura-lk.onrender.com',
-    'http://localhost:3000',
-    'http://localhost:5500'
-];
-
-app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin) return callback(null, true);
-        if (FRONTEND_URLS.includes(origin)) {
-            callback(null, true);
-        } else {
-            console.warn(`⚠️  CORS blocked from: ${origin}`);
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: true,
-    optionsSuccessStatus: 200
-}));
-
-// ✅ INPUT VALIDATION UTILITIES
-function sanitizeString(str, maxLength = 500) {
-    if (typeof str !== 'string') return '';
-    return str.trim().substring(0, maxLength);
-}
-
-function validateEmail(email) {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(String(email).toLowerCase());
-}
-
-function validatePhone(phone) {
-    const cleaned = String(phone || '').replace(/\D/g, '');
-    return cleaned.length >= 7 && cleaned.length <= 15;
-}
-
-function validatePrice(price) {
-    const num = Number(price);
-    return !isNaN(num) && num >= 0 && num <= 999999999;
-}
-
-function validateYear(year) {
-    const num = parseInt(year);
-    const currentYear = new Date().getFullYear();
-    return !isNaN(num) && num >= 1900 && num <= currentYear + 1;
-}
-
-// ✅ RATE LIMITING
-const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 5,
-    message: 'Too many attempts',
-    skip: (req) => process.env.NODE_ENV !== 'production'
-});
-
 const postLimiter = rateLimit({
     windowMs: 60 * 60 * 1000,
     max: 20,
@@ -1587,74 +1528,66 @@ app.post('/add-vehicle', authenticateToken, postLimiter, upload.array('images', 
 
 // 🟢 Get All Vehicles (with ✅ PAGINATION)
 app.get('/get-vehicles', apiLimiter, (req, res) => {
-    try {
-        expireFeaturedAds(err => {
-            if (err) {
-                console.error('❌ Error expiring featured ads:', err.message);
+    expireFeaturedAds(err => {
+        if (err) {
+            console.error('❌ Error expiring featured ads:', err.message);
+        }
+
+        // ✅ FIXED: Add pagination parameters
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = Math.min(100, parseInt(req.query.limit) || 20);  // max 100 per page
+        const offset = (page - 1) * limit;
+
+        // First: Get total count
+        db.query('SELECT COUNT(*) as total FROM vehicles WHERE is_approved = 1', (countErr, countResults) => {
+            if (countErr) {
+                console.error('❌ [/get-vehicles] Count query error:', countErr.message);
+                return res.status(500).json({ success: false, message: 'Error fetching vehicles' });
             }
 
-            // ✅ FIXED: Add pagination parameters
-            const page = Math.max(1, parseInt(req.query.page) || 1);
-            const limit = Math.min(100, parseInt(req.query.limit) || 20);  // max 100 per page
-            const offset = (page - 1) * limit;
+            const total = countResults[0]?.total || 0;
+            const totalPages = Math.ceil(total / limit);
 
-            // First: Get total count
-            db.query('SELECT COUNT(*) as total FROM vehicles WHERE is_approved = 1', (countErr, countResults) => {
-                if (countErr) {
-                    console.error('❌ [/get-vehicles] Count query error:', countErr.message);
-                    return res.status(500).json({ success: false, message: 'Error fetching vehicles' });
+            // Second: Get paginated results
+            const sql = "SELECT * FROM vehicles WHERE is_approved = 1 ORDER BY isFeatured DESC, views DESC, createdAt DESC, id DESC LIMIT ? OFFSET ?";
+            console.log(`📤 [/get-vehicles] Fetching page ${page} (${limit} per page, total: ${total})...`);
+
+            db.query(sql, [limit, offset], (err, results) => {
+                if (err) {
+                    console.error('❌ [/get-vehicles] Database query error:', err.message);
+                    return res.status(500).json({ 
+                        success: false,
+                        message: 'Error fetching vehicles',
+                        error: process.env.NODE_ENV === 'development' ? err.message : undefined
+                    });
                 }
 
-                const total = countResults[0]?.total || 0;
-                const totalPages = Math.ceil(total / limit);
-
-                // Second: Get paginated results
-                const sql = "SELECT * FROM vehicles WHERE is_approved = 1 ORDER BY isFeatured DESC, views DESC, createdAt DESC, id DESC LIMIT ? OFFSET ?";
-                console.log(`📤 [/get-vehicles] Fetching page ${page} (${limit} per page, total: ${total})...`);
-
-                db.query(sql, [limit, offset], (err, results) => {
-                    if (err) {
-                        console.error('❌ [/get-vehicles] Database query error:', err.message);
-                        return res.status(500).json({ 
-                            success: false,
-                            message: 'Error fetching vehicles',
-                            error: process.env.NODE_ENV === 'development' ? err.message : undefined
-                        });
-                    }
-
-                    try {
-                        const normalizedResults = results.map(normalizeVehicleRecord);
-                        console.log(`✅ [/get-vehicles] Returned ${normalizedResults.length} vehicles (page ${page}/${totalPages})`);
-                        res.json({
-                            success: true,
-                            data: normalizedResults,
-                            count: normalizedResults.length,
-                            pagination: {
-                                page,
-                                limit,
-                                total,
-                                totalPages,
-                                hasMore: page < totalPages
-                            }
-                        });
-                    } catch (normalizeErr) {
-                        console.error('❌ [/get-vehicles] Error normalizing vehicle data:', normalizeErr.message);
-                        return res.status(500).json({
-                            success: false,
-                            message: 'Error processing vehicle data',
-                            error: process.env.NODE_ENV === 'development' ? normalizeErr.message : undefined
-                        });
-                    }
+                try {
+                    const normalizedResults = results.map(normalizeVehicleRecord);
+                    console.log(`✅ [/get-vehicles] Returned ${normalizedResults.length} vehicles (page ${page}/${totalPages})`);
+                    res.json({
+                        success: true,
+                        data: normalizedResults,
+                        count: normalizedResults.length,
+                        pagination: {
+                            page,
+                            limit,
+                            total,
+                            totalPages,
+                            hasMore: page < totalPages
+                        }
+                    });
+                } catch (normalizeErr) {
+                    console.error('\u274c [/get-vehicles] Error normalizing vehicle data:', normalizeErr.message);
+                    return res.status(500).json({
+                        success: false,
+                        message: 'Error processing vehicle data',
+                        error: process.env.NODE_ENV === 'development' ? normalizeErr.message : undefined
+                    });
+                }
             });
         });
-    } catch (err) {
-        console.error('❌ Unexpected error in /get-vehicles:', err.message);
-        res.status(500).json({
-            success: false,
-            message: 'Unexpected server error',
-            error: process.env.NODE_ENV === 'development' ? err.message : undefined
-        });
-    }
+    });
 });
 
 // 🟢 Get Vehicle by ID (with view counter increment)
@@ -2164,6 +2097,7 @@ app.use((err, req, res, next) => {
     res.header("Access-Control-Allow-Credentials", "true");
     console.error('Unhandled error:', err);
     res.status(err.status || 500).json({ success: false, message: err.message || 'Internal server error' });
+});
 });
 
 // start server
