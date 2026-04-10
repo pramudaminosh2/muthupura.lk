@@ -110,6 +110,11 @@ const FACEBOOK_OAUTH_URL = 'https://www.facebook.com/v16.0/dialog/oauth';
 const FACEBOOK_TOKEN_URL = 'https://graph.facebook.com/v16.0/oauth/access_token';
 const FACEBOOK_USERINFO_URL = 'https://graph.facebook.com/v16.0/me';
 
+// ============================================
+// EXPRESS APP INITIALIZATION
+// ============================================
+const app = express();
+
 // Body parsing middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
