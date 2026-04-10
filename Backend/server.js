@@ -539,102 +539,160 @@ async function uploadToFirebase(file) {
 
 const bcrypt = require('bcrypt');
 
-<<<<<<< HEAD
-app.post('/register', async (req, res) => {
-  try {
-    const { idToken, name, email, phone, provider } = req.body;
-=======
 app.post('/register', authLimiter, async (req, res) => {
     try {
         const { name, email, password, idToken, phone, provider } = req.body;
->>>>>>> temp-work
 
-    if (!idToken) {
-      return res.status(400).json({
-        success: false,
-        message: 'idToken is required'
-      });
-    }
+        // If idToken is provided (from Firebase Auth), verify it
+        let firebaseUser = null;
+        let normalizedEmail = null;
+        let normalizedName = null;
+        let normalizedPhone = null;
+        let authProvider = provider || 'local';
 
-    // Verify Firebase token
-    let decodedToken;
-    try {
-      decodedToken = await admin.auth().verifyIdToken(idToken);
-    } catch (verifyErr) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid or expired token'
-      });
-    }
-
-    const firebase_uid = decodedToken.uid;
-    const userEmail = email || decodedToken.email || null;
-    const userName = name || decodedToken.name || 
-                     (userEmail ? userEmail.split('@')[0] : 'User');
-    const userPhone = phone || decodedToken.phone_number || null;
-    const authProvider = provider || decodedToken.firebase?.sign_in_provider 
-                         || 'password';
-
-    // Upsert user — insert or update if exists
-    const sql = `
-      INSERT INTO users 
-        (firebase_uid, email, name, phone, auth_provider)
-      VALUES (?, ?, ?, ?, ?)
-      ON DUPLICATE KEY UPDATE
-        name  = COALESCE(VALUES(name), name),
-        phone = COALESCE(VALUES(phone), phone),
-        email = COALESCE(VALUES(email), email),
-        auth_provider = COALESCE(VALUES(auth_provider), auth_provider)
-    `;
-
-    db.query(
-      sql,
-      [firebase_uid, userEmail, userName, userPhone, authProvider],
-      (err, result) => {
-        if (err) {
-          console.error('Register DB error:', err.message);
-          return res.status(500).json({
-            success: false,
-            message: 'Database error: ' + err.message
-          });
-        }
-
-        // Fetch the user record
-        db.query(
-          'SELECT * FROM users WHERE firebase_uid = ?',
-          [firebase_uid],
-          (err2, rows) => {
-            if (err2 || !rows.length) {
-              return res.json({
-                success: true,
-                user: { name: userName, email: userEmail }
-              });
+        if (idToken) {
+            try {
+                // Verify Firebase idToken with Admin SDK
+                firebaseUser = await admin.auth().verifyIdToken(idToken);
+                normalizedEmail = (firebaseUser.email || '').trim().toLowerCase();
+                normalizedName = (name || firebaseUser.name || firebaseUser.email.split('@')[0]).trim();
+                normalizedPhone = (phone || '').replace(/\D/g, '');
+                authProvider = provider || (firebaseUser.provider === 'anonymous' ? 'local' : firebaseUser.provider);
+            } catch (tokenErr) {
+                console.error('Firebase idToken verification failed:', tokenErr);
+                return res.status(401).json({ 
+                    success: false,
+                    message: 'Invalid Firebase token' 
+                });
+            }
+        } else {
+            // Local auth (email/password)
+            if (!name || !email || !password) {
+                return res.status(400).json({ 
+                    success: false,
+                    message: 'Name, email, and password are required' 
+                });
             }
 
-            const user = rows[0];
-            return res.json({
-              success: true,
-              user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                phone: user.phone,
-                role: user.role
-              },
-              token: idToken
-            });
-          }
-        );
-      }
-    );
+            normalizedEmail = email.trim().toLowerCase();
+            normalizedName = name.trim();
+            normalizedPhone = (phone || '').replace(/\D/g, '');
 
-  } catch (err) {
-    console.error('Register route error:', err.message);
-    res.status(500).json({
-      success: false,
-      message: 'Server error: ' + err.message
-    });
-  }
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(normalizedEmail)) {
+                return res.status(400).json({ 
+                    success: false,
+                    message: 'Invalid email format' 
+                });
+            }
+
+            if (password.length < 8) {
+                return res.status(400).json({ 
+                    success: false,
+                    message: 'Password must be at least 8 characters' 
+                });
+            }
+        }
+
+        if (!normalizedEmail) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'Email is required' 
+            });
+        }
+
+        // Generate username from name
+        const username = (normalizedName || normalizedEmail.split('@')[0])
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, '')
+            .substring(0, 20) || 'user' + Math.floor(Math.random() * 10000);
+
+        // UPSERT: Try to find existing user by email, or insert new one
+        db.query(
+            `INSERT INTO users (firebase_uid, name, username, email, phone, password, role, auth_provider, createdAt)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+             ON DUPLICATE KEY UPDATE
+                name = IF(VALUES(name) != '', VALUES(name), name),
+                phone = IF(VALUES(phone) != '', VALUES(phone), phone),
+                auth_provider = IF(VALUES(auth_provider) != 'local', VALUES(auth_provider), auth_provider),
+                firebase_uid = IF(VALUES(firebase_uid) != '', VALUES(firebase_uid), firebase_uid)`,
+            [
+                firebaseUser?.uid || null,
+                normalizedName,
+                username,
+                normalizedEmail,
+                normalizedPhone || null,
+                idToken ? null : (password ? await bcrypt.hash(password, 10) : null),
+                'user',
+                authProvider
+            ],
+            (err, result) => {
+                if (err) {
+                    if (err.code === 'ER_DUP_ENTRY') {
+                        // Email already exists - return success anyway so OAuth flows work
+                        db.query('SELECT id, name, email, role FROM users WHERE email = ?', [normalizedEmail], (selectErr, users) => {
+                            if (selectErr || !users.length) {
+                                return res.status(500).json({ 
+                                    success: false,
+                                    message: 'Database error' 
+                                });
+                            }
+                            const user = users[0];
+                            const token = jwt.sign(
+                                { id: user.id, name: user.name, email: user.email, role: user.role },
+                                SECRET,
+                                { expiresIn: '6h' }
+                            );
+                            return res.status(200).json({
+                                success: true,
+                                message: 'User already exists',
+                                user: { id: user.id, name: user.name, email: user.email, role: user.role },
+                                token
+                            });
+                        });
+                        return;
+                    }
+                    console.error('Register upsert error:', err);
+                    return res.status(500).json({ 
+                        success: false,
+                        message: 'Internal server error' 
+                    });
+                }
+
+                const userId = result.insertId || result.affectedRows > 0;
+                
+                // Get the user record
+                db.query('SELECT id, name, email, role FROM users WHERE email = ?', [normalizedEmail], (selectErr, users) => {
+                    if (selectErr || !users.length) {
+                        return res.status(500).json({ 
+                            success: false,
+                            message: 'Failed to retrieve user' 
+                        });
+                    }
+
+                    const user = users[0];
+                    const token = jwt.sign(
+                        { id: user.id, name: user.name, email: user.email, role: user.role },
+                        SECRET,
+                        { expiresIn: '6h' }
+                    );
+
+                    res.status(201).json({
+                        success: true,
+                        message: 'User registered successfully',
+                        user: { id: user.id, name: user.name, email: user.email, role: user.role },
+                        token
+                    });
+                });
+            }
+        );
+    } catch (err) {
+        console.error('Unexpected error in /register:', err);
+        res.status(500).json({
+            success: false,
+            message: 'Unexpected server error'
+        });
+    }
 });
 
 const jwt = require('jsonwebtoken');
@@ -2077,7 +2135,7 @@ app.post('/test-url-parsing', (req, res) => {
     });
 });
 
-// Multer file upload error handler
+// Multer file upload error handler 2.0
 app.use((err, req, res, next) => {
     res.header("Access-Control-Allow-Origin", "https://muthupuralk.web.app");
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");

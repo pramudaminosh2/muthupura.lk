@@ -570,17 +570,10 @@
 
                 <div id="auth-error" class="auth-error-msg"></div>
 
-<<<<<<< HEAD
-                <!-- Email/Password -->
-                <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" id="login-email" placeholder="you@example.com" class="auth-input">
-=======
                 <!-- Email/Password - PRIMARY LOGIN -->
                 <div class="form-group">
                     <label>Email Address</label>
                     <input type="email" id="email" placeholder="you@example.com" class="auth-input">
->>>>>>> temp-work
                 </div>
                 <div class="form-group">
                     <label>Password</label>
@@ -798,12 +791,6 @@
                 localStorage.setItem('userData', JSON.stringify(userData));
             }
 
-<<<<<<< HEAD
-            const loginPanel = document.getElementById('panel-login');
-            const regPanel = document.getElementById('panel-register');
-            if (loginPanel) loginPanel.style.display = 'none';
-            if (regPanel) regPanel.style.display = 'none';
-=======
         // ============================================
         // AFTER LOGIN SUCCESS
         // ============================================
@@ -813,7 +800,6 @@
             localStorage.setItem('user_role', userData.is_admin ? 'admin' : 'user');
             localStorage.setItem('user_name', userData.name || userData.email || 'User');
             localStorage.setItem('userData', JSON.stringify(userData)); // Keep for backward compatibility
->>>>>>> temp-work
 
             let successEl = document.getElementById('auth-success');
             if (!successEl) {
@@ -848,12 +834,6 @@
         // ════════════════════════════════
         async function syncUserToBackend(idToken, extraData = {}) {
             try {
-<<<<<<< HEAD
-                const res = await fetch(`${API_BASE}/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ idToken, ...extraData })
-=======
                 const email = document.querySelector("#email").value.trim();
                 const password = document.querySelector("#password").value.trim();
 
@@ -870,7 +850,6 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({ email, password })
->>>>>>> temp-work
                 });
                 
                 if (!res.ok) {
@@ -880,13 +859,6 @@
                     }
                     throw new Error(errData.message || `Server error ${res.status}`);
                 }
-<<<<<<< HEAD
-                
-                return await res.json();
-            } catch (err) {
-                console.error('Backend sync error:', err);
-                return { success: true, backendError: err.message };
-=======
 
                 // ✅ FIXED: Save auth state in format auth-ui.js expects
                 localStorage.setItem("user", JSON.stringify(data.user));
@@ -912,7 +884,6 @@
                 console.error(err);
                 showError(err.message);
                 setLoading('login-btn', false, 'Login');
->>>>>>> temp-work
             }
         }
 
@@ -1195,22 +1166,12 @@
 
         // ════════════════════════════════
         // FORGOT PASSWORD
-<<<<<<< HEAD
-        // ════════════════════════════════
-        window.showForgotPassword = async function() {
-            const emailEl = document.getElementById('login-email');
-            const email = emailEl?.value.trim();
-
-            const target = email || window.prompt('Enter your email address to reset your password:');
-            if (!target) return;
-=======
         // ============================================
         async function showForgotPassword() {
             const email = document.getElementById('email').value.trim();
             const emailToReset = email || prompt('Enter your email address to reset password:');
             
             if (!emailToReset) return;
->>>>>>> temp-work
 
             try {
                 await sendPasswordResetEmail(auth, target);
@@ -1231,18 +1192,6 @@
             }
         });
 
-<<<<<<< HEAD
-        // ════════════════════════════════
-        // SPIN ANIMATION
-        // ════════════════════════════════
-        const spinStyle = document.createElement('style');
-        spinStyle.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
-        document.head.appendChild(spinStyle);
-
-        console.log('✅ Muthupura.lk auth system loaded');
-    </script>
-    <script src="navbar.js"></script>
-=======
         // ============================================
         // EXPOSE FUNCTIONS TO WINDOW/GLOBAL SCOPE
         // ============================================
@@ -1261,6 +1210,5 @@
 
     <!-- ✅ Auth UI Manager - Handles login state display -->
     <script src="auth-ui.js"></script>
->>>>>>> temp-work
 </body>
 </html>
