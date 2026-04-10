@@ -1,6 +1,727 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Listings - Muthupura.lk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        /* ===== PAGE-SPECIFIC STYLES ===== */
+        .page-header {
+            margin-top: 90px;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, rgba(79, 110, 247, 0.1) 0%, rgba(142, 82, 248, 0.08) 100%);
+            text-align: center;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .page-header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--dark-bg);
+            margin: 0 0 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .page-header .breadcrumb {
+            font-size: 0.95rem;
+            color: var(--accent);
+            margin-bottom: 16px;
+        }
+
+        .page-header .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            opacity: 0.85;
+        }
+
+        .page-content {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 247, 255, 0.95) 100%);
+            padding: 60px 20px;
+            min-height: 60vh;
+        }
+
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ===== DASHBOARD STATS ===== */
+        .dash-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--border-light);
+            border-radius: 20px;
+            padding: 32px;
+            text-align: center;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: var(--accent);
+            box-shadow: 0 12px 40px rgba(79, 110, 247, 0.1);
+            transform: translateY(-4px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), #8e52f8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 0 0 8px;
+        }
+
+        .stat-label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            opacity: 0.75;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== ACTION BAR ===== */
+        .dash-action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .btn-post-new {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, var(--accent) 0%, #8e52f8 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(79, 110, 247, 0.25);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-post-new:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(79, 110, 247, 0.35);
+        }
+
+        .refresh-btn {
+            padding: 10px 20px;
+            background: rgba(79, 110, 247, 0.1);
+            color: var(--accent);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(79, 110, 247, 0.2);
+            border-color: var(--accent);
+        }
+
+        .listings-header {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--dark-bg);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* ===== LISTINGS GRID ===== */
+        .my-listings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 28px;
+            margin-bottom: 48px;
+        }
+
+        .listing-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--border-light);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .listing-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 12px 40px rgba(79, 110, 247, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .listing-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, rgba(79, 110, 247, 0.1), rgba(142, 82, 248, 0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-size: 3rem;
+        }
+
+        .listing-content {
+            padding: 24px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .listing-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--dark-bg);
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .listing-price {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
+        .listing-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            opacity: 0.75;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .listing-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 16px;
+        }
+
+        .status-active {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+        }
+
+        .status-expired {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .listing-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: auto;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, var(--accent) 0%, #6b8ef0 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(79, 110, 247, 0.2);
+        }
+
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(79, 110, 247, 0.3);
+        }
+
+        .btn-delete {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-delete:hover {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+        }
+
+        .empty-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--dark-bg);
+            margin-bottom: 8px;
+        }
+
+        .empty-text {
+            color: var(--text-dark);
+            opacity: 0.75;
+            margin-bottom: 24px;
+        }
+
+        /* ===== LOADING ===== */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--accent);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                margin-top: 80px;
+                padding: 40px 16px;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .page-content {
+                padding: 40px 16px;
+            }
+
+            .dash-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+
+            .stat-card {
+                padding: 20px;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            .dash-action-bar {
+                flex-direction: column-reverse;
+            }
+
+            .btn-post-new, .refresh-btn {
+                width: 100%;
+            }
+
+            .my-listings-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== AURORA BACKGROUND ===== -->
+    <div class="bg-aurora" aria-hidden="true">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- ===== PREMIUM NAVBAR ===== -->
+    <nav class="premium-navbar" id="navbar">
+        <div class="navbar-container">
+            <div class="navbar-left">
+                <a href="index.html" class="navbar-brand">
+                    <img src="logo.PNG" alt="Muthupura.lk" class="navbar-logo">
+                    <span class="navbar-brand-text">Muthupura.lk</span>
+                </a>
+            </div>
+            <div class="navbar-center">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="post.html" class="nav-link">Post Ad</a>
+                <a href="dashboard.html" class="nav-link active">My Listings</a>
+                <a href="about.html" class="nav-link">About Us</a>
+                <a href="contact.html" class="nav-link">Contact Us</a>
+            </div>
+            <div class="navbar-right">
+                <span id="user-greeting" style="display:none;" class="user-greeting"></span>
+                <a id="auth-link" href="login.html" class="nav-auth-btn nav-login-btn">Login</a>
+                <a id="admin-link" href="admin.html" class="nav-auth-btn nav-admin-btn" style="display:none;">Admin</a>
+                <button class="navbar-hamburger" id="navbar-hamburger" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== MOBILE MENU DROPDOWN ===== -->
+    <div class="mobile-menu-dropdown" id="mobile-menu">
+        <a href="index.html" class="mobile-menu-link">Home</a>
+        <a href="post.html" class="mobile-menu-link">Post Ad</a>
+        <a href="dashboard.html" class="mobile-menu-link active">My Listings</a>
+        <a href="about.html" class="mobile-menu-link">About Us</a>
+        <a href="contact.html" class="mobile-menu-link">Contact Us</a>
+        <hr style="border: none; border-top: 1px solid rgba(220, 230, 255, 0.3); margin: 12px 0;">
+        <a id="auth-link-mobile" href="login.html" class="mobile-menu-link nav-login-btn">Login</a>
+        <a id="admin-link-mobile" href="admin.html" class="mobile-menu-link nav-admin-btn" style="display:none;">Admin</a>
+    </div>
+
+    <!-- ===== PAGE HEADER ===== -->
+    <section class="page-header">
+        <div class="page-container">
+            <div class="breadcrumb">Your Dashboard</div>
+            <h1>My Listings</h1>
+            <p class="subtitle">Manage all your vehicle listings in one place</p>
+        </div>
+    </section>
+
+    <!-- ===== PAGE CONTENT ===== -->
+    <section class="page-content">
+        <div class="page-container">
+            <!-- ===== STATS ROW ===== -->
+            <div class="dash-stats" id="statsContainer">
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Total Listings</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Total Views</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Featured</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Pending Approval</div>
+                </div>
+            </div>
+
+            <!-- ===== ACTION BAR ===== -->
+            <div class="dash-action-bar">
+                <a href="post.html" class="btn-post-new">+ Post New Vehicle</a>
+                <button class="refresh-btn" id="refreshBtn">🔄 Refresh</button>
+            </div>
+
+            <!-- ===== LISTINGS HEADER ===== -->
+            <div class="listings-header">
+                <span>📋 Your Listings</span>
+            </div>
+
+            <!-- ===== LISTINGS GRID ===== -->
+            <div class="my-listings-grid" id="listingsGrid">
+                <div class="loading">Loading your listings...</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== PREMIUM FOOTER ===== -->
+    <footer class="premium-footer">
+        <div class="footer-content">
+            <div class="footer-column">
+                <h4>Muthupura.lk</h4>
+                <p>Sri Lanka's premier online vehicle marketplace connecting buyers and sellers with trusted transactions.</p>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook">f</a>
+                    <a href="#" aria-label="Twitter">𝕏</a>
+                    <a href="#" aria-label="Instagram">📷</a>
+                </div>
+            </div>
+            <div class="footer-column">
+                <h4>Quick Links</h4>
+                <a href="index.html">Home</a>
+                <a href="about.html">About Us</a>
+                <a href="post.html">Post Vehicle</a>
+                <a href="contact.html">Contact</a>
+            </div>
+            <div class="footer-column">
+                <h4>Support</h4>
+                <a href="#faq">FAQ</a>
+                <a href="#privacy">Privacy Policy</a>
+                <a href="#terms">Terms & Conditions</a>
+                <a href="contact.html">Contact Support</a>
+            </div>
+            <div class="footer-column">
+                <h4>Newsletter</h4>
+                <p style="font-size: 0.9rem; margin-bottom: 12px;">Get updates on new listings and market tips</p>
+                <form class="newsletter-form" onsubmit="event.preventDefault();">
+                    <input type="email" placeholder="Your email" required>
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-bottom-links">
+                <a href="#privacy">Privacy</a>
+                <span>•</span>
+                <a href="#terms">Terms</a>
+                <span>•</span>
+                <a href="contact.html">Contact</a>
+            </div>
+            <p>&copy; 2025 Muthupura.lk – All rights reserved</p>
+        </div>
+    </footer>
+
+    <script src="config.js"></script>
+    <script>
+        const API_URL = API_BASE_URL;
+        const getEl = (id) => document.getElementById(id);
+
+        // ===== AUTH CHECK (Redirect if not logged in) =====
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return false;
+            }
+            return true;
+        }
+
+        function getTokenPayload() {
+            const token = localStorage.getItem('token');
+            if (!token) return null;
+            try {
+                const parts = token.split('.');
+                if (parts.length !== 3) return null;
+                const decoded = JSON.parse(atob(parts[1]));
+                return decoded;
+            } catch (e) {
+                console.error('Token decode error:', e);
+                return null;
+            }
+        }
+
+        async function updateNavigation() {
+            try {
+                let payload = getTokenPayload();
+                const authLink = getEl('auth-link');
+                const adminLink = getEl('admin-link');
+                const myListings = getEl('mylistings-link');
+                const userGreeting = getEl('user-greeting');
+                const authLinkMobile = getEl('auth-link-mobile');
+                const adminLinkMobile = getEl('admin-link-mobile');
+
+                if (!payload || (payload.exp && Date.now() >= payload.exp * 1000)) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('userName');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                if (payload && !payload.name) {
+                    try {
+                        const res = await fetch(`${API_URL}/profile`, {
+                            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                        });
+                        if (res.ok) {
+                            const profile = await res.json();
+                            if (profile.name) {
+                                payload.name = profile.name;
+                            }
+                        }
+                    } catch (err) {
+                        console.warn('Failed to fetch profile', err);
+                    }
+                }
+
+                if (adminLink) adminLink.style.display = payload?.role === 'admin' ? 'inline-block' : 'none';
+                if (adminLinkMobile) adminLinkMobile.style.display = payload?.role === 'admin' ? 'block' : 'none';
+
+                const displayName = payload.name || localStorage.getItem('userName') || payload.email || '';
+                if (userGreeting) {
+                    userGreeting.textContent = displayName ? `Hi, ${displayName}` : 'Hi';
+                    userGreeting.style.display = 'inline-block';
+                }
+
+                if (authLink) {
+                    authLink.textContent = 'Logout';
+                    authLink.classList.remove('nav-login-btn');
+                    authLink.classList.add('nav-logout-btn');
+                    authLink.href = '#';
+                    authLink.onclick = (e) => {
+                        e.preventDefault();
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('userName');
+                        location.reload();
+                    };
+                }
+                if (authLinkMobile) {
+                    authLinkMobile.textContent = 'Logout';
+                    authLinkMobile.classList.remove('nav-login-btn');
+                    authLinkMobile.classList.add('nav-logout-btn');
+                    authLinkMobile.href = '#';
+                    authLinkMobile.onclick = (e) => {
+                        e.preventDefault();
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('userName');
+                        location.reload();
+                    };
+                }
+            } catch (err) {
+                console.error('Navigation update error:', err);
+            }
+        }
+
+        function renderVehicles(vehicles) {
+            const grid = getEl('listingsGrid');
+            if (!vehicles || vehicles.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1;">
+                        <div class="empty-state">
+                            <div class="empty-icon">🚗</div>
+                            <div class="empty-title">No listings yet</div>
+                            <div class="empty-text">Start selling vehicles by creating your first listing</div>
+                            <a href="post.html" class="btn-post-new">+ Post New Vehicle</a>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = vehicles.map((v, i) => `
+                <div class="listing-card">
+                    <div class="listing-image">${i % 3 === 0 ? '🏎️' : i % 3 === 1 ? '🚙' : '🚗'}</div>
+                    <div class="listing-content">
+                        <div class="listing-title">${v.title || 'Vehicle Listing'}</div>
+                        <div class="listing-price">$${(v.price || 0).toLocaleString()}</div>
+                        <div class="listing-meta">
+                            <span>${v.year || '2024'}</span>
+                            <span>${v.mileage || '0'} km</span>
+                        </div>
+                        <span class="listing-status ${v.status === 'active' ? 'status-active' : v.status === 'pending' ? 'status-pending' : 'status-expired'}">
+                            ${(v.status || 'active').toUpperCase()}
+                        </span>
+                        <div class="listing-actions">
+                            <button class="btn-action btn-edit">Edit</button>
+                            <button class="btn-action btn-delete">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function fetchMyListings() {
+            const grid = getEl('listingsGrid');
+            grid.innerHTML = '<div class="loading">Loading your listings...</div>';
+            
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch(`${API_URL}/vehicles/my-listings`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                if (!res.ok) throw new Error('Failed to load listings');
+                const data = await res.json();
+                renderVehicles(data.vehicles || []);
+            } catch (err) {
+                console.error('Error loading listings:', err);
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1;">
+                        <div class="empty-state">
+                            <div class="empty-icon">⚠️</div>
+                            <div class="empty-title">Error loading listings</div>
+                            <div class="empty-text">Please try refreshing or contact support</div>
+                            <button class="btn-post-new" onclick="location.reload()" style="background: linear-gradient(135deg, #ef4444, #dc2626);">Retry</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function setupNavbarScroll() {
+            const navbar = getEl('navbar');
+            if (!navbar) return;
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 0) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+        }
+
+        function setupHamburgerMenu() {
+            const hamburger = getEl('navbar-hamburger');
+            const mobileMenu = getEl('mobile-menu');
+            if (!hamburger || !mobileMenu) return;
+
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+            });
+
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    hamburger.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!checkAuth()) return;
+            updateNavigation();
+            setupNavbarScroll();
+            setupHamburgerMenu();
+            fetchMyListings();
+
+            const refreshBtn = getEl('refreshBtn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', fetchMyListings);
+            }
+        });
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Seller Dashboard - Muthupura.lk</title>

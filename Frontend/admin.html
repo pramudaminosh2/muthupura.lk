@@ -1,573 +1,320 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Muthupura.lk</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="shared.css">
     <style>
-        :root {
-            --bg: #eef2f8;
-            --surface: #ffffff;
-            --text: #1f2f4f;
-            --muted: #5b6d8a;
-            --accent1: #3a6ff8;
-            --accent2: #8e52f8;
-            --shadow-strong: 0 32px 90px rgba(25, 73, 145, 0.14);
-        }
-
-        /* ===== NAVBAR FIXED POSITIONING ===== */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            width: 66%;
-            box-sizing: border-box;
-            background: linear-gradient(135deg, rgba(58,111,248,0.08) 0%, rgba(142,82,248,0.06) 100%);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1.2px solid rgba(58,111,248,0.15);
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(58,111,248,0.08), inset 0 1px 1px rgba(255,255,255,0.9);
-            padding: 0;
-            height: 70px;
-            display: flex;
-            align-items: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .navbar:hover {
-            box-shadow: 0 12px 40px rgba(58,111,248,0.12), inset 0 1px 1px rgba(255,255,255,0.95);
-            border-color: rgba(58,111,248,0.22);
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 0 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 24px;
-        }
-
-        .nav-left {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .nav-center {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            flex-grow: 1;
-        }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-shrink: 0;
-        }
-
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            color: #1f2d52;
-            font-weight: 700;
-            font-size: 1.05rem;
-            transition: all 0.22s ease;
-            flex-shrink: 0;
-        }
-
-        .nav-brand:hover {
-            opacity: 0.85;
-            transform: translateY(-1px);
-        }
-
-        .nav-brand img {
-            height: 46px;
-            width: auto;
-            object-fit: contain;
-        }
-
-        .nav-brand span {
-            display: none;
-        }
-
-        @media (min-width: 640px) {
-            .nav-brand span {
-                display: inline;
-            }
-        }
-
-        .nav-center a {
-            text-decoration: none;
-            color: #1f2d52;
-            font-weight: 600;
-            font-size: 1.05rem;
-            letter-spacing: 0.4px;
-            padding: 10px 18px;
-            border-radius: 14px;
-            transition: all 0.22s ease;
-            position: relative;
-            background: rgba(255, 255, 255, 0.25);
-        }
-
-        .nav-center a:hover {
-            color: #fff;
-            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(58, 111, 248, 0.25);
-        }
-
-        #auth-link {
-            padding: 9px 18px;
-            background: rgba(58, 111, 248, 0.08);
-            color: #1f2f4f;
-            border-radius: 12px;
-            border: 1px solid rgba(58, 111, 248, 0.15);
-            transition: all 0.22s ease;
-            text-decoration: none;
-            font-weight: 500;
-            cursor: pointer;
-            font-size: 0.9rem;
-            display: inline-block;
-        }
-
-        #auth-link:hover {
-            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
-            color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(58, 111, 248, 0.25);
-            border-color: #3a6ff8;
-        }
-
-        #logout-btn {
-            padding: 9px 18px;
-            background: rgba(209, 40, 69, 0.08);
-            color: #d12845;
-            border-radius: 12px;
-            border: 1px solid rgba(209, 40, 69, 0.2);
-            transition: all 0.22s ease;
-            font-weight: 500;
-            cursor: pointer;
-            font-size: 0.9rem;
-            display: inline-block;
-        }
-
-        #logout-btn:hover {
-            background: #d12845;
-            color: #fff;
-            border-color: #d12845;
-            box-shadow: 0 8px 20px rgba(209, 40, 69, 0.25);
-            transform: translateY(-2px);
-        }
-
-        .hamburger {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            cursor: pointer;
-            background: none;
-            border: none;
-            padding: 8px;
-            transition: all 0.2s ease;
-        }
-
-        @media (min-width: 768px) {
-            .hamburger {
-                display: none;
-            }
-        }
-
-        .hamburger span {
-            width: 24px;
-            height: 2px;
-            background: #1f2d52;
-            border-radius: 2px;
-            transition: all 0.3s ease;
-        }
-
-        .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(8px, 8px);
-        }
-
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -7px);
-        }
-
-        /* Mobile menu */
-        .mobile-menu {
-            display: none;
-            position: fixed;
-            top: 70px;
-            left: 0;
-            right: 0;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(248, 250, 255, 0.95) 100%);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(200, 210, 230, 0.3);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-            flex-direction: column;
-            padding: 16px;
-            gap: 8px;
-            z-index: 999;
-            max-height: calc(100vh - 70px);
-            overflow-y: auto;
-            animation: slideDown 0.25s ease forwards;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .mobile-menu.active {
-            display: flex;
-        }
-
-        .mobile-menu a {
-            display: block;
-            padding: 12px 16px;
-            text-decoration: none;
-            color: #1f2d52;
-            font-weight: 500;
-            border-radius: 12px;
-            transition: all 0.22s ease;
-            background: rgba(255, 255, 255, 0.4);
-            border: 1px solid rgba(58, 111, 248, 0.1);
-        }
-
-        .mobile-menu a:hover {
-            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
-            color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(58, 111, 248, 0.2);
-            border-color: #3a6ff8;
-        }
-
-        @media (max-width: 768px) {
-            .nav-center {
-                display: none;
-            }
-        }
-
-        .wrapper {
-            max-width: 1160px;
-            margin: 0 auto;
-            padding: 14px 16px 24px;
-        }
-
-        .stats {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin: 24px 0;
-        }
-
-        .stat {
-            flex: 1;
-            min-width: 180px;
-            background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.96) 100%);
-            border-radius: 18px;
-            padding: 20px;
-            box-shadow: var(--shadow-strong);
-            border: 1.2px solid rgba(58, 111, 248, 0.14);
-            animation: fadeInUp 0.45s ease both;
-        }
-
-        .stat h3 {
-            margin: 0;
-            font-size: 0.9rem;
-            color: var(--muted);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-        }
-
-        .stat p {
-            margin: 12px 0 0;
-            font-size: 2rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, #1f2f4f 0%, #3a6ff8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .panel {
-            background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.96) 100%);
-            border-radius: 18px;
-            border: 1.2px solid rgba(58, 111, 248, 0.14);
-            box-shadow: var(--shadow-strong);
-            padding: 28px;
-            margin-bottom: 24px;
-            animation: fadeInUp 0.45s ease both;
-        }
-
-        .panel h2 {
-            margin: 0 0 20px;
-            font-size: 1.4rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #1f2f4f 0%, #3a6ff8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .table-wrap {
-            overflow-x: auto;
-            border-radius: 14px;
-            border: 1px solid rgba(74, 99, 142, 0.18);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.95rem;
-            background: var(--surface);
-        }
-
-        thead {
-            background: linear-gradient(90deg, var(--accent1), var(--accent2));
-            color: white;
-        }
-
-        th {
-            padding: 14px 16px;
-            text-align: left;
-            font-weight: 700;
-            letter-spacing: -0.01em;
-        }
-
-        td {
-            padding: 14px 16px;
-            border-bottom: 1px solid rgba(74, 99, 142, 0.18);
-            color: var(--text);
-        }
-
-        tbody tr:hover {
-            background: rgba(58, 111, 248, 0.04);
-            transition: background 0.2s ease;
-        }
-
-        img.thumb {
-            width: 60px;
-            height: 40px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid rgba(74, 99, 142, 0.18);
-        }
-
-        .note {
-            margin-top: 16px;
-            padding: 14px 16px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
-            border: 1.2px solid rgba(245, 158, 11, 0.3);
-            color: #78350f;
-            font-weight: 600;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @media (max-width: 860px) {
-            .navbar {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .stats {
-                display: block;
-            }
-
-            .stat {
-                margin-bottom: 12px;
-            }
-
-            .panel {
-                padding: 20px;
-            }
-
-            th, td {
-                padding: 12px 10px;
-                font-size: 0.9rem;
-            }
-        }
-    </style>
+        .page-header { margin-top: 90px; padding: 60px 20px; background: linear-gradient(135deg, rgba(79, 110, 247, 0.1) 0%, rgba(142, 82, 248, 0.08) 100%); text-align: center; border-bottom: 1px solid var(--border-light); }
+        .page-header h1 { font-size: 3rem; font-weight: 800; color: var(--dark-bg); margin: 0 0 12px; letter-spacing: -0.02em; }
+        .page-header .breadcrumb { font-size: 0.95rem; color: var(--accent); margin-bottom: 16px; }
+        .page-header .subtitle { font-size: 1.1rem; color: var(--text-dark); opacity: 0.85; max-width: 600px; margin: 0 auto; }
+        .page-content { background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 247, 255, 0.95) 100%); padding: 60px 20px; min-height: 80vh; }
+        .page-container { max-width: 1200px; margin: 0 auto; }
+        .admin-stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 40px; }
+        @media (max-width: 900px) { .admin-stats-row { grid-template-columns: repeat(2, 1fr); gap: 20px; } }
+        @media (max-width: 600px) { .admin-stats-row { grid-template-columns: 1fr; gap: 16px; } }
+        .stat-card { background: rgba(255, 255, 255, 0.9); border: 1px solid var(--border-light); border-radius: 20px; padding: 28px; backdrop-filter: blur(8px); box-shadow: 0 8px 32px rgba(79, 110, 247, 0.08); transition: all 0.3s ease; }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 48px rgba(79, 110, 247, 0.12); border-color: var(--accent); }
+        .stat-icon { font-size: 2.4rem; margin-bottom: 12px; }
+        .stat-label { font-size: 0.9rem; color: var(--text-dark); opacity: 0.75; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600; margin-bottom: 8px; }
+        .stat-value { font-size: 2.2rem; font-weight: 800; color: var(--dark-bg); }
+        .pending-vehicles-section h2 { font-size: 1.6rem; font-weight: 800; color: var(--dark-bg); margin: 0 0 24px; }
+        .vehicles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        @media (max-width: 1024px) { .vehicles-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; } }
+        @media (max-width: 600px) { .vehicles-grid { grid-template-columns: 1fr; gap: 16px; } }
+        .vehicle-card { background: rgba(255, 255, 255, 0.9); border: 1px solid var(--border-light); border-radius: 16px; overflow: hidden; transition: all 0.3s ease; box-shadow: 0 4px 16px rgba(79, 110, 247, 0.06); }
+        .vehicle-card:hover { box-shadow: 0 12px 32px rgba(79, 110, 247, 0.12); transform: translateY(-4px); }
+        .vehicle-image { width: 100%; height: 180px; background: linear-gradient(135deg, rgba(79, 110, 247, 0.1) 0%, rgba(142, 82, 248, 0.08) 100%); display: flex; align-items: center; justify-content: center; font-size: 4rem; }
+        .vehicle-info { padding: 20px; }
+        .vehicle-title { font-size: 1.15rem; font-weight: 700; color: var(--dark-bg); margin: 0 0 8px; }
+        .vehicle-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 0.9rem; }
+        .vehicle-price { font-size: 1.3rem; font-weight: 800; color: var(--accent); }
+        .vehicle-meta-text { color: var(--text-dark); opacity: 0.75; }
+        .vehicle-user { font-size: 0.85rem; color: var(--text-dark); opacity: 0.7; margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--border-light); }
+        .vehicle-actions { padding: 16px 20px; background: rgba(245, 247, 255, 0.5); border-top: 1px solid var(--border-light); display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-action { padding: 8px 14px; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; cursor: pointer; transition: all 0.2s ease; }
+        .btn-approve { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25); }
+        .btn-approve:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(34, 197, 94, 0.35); }
+        .btn-reject { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; }
+        .btn-reject:hover { background: rgba(239, 68, 68, 0.2); }
+        .btn-feature { background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%); color: white; box-shadow: 0 4px 12px rgba(234, 179, 8, 0.25); }
+        .btn-feature:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(234, 179, 8, 0.35); }
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state-icon { font-size: 4rem; margin-bottom: 16px; }
+        .empty-state-title { font-size: 1.5rem; font-weight: 700; color: var(--dark-bg); margin-bottom: 8px; }
+        .empty-state-text { font-size: 1rem; color: var(--text-dark); opacity: 0.75; }
+        @media (max-width: 768px) { .page-header { margin-top: 80px; padding: 40px 16px; } .page-header h1 { font-size: 2rem; } .page-content { padding: 40px 16px; } }
     </style>
 </head>
-<body data-light-nav="true">
-    <!-- Navbar will be injected by navbar.js -->
-
-    <div class="wrapper" style="margin-top: 100px;">
-
-        <div class="stats">
-            <div class="stat"><h3>Total Ads</h3><p id="total-ads">-</p></div>
-            <div class="stat"><h3>Featured</h3><p id="featured-ads">-</p></div>
-            <div class="stat"><h3>Total Views</h3><p id="total-views">-</p></div>
-        </div>
-
-        <div class="panel">
-            <h2>Vehicles List</h2>
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr><th>ID</th><th>Title</th><th>Brand</th><th>Price</th><th>Year</th><th>Phone</th><th>Fuel</th><th>Owner</th><th>Image</th><th>Actions</th></tr>
-                    </thead>
-                    <tbody id="vehicles-table"></tbody>
-                </table>
+<body>
+    <div class="bg-aurora" aria-hidden="true"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+    <nav class="premium-navbar" id="navbar">
+        <div class="navbar-container">
+            <div class="navbar-left"><a href="index.html" class="navbar-brand"><img src="logo.PNG" alt="Muthupura.lk" class="navbar-logo"><span class="navbar-brand-text">Muthupura.lk</span></a></div>
+            <div class="navbar-center">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="post.html" class="nav-link">Post Ad</a>
+                <a href="dashboard.html" class="nav-link">My Listings</a>
+                <a href="about.html" class="nav-link">About Us</a>
+                <a href="contact.html" class="nav-link">Contact Us</a>
+            </div>
+            <div class="navbar-right">
+                <span id="user-greeting" style="display:none;" class="user-greeting"></span>
+                <a id="auth-link" href="login.html" class="nav-auth-btn nav-login-btn">Login</a>
+                <a id="admin-link" href="admin.html" class="nav-auth-btn nav-admin-btn" style="display:none;">Admin</a>
+                <button class="navbar-hamburger" id="navbar-hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
             </div>
         </div>
-
-        <p class="note">Use features to highlight top vehicles; delete outdated listings quickly.</p>
+    </nav>
+    <div class="mobile-menu-dropdown" id="mobile-menu">
+        <a href="index.html" class="mobile-menu-link">Home</a>
+        <a href="post.html" class="mobile-menu-link">Post Ad</a>
+        <a href="dashboard.html" class="mobile-menu-link">My Listings</a>
+        <a href="about.html" class="mobile-menu-link">About Us</a>
+        <a href="contact.html" class="mobile-menu-link">Contact Us</a>
+        <hr style="border: none; border-top: 1px solid rgba(220, 230, 255, 0.3); margin: 12px 0;">
+        <a id="auth-link-mobile" href="login.html" class="mobile-menu-link nav-login-btn">Login</a>
+        <a id="admin-link-mobile" href="admin.html" class="mobile-menu-link nav-admin-btn" style="display:none;">Admin</a>
     </div>
-
-    <script src="config.js"></script>
+    <section class="page-header">
+        <div class="page-container"><div class="breadcrumb">Platform Management</div><h1>Admin Dashboard</h1><p class="subtitle">Manage vehicle listings and platform moderation.</p></div>
+    </section>
+    <section class="page-content">
+        <div class="page-container">
+            <div class="admin-stats-row">
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-label">Total Vehicles</div>
+                    <div class="stat-value" id="totalVehicles">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-label">Pending Approval</div>
+                    <div class="stat-value" id="pendingCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-label">Active Listings</div>
+                    <div class="stat-value" id="activeCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-label">Featured</div>
+                    <div class="stat-value" id="featuredCount">0</div>
+                </div>
+            </div>
+            <div class="pending-vehicles-section">
+                <h2>📋 Pending Vehicles for Approval</h2>
+                <div id="vehiclesContainer" class="vehicles-grid">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">✅</div>
+                        <div class="empty-state-title">All Caught Up!</div>
+                        <div class="empty-state-text">No pending vehicles to review at the moment.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="premium-footer">
+        <div class="footer-content">
+            <div class="footer-column"><h4>Muthupura.lk</h4><p>Sri Lanka's premier online vehicle marketplace.</p><div class="social-links"><a href="#">f</a><a href="#">𝕏</a><a href="#">📷</a></div></div>
+            <div class="footer-column"><h4>Quick Links</h4><a href="index.html">Home</a><a href="about.html">About Us</a><a href="post.html">Post Vehicle</a><a href="contact.html">Contact</a></div>
+            <div class="footer-column"><h4>Support</h4><a href="#">FAQ</a><a href="#">Privacy Policy</a><a href="#">Terms & Conditions</a><a href="contact.html">Contact Support</a></div>
+            <div class="footer-column"><h4>Newsletter</h4><p style="font-size: 0.9rem; margin-bottom: 12px;">Get updates on new listings</p><form class="newsletter-form" onsubmit="event.preventDefault();"><input type="email" placeholder="Your email" required><button type="submit">Subscribe</button></form></div>
+        </div>
+        <div class="footer-bottom"><div class="footer-bottom-links"><a href="#">Privacy</a><span>•</span><a href="#">Terms</a><span>•</span><a href="contact.html">Contact</a></div><p>&copy; 2025 Muthupura.lk – All rights reserved</p></div>
+    </footer>
     <script src="config.js"></script>
     <script>
-        console.log('📡 Using API URL:', API_BASE_URL);
         const API_URL = API_BASE_URL;
-
-        /**
-         * Get image URL from vehicle data
-         * Images are now stored as Firebase Storage URLs directly
-         */
-        function getImageUrl(images) {
-            const FALLBACK = '/logo.PNG';
+        const getEl = (id) => document.getElementById(id);
+        const emojis = ['🏎️', '🚗', '🚙', '🚕', '🏍️', '🚌', '🚎', '🚐'];
+        function getTokenPayload() {
+            const token = localStorage.getItem('token');
+            if (!token) return null;
             try {
-                let imageArray = [];
-                if (typeof images === 'string') {
-                    // Try to parse as JSON array first
-                    try {
-                        imageArray = JSON.parse(images);
-                        // Ensure it's actually an array
-                        if (!Array.isArray(imageArray)) {
-                            imageArray = [images]; // Treat as single image
-                        }
-                    } catch (parseError) {
-                        // If JSON.parse fails, treat as single image URL
-                        imageArray = [images];
-                    }
-                } else if (Array.isArray(images)) {
-                    imageArray = images;
-                }
-                return (imageArray && imageArray[0]) || FALLBACK;
-            } catch (e) {
-                console.warn('⚠️ Failed to parse images:', e.message);
-                return FALLBACK;
+                const parts = token.split('.');
+                if (parts.length !== 3) return null;
+                return JSON.parse(atob(parts[1]));
+            } catch (e) { return null; }
+        }
+        function checkAdminAccess() {
+            const payload = getTokenPayload();
+            if (!payload || payload.role !== 'admin') {
+                alert('Access denied. Admin privileges required.');
+                window.location.href = 'index.html';
             }
         }
-        
-        function getPayload(){ const t=localStorage.getItem('token'); if(!t) return null; try{return JSON.parse(atob(t.split('.')[1]));}catch{return null;} }
-        function requireAdmin(){ const p=getPayload(); if(!p||p.role!=='admin'){ alert('Admin login required'); window.location.href='login.html'; return false; } return true; }
-        if(!requireAdmin()) throw new Error('Unauthorized');
-
-        document.getElementById('logout-btn').onclick = () => { localStorage.removeItem('token'); window.location.href='login.html'; };
-
-        async function loadVehicles(){
-            const token = localStorage.getItem('token');
+        async function updateNavigation() {
             try {
-                console.log('Calling API:', API_BASE_URL);
-                console.log('📤 Calling API: ' + API_URL + '/admin/vehicles');
-                const response = await fetch(`${API_URL}/admin/vehicles`, { headers: { Authorization: `Bearer ${token}` } });
-                if(!response.ok) throw new Error('Failed to load');
-                const vehicles = await response.json();
-
-                const tbody = document.getElementById('vehicles-table'); tbody.innerHTML='';
-                let totalViews=0, featuredCount=0;
-
-                if(!vehicles.length){ tbody.innerHTML='<tr><td colspan="8" style="text-align:center; padding:18px;">No vehicles found.</td></tr>'; }
-
-                vehicles.forEach(v => {
-                    totalViews += Number(v.views||0);
-                    if(v.isFeatured) featuredCount++;
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${v.id}</td>
-                        <td>${v.title||''}</td>
-                        <td>${v.brand||''}</td>
-                        <td>${v.price||''}</td>
-                        <td>${v.year||''}</td>
-                        <td>${v.phone||''}</td>
-                        <td>${v.fuelType||''}</td>
-                        <td>${v.ownerId||''}</td>
-                        <td><img class="thumb" src="${getImageUrl(v.image)}" onerror="this.src='/logo.PNG';console.warn('⚠️ Thumb failed:', this.src);" /></td>
-                        <td>
-                            <button class="btn ${v.isFeatured?'secondary':'primary'}" onclick="toggleFeature(${v.id},${v.isFeatured})">${v.isFeatured?'Unfeature':'Feature'}</button>
-                            <button class="btn danger" onclick="deleteAd(${v.id})">Delete</button>
-                        </td>
-                    `;
-                    tbody.appendChild(row);
+                let payload = getTokenPayload();
+                const authLink = getEl('auth-link'), adminLink = getEl('admin-link'), myListings = getEl('mylistings-link');
+                const userGreeting = getEl('user-greeting'), authLinkMobile = getEl('auth-link-mobile');
+                const adminLinkMobile = getEl('admin-link-mobile'), myListingsMobile = getEl('mylistings-link-mobile');
+                if (!payload || (payload.exp && Date.now() >= payload.exp * 1000)) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('userName');
+                    if (userGreeting) userGreeting.style.display = 'none';
+                    payload = null;
+                }
+                if (adminLink) adminLink.style.display = payload?.role === 'admin' ? 'inline-block' : 'none';
+                if (adminLinkMobile) adminLinkMobile.style.display = payload?.role === 'admin' ? 'block' : 'none';
+                if (payload) {
+                    if (myListings) myListings.style.display = 'block';
+                    if (myListingsMobile) myListingsMobile.style.display = 'block';
+                    const displayName = payload.name || localStorage.getItem('userName') || payload.email || '';
+                    if (userGreeting) {
+                        userGreeting.textContent = displayName ? `Hi, ${displayName}` : 'Hi';
+                        userGreeting.style.display = 'inline-block';
+                    }
+                    if (authLink) {
+                        authLink.textContent = 'Logout';
+                        authLink.classList.remove('nav-login-btn');
+                        authLink.classList.add('nav-logout-btn');
+                        authLink.href = '#';
+                        authLink.onclick = (e) => {
+                            e.preventDefault();
+                            localStorage.removeItem('token');
+                            localStorage.removeItem('userName');
+                            location.reload();
+                        };
+                    }
+                    if (authLinkMobile) {
+                        authLinkMobile.textContent = 'Logout';
+                        authLinkMobile.classList.remove('nav-login-btn');
+                        authLinkMobile.classList.add('nav-logout-btn');
+                        authLinkMobile.href = '#';
+                        authLinkMobile.onclick = (e) => {
+                            e.preventDefault();
+                            localStorage.removeItem('token');
+                            localStorage.removeItem('userName');
+                            location.reload();
+                        };
+                    }
+                } else {
+                    if (myListings) myListings.style.display = 'none';
+                    if (myListingsMobile) myListingsMobile.style.display = 'none';
+                    if (authLink) { authLink.textContent = 'Login'; authLink.classList.add('nav-login-btn'); authLink.classList.remove('nav-logout-btn'); authLink.href = 'login.html'; authLink.onclick = null; }
+                    if (authLinkMobile) { authLinkMobile.textContent = 'Login'; authLinkMobile.classList.add('nav-login-btn'); authLinkMobile.classList.remove('nav-logout-btn'); authLinkMobile.href = 'login.html'; authLinkMobile.onclick = null; }
+                }
+            } catch (err) { console.error('Navigation update error:', err); }
+        }
+        async function fetchPendingVehicles() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/vehicles/pending`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
-
-                document.getElementById('total-ads').textContent = vehicles.length;
-                document.getElementById('featured-ads').textContent = featuredCount;
-                document.getElementById('total-views').textContent = totalViews;
-            } catch(err){ console.error(err); alert('Could not load dashboard data.'); }
+                if (response.ok) {
+                    const vehicles = await response.json();
+                    renderVehicles(vehicles);
+                    updateStats(vehicles);
+                } else if (response.status === 401) {
+                    localStorage.removeItem('token');
+                    window.location.href = 'login.html';
+                }
+            } catch (err) { console.error('Error fetching vehicles:', err); }
         }
-
-        async function toggleFeature(id, current){
-            const token = localStorage.getItem('token');
+        function updateStats(vehicles) {
+            getEl('pendingCount').textContent = vehicles.filter(v => v.status === 'pending').length;
+            getEl('activeCount').textContent = vehicles.filter(v => v.status === 'active').length;
+            getEl('featuredCount').textContent = vehicles.filter(v => v.featured).length;
+            getEl('totalVehicles').textContent = vehicles.length;
+        }
+        function renderVehicles(vehicles) {
+            const container = getEl('vehiclesContainer');
+            const pendingVehicles = vehicles.filter(v => v.status === 'pending');
+            if (pendingVehicles.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><div class="empty-state-icon">✅</div><div class="empty-state-title">All Caught Up!</div><div class="empty-state-text">No pending vehicles to review at the moment.</div></div>';
+                return;
+            }
+            container.innerHTML = pendingVehicles.map((vehicle, idx) => `
+                <div class="vehicle-card">
+                    <div class="vehicle-image">${emojis[idx % emojis.length]}</div>
+                    <div class="vehicle-info">
+                        <div class="vehicle-title">${(vehicle.make || 'Unknown') + ' ' + (vehicle.model || 'Model')}</div>
+                        <div class="vehicle-meta">
+                            <span class="vehicle-meta-text">${vehicle.year || 'N/A'} • ${vehicle.mileage || 'N/A'} km</span>
+                        </div>
+                        <div class="vehicle-price">LKR ${((vehicle.price || 0) / 100000).toFixed(1)}L</div>
+                        <div class="vehicle-user">👤 ${vehicle.postedBy || 'User'}</div>
+                    </div>
+                    <div class="vehicle-actions">
+                        <button class="btn-action btn-approve" onclick="approveVehicle('${vehicle._id || ''}')">Approve</button>
+                        <button class="btn-action btn-reject" onclick="rejectVehicle('${vehicle._id || ''}')">Reject</button>
+                        <button class="btn-action btn-feature" onclick="featureVehicle('${vehicle._id || ''}')">Feature</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        async function approveVehicle(vehicleId) {
+            if (!vehicleId) { alert('Vehicle ID not found'); return; }
             try {
-                console.log('Calling API:', API_BASE_URL);
-                console.log('📤 Calling API: ' + API_URL + '/toggle-feature/' + id);
-                const res = await fetch(`${API_URL}/toggle-feature/${id}`, { method:'PUT', headers:{'Content-Type':'application/json', Authorization:`Bearer ${token}`}});
-                if(!res.ok) throw new Error();
-                await loadVehicles();
-            } catch(err){ console.error(err); alert('Feature toggle failed.'); }
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/vehicles/${vehicleId}/approve`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+                });
+                if (response.ok) {
+                    alert('Vehicle approved successfully');
+                    fetchPendingVehicles();
+                } else {
+                    alert('Error approving vehicle');
+                }
+            } catch (err) { console.error('Error:', err); alert('Error approving vehicle'); }
         }
-
-        async function deleteAd(id){ if(!confirm('Delete this vehicle?')) return; const token = localStorage.getItem('token'); try { console.log('Calling API:', API_BASE_URL); console.log('📤 Calling API: ' + API_URL + '/delete-vehicle/' + id); const res = await fetch(`${API_URL}/delete-vehicle/${id}`, { method:'DELETE', headers:{Authorization:`Bearer ${token}`}}); if(!res.ok) throw new Error(); await loadVehicles(); } catch(err){ console.error(err); alert('Delete failed.'); }}
-
-        // Sync mobile logout button
-        const mobileLogoutBtn = document.getElementById('logout-btn-mobile');
-        if (mobileLogoutBtn) {
-            mobileLogoutBtn.onclick = () => { localStorage.removeItem('token'); window.location.href='login.html'; };
+        async function rejectVehicle(vehicleId) {
+            if (!vehicleId) { alert('Vehicle ID not found'); return; }
+            if (!confirm('Are you sure you want to reject this vehicle?')) return;
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/vehicles/${vehicleId}/reject`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    alert('Vehicle rejected successfully');
+                    fetchPendingVehicles();
+                } else {
+                    alert('Error rejecting vehicle');
+                }
+            } catch (err) { console.error('Error:', err); alert('Error rejecting vehicle'); }
         }
-
-        // ===== HAMBURGER MENU =====
+        async function featureVehicle(vehicleId) {
+            if (!vehicleId) { alert('Vehicle ID not found'); return; }
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${API_URL}/vehicles/${vehicleId}/feature`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+                });
+                if (response.ok) {
+                    alert('Vehicle featured successfully');
+                    fetchPendingVehicles();
+                } else {
+                    alert('Error featuring vehicle');
+                }
+            } catch (err) { console.error('Error:', err); alert('Error featuring vehicle'); }
+        }
+        function setupNavbarScroll() {
+            const navbar = getEl('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 0) navbar.classList.add('scrolled');
+                else navbar.classList.remove('scrolled');
+            });
+        }
         function setupHamburgerMenu() {
-            const hamburger = document.getElementById('navbar-hamburger');
-            const mobileMenu = document.getElementById('mobile-menu');
+            const hamburger = getEl('navbar-hamburger'), mobileMenu = getEl('mobile-menu');
             if (!hamburger || !mobileMenu) return;
-
             hamburger.addEventListener('click', () => {
                 hamburger.classList.toggle('active');
                 mobileMenu.classList.toggle('active');
             });
-
             mobileMenu.querySelectorAll('a').forEach(link => {
                 link.addEventListener('click', () => {
                     hamburger.classList.remove('active');
@@ -575,17 +322,13 @@
                 });
             });
         }
-
-        setTimeout(setupHamburgerMenu, 100);
-
-        loadVehicles();
+        document.addEventListener('DOMContentLoaded', () => {
+            updateNavigation();
+            checkAdminAccess();
+            fetchPendingVehicles();
+            setupNavbarScroll();
+            setupHamburgerMenu();
+        });
     </script>
-<<<<<<< HEAD
-    <script src="navbar.js"></script>
-=======
-
-    <!-- ✅ Auth UI Manager - Handles login state display -->
-    <script src="auth-ui.js"></script>
->>>>>>> temp-work
 </body>
 </html>
