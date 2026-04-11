@@ -155,8 +155,6 @@ app.use(cors({
   credentials: true
 }));
 
-app.options('*', cors());
-
 // ✅ FIXED: Caching headers & security headers
 app.use((req, res, next) => {
     if (req.method === 'GET') {
