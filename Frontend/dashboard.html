@@ -508,12 +508,25 @@
 
     <script src="config.js"></script>
     <script>
+        // Global logout function
+        window.performLogout = function() {
+            console.log('🚪 Logout initiated');
+            const keysToRemove = ['token', 'jwt_token', 'user_name', 'user_role', 'user', 'userName'];
+            keysToRemove.forEach(key => {
+                if (localStorage.getItem(key)) {
+                    localStorage.removeItem(key);
+                    console.log(`✅ Removed: ${key}`);
+                }
+            });
+            window.location.href = 'index.html';
+        };
+        
         const API_URL = API_BASE_URL;
         const getEl = (id) => document.getElementById(id);
 
         // ===== AUTH CHECK (Redirect if not logged in) =====
         function checkAuth() {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('token') || localStorage.getItem('jwt_token');
             if (!token) {
                 window.location.href = 'login.html';
                 return false;
@@ -584,9 +597,7 @@
                     authLink.href = '#';
                     authLink.onclick = (e) => {
                         e.preventDefault();
-                        localStorage.removeItem('token');
-                        localStorage.removeItem('userName');
-                        location.reload();
+                        window.performLogout();
                     };
                 }
                 if (authLinkMobile) {
@@ -596,9 +607,7 @@
                     authLinkMobile.href = '#';
                     authLinkMobile.onclick = (e) => {
                         e.preventDefault();
-                        localStorage.removeItem('token');
-                        localStorage.removeItem('userName');
-                        location.reload();
+                        window.performLogout();
                     };
                 }
             } catch (err) {
@@ -1380,9 +1389,7 @@
                         authLink.href = '#';
                         authLink.onclick = (e) => {
                             e.preventDefault();
-                            localStorage.removeItem('token');
-                            localStorage.removeItem('userName');
-                            location.reload();
+                            window.performLogout();
                         };
                     }
                 } else {
@@ -1406,11 +1413,17 @@
             if (desktopAuthLink && mobileAuthLink) {
                 mobileAuthLink.textContent = desktopAuthLink.textContent;
                 mobileAuthLink.href = desktopAuthLink.href;
-                mobileAuthLink.onclick = desktopAuthLink.onclick;
                 
+                // For logout button, use performLogout function
                 if (desktopAuthLink.classList.contains('logout-btn')) {
+                    mobileAuthLink.onclick = (e) => {
+                        e.preventDefault();
+                        window.performLogout();
+                    };
                     mobileAuthLink.classList.add('logout-btn');
                 } else {
+                    // For login button, just set href
+                    mobileAuthLink.onclick = null;
                     mobileAuthLink.classList.remove('logout-btn');
                 }
             }

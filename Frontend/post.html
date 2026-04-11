@@ -237,6 +237,19 @@
     </footer>
     <script src="config.js"></script>
     <script>
+        // Global logout function
+        window.performLogout = function() {
+            console.log('🚪 Logout initiated');
+            const keysToRemove = ['token', 'jwt_token', 'user_name', 'user_role', 'user', 'userName'];
+            keysToRemove.forEach(key => {
+                if (localStorage.getItem(key)) {
+                    localStorage.removeItem(key);
+                    console.log(`✅ Removed: ${key}`);
+                }
+            });
+            window.location.href = 'index.html';
+        };
+        
         const API_URL = API_BASE_URL;
         const getEl = (id) => document.getElementById(id);
         function getTokenPayload() {
@@ -262,8 +275,10 @@
                 const userGreeting = getEl('user-greeting'), authLinkMobile = getEl('auth-link-mobile');
                 const adminLinkMobile = getEl('admin-link-mobile'), myListingsMobile = getEl('mylistings-link-mobile');
                 if (!payload || (payload.exp && Date.now() >= payload.exp * 1000)) {
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('userName');
+                    // Clear all auth keys on token expiry
+                    ['token', 'jwt_token', 'user_name', 'user_role', 'user', 'userName'].forEach(key => {
+                        localStorage.removeItem(key);
+                    });
                     if (userGreeting) userGreeting.style.display = 'none';
                     payload = null;
                 }
@@ -284,9 +299,7 @@
                         authLink.href = '#';
                         authLink.onclick = (e) => {
                             e.preventDefault();
-                            localStorage.removeItem('token');
-                            localStorage.removeItem('userName');
-                            location.reload();
+                            window.performLogout();
                         };
                     }
                     if (authLinkMobile) {
@@ -296,9 +309,7 @@
                         authLinkMobile.href = '#';
                         authLinkMobile.onclick = (e) => {
                             e.preventDefault();
-                            localStorage.removeItem('token');
-                            localStorage.removeItem('userName');
-                            location.reload();
+                            window.performLogout();
                         };
                     }
                 } else {

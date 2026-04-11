@@ -3149,6 +3149,38 @@
     <script src="config.js"></script>
     
     <script>
+        // ========================================
+        // GLOBAL LOGOUT FUNCTION - Clear all auth
+        // ========================================
+        window.performLogout = function() {
+            console.log('🚪 Logout initiated');
+            
+            // Clear ALL auth-related localStorage keys
+            const keysToRemove = [
+                'token',
+                'jwt_token',
+                'user_name',
+                'user_role',
+                'user',
+                'userName', // legacy
+                'temp_mobile',
+                'temp_votp_verified'
+            ];
+            
+            keysToRemove.forEach(key => {
+                const value = localStorage.getItem(key);
+                if (value) {
+                    localStorage.removeItem(key);
+                    console.log(`✅ Removed: ${key}`);
+                }
+            });
+            
+            console.log('🔄 All auth data cleared, reloading page...');
+            
+            // Force reload to reset navbar completely
+            window.location.href = 'index.html';
+        };
+        
         const API_URL = API_BASE_URL;
         console.log('Using API URL:', API_URL);
         let vehiclesData = [];
@@ -3178,7 +3210,7 @@
         }
 
         function getTokenPayload() {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('token') || localStorage.getItem('jwt_token');
             if (!token) return null;
             try { return JSON.parse(atob(token.split('.')[1])); } catch { return null; }
         }
@@ -3194,8 +3226,10 @@
                 const userGreeting = getEl('user-greeting');
 
                 if (!payload || (payload.exp && Date.now() >= payload.exp * 1000)) {
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('userName');
+                    // Clear all auth keys on token expiry
+                    ['token', 'jwt_token', 'user_name', 'user_role', 'user', 'userName', 'user_id'].forEach(key => {
+                        localStorage.removeItem(key);
+                    });
                     if (userGreeting) userGreeting.style.display = 'none';
                     payload = null;
                 }
@@ -3240,9 +3274,7 @@
                         authLink.href = '#';
                         authLink.onclick = (e) => {
                             e.preventDefault();
-                            localStorage.removeItem('token');
-                            localStorage.removeItem('userName');
-                            location.reload();
+                            window.performLogout();
                         };
                     }
                 } else {
@@ -3266,11 +3298,17 @@
             if (desktopAuthLink && mobileAuthLink) {
                 mobileAuthLink.textContent = desktopAuthLink.textContent;
                 mobileAuthLink.href = desktopAuthLink.href;
-                mobileAuthLink.onclick = desktopAuthLink.onclick;
                 
+                // For logout button, use performLogout function
                 if (desktopAuthLink.classList.contains('logout-btn')) {
+                    mobileAuthLink.onclick = (e) => {
+                        e.preventDefault();
+                        window.performLogout();
+                    };
                     mobileAuthLink.classList.add('logout-btn');
                 } else {
+                    // For login button, just set href
+                    mobileAuthLink.onclick = null;
                     mobileAuthLink.classList.remove('logout-btn');
                 }
             }
