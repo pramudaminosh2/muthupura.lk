@@ -608,10 +608,26 @@ app.post('/register', authLimiter, async (req, res) => {
             ],
             (err, result) => {
                 if (err) {
+                    console.error('❌ Register database error:', {
+                        message: err.message,
+                        code: err.code,
+                        errno: err.errno,
+                        sql: err.sql
+                    });
+                    
                     if (err.code === 'ER_DUP_ENTRY') {
                         // Email already exists - return success anyway so OAuth flows work
                         db.query('SELECT id, name, email, role FROM users WHERE email = ?', [normalizedEmail], (selectErr, users) => {
-                            if (selectErr || !users.length) {
+                            if (selectErr) {
+                                console.error('❌ Error retrieving duplicate user:', selectErr.message);
+                                return res.status(500).json({ 
+                                    success: false,
+                                    message: 'Database error' 
+                                });
+                            }
+                            
+                            if (!users || !users.length) {
+                                console.error('❌ No user found for duplicate email:', normalizedEmail);
                                 return res.status(500).json({ 
                                     success: false,
                                     message: 'Database error' 
@@ -643,7 +659,16 @@ app.post('/register', authLimiter, async (req, res) => {
                 
                 // Get the user record
                 db.query('SELECT id, name, email, role FROM users WHERE email = ?', [normalizedEmail], (selectErr, users) => {
-                    if (selectErr || !users.length) {
+                    if (selectErr) {
+                        console.error('❌ Error retrieving user after registration:', selectErr.message);
+                        return res.status(500).json({ 
+                            success: false,
+                            message: 'Failed to retrieve user' 
+                        });
+                    }
+                    
+                    if (!users || !users.length) {
+                        console.error('❌ No user found after registration for email:', normalizedEmail);
                         return res.status(500).json({ 
                             success: false,
                             message: 'Failed to retrieve user' 
@@ -667,10 +692,15 @@ app.post('/register', authLimiter, async (req, res) => {
             }
         );
     } catch (err) {
-        console.error('Unexpected error in /register:', err);
+        console.error('❌ Unexpected error in /register:', {
+            message: err.message,
+            stack: err.stack,
+            code: err.code
+        });
         res.status(500).json({
             success: false,
-            message: 'Unexpected server error'
+            message: 'Unexpected server error',
+            error: process.env.NODE_ENV === 'development' ? err.message : undefined
         });
     }
 });
