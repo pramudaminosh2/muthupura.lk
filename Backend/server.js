@@ -768,52 +768,72 @@ app.post('/register', authLimiter, async (req, res) => {
                 console.log('✅ REGISTER - Email is unique, proceeding with registration');
 
                 // ============================================
-                // 7. INSERT NEW USER
+                // 7. DEBUG LOG BEFORE INSERT
+                // ============================================
+                console.log('📊 REGISTER DATA:', {
+                    name: normalizedName,
+                    email: normalizedEmail,
+                    passwordLength: hashedPassword ? hashedPassword.length : 0,
+                    username: username,
+                    phone: normalizedPhone || 'NULL',
+                    authProvider: authProvider,
+                    firebaseUid: firebaseUser?.uid || 'NULL'
+                });
+
+                // ============================================
+                // 8. INSERT NEW USER
                 // ============================================
                 console.log('💾 REGISTER - Inserting new user...');
 
-                db.query(
-                    `INSERT INTO users (firebase_uid, name, username, email, phone, password, role, auth_provider)
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-                    [
-                        firebaseUser?.uid || null,
-                        normalizedName,
-                        username,
-                        normalizedEmail,
-                        normalizedPhone || null,
-                        hashedPassword || null,
-                        'user',
-                        authProvider
-                    ],
-                    (insertErr, result) => {
-                        if (insertErr) {
-                            console.error('❌ REGISTER - DB INSERT ERROR:', {
-                                message: insertErr.message,
-                                code: insertErr.code,
-                                errno: insertErr.errno,
-                                sql: insertErr.sql
-                            });
+                const insertSql = `
+                    INSERT INTO users 
+                    (name, email, password, username, role, auth_provider, phone, firebase_uid, createdAt)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                `;
 
-                            // Handle specific error codes
-                            if (insertErr.code === 'ER_DUP_ENTRY') {
-                                return res.status(400).json({
-                                    success: false,
-                                    message: 'Email or username already exists',
-                                    error: 'Duplicate entry'
-                                });
-                            }
+                const insertValues = [
+                    normalizedName,           // name
+                    normalizedEmail,          // email
+                    hashedPassword || null,   // password (NULL for OAuth)
+                    username,                 // username
+                    'user',                   // role
+                    authProvider,             // auth_provider
+                    normalizedPhone || null,  // phone (optional)
+                    firebaseUser?.uid || null // firebase_uid (NULL for local auth)
+                ];
 
-                            return res.status(500).json({
+                console.log('📝 REGISTER - SQL insert query built, executing...');
+
+                db.query(insertSql, insertValues, (insertErr, result) => {
+                    if (insertErr) {
+                        console.error('❌ REGISTER - DB INSERT ERROR FULL:', {
+                            message: insertErr.message,
+                            code: insertErr.code,
+                            errno: insertErr.errno,
+                            sqlMessage: insertErr.sqlMessage,
+                            sql: insertErr.sql
+                        });
+
+                        // Handle specific error codes
+                        if (insertErr.code === 'ER_DUP_ENTRY') {
+                            return res.status(400).json({
                                 success: false,
-                                message: 'Database insert failed',
-                                error: process.env.NODE_ENV === 'development' ? insertErr.message : 'Server error'
+                                message: 'Email or username already exists',
+                                error: insertErr.sqlMessage || 'Duplicate entry'
                             });
                         }
+
+                        return res.status(500).json({
+                            success: false,
+                            message: 'Database insert failed',
+                            error: insertErr.sqlMessage || insertErr.message
+                        });
+                    }
 
                         console.log('✅ REGISTER - User inserted successfully:', { userId: result.insertId });
 
                         // ============================================
-                        // 8. RETRIEVE USER & GENERATE TOKEN
+                        // 9. RETRIEVE USER & GENERATE TOKEN
                         // ============================================
                         console.log('🔑 REGISTER - Retrieving user record and generating token...');
 
@@ -824,7 +844,8 @@ app.post('/register', authLimiter, async (req, res) => {
                                 if (retrieveErr) {
                                     console.error('❌ REGISTER - DB RETRIEVE ERROR:', {
                                         message: retrieveErr.message,
-                                        code: retrieveErr.code
+                                        code: retrieveErr.code,
+                                        sqlMessage: retrieveErr.sqlMessage
                                     });
                                     return res.status(500).json({
                                         success: false,
@@ -850,8 +871,8 @@ app.post('/register', authLimiter, async (req, res) => {
                                         { expiresIn: '6h' }
                                     );
 
-                                    console.log('✅ REGISTER - User registered and token generated successfully');
-                                    console.log('✅ REGISTER - New user:', { userId: user.id, email: user.email, name: user.name });
+                                    console.log('✅ REGISTER - USER REGISTERED AND TOKEN GENERATED SUCCESSFULLY');
+                                    console.log('✅ REGISTER - New user created:', { userId: user.id, email: user.email, name: user.name, provider: authProvider });
 
                                     return res.status(201).json({
                                         success: true,
