@@ -639,7 +639,13 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+                    console.error('❌ Registration validation failed:', {
+                        status: response.status,
+                        message: errorData.message,
+                        fullResponse: errorData
+                    });
+                    throw new Error(`HTTP ${response.status}: ${errorData.message || response.statusText}`);
                 }
                 
                 const data = await response.json();

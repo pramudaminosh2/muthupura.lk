@@ -523,6 +523,17 @@ app.post('/register', authLimiter, async (req, res) => {
     try {
         const { name, email, password, idToken, phone, provider } = req.body;
 
+        console.log('📥 Register request received:', {
+            hasName: !!name,
+            hasEmail: !!email,
+            hasPassword: !!password,
+            hasPhone: !!phone,
+            hasIdToken: !!idToken,
+            nameLength: name ? name.length : 0,
+            passwordLength: password ? password.length : 0,
+            phoneLength: phone ? phone.length : 0
+        });
+
         // If idToken is provided (from Firebase Auth), verify it
         let firebaseUser = null;
         let normalizedEmail = null;
@@ -548,6 +559,7 @@ app.post('/register', authLimiter, async (req, res) => {
         } else {
             // Local auth (email/password)
             if (!name || !email || !password) {
+                console.error('❌ Validation failed - missing required fields:', { name: !!name, email: !!email, password: !!password });
                 return res.status(400).json({ 
                     success: false,
                     message: 'Name, email, and password are required' 
@@ -560,6 +572,7 @@ app.post('/register', authLimiter, async (req, res) => {
 
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailPattern.test(normalizedEmail)) {
+                console.error('❌ Validation failed - invalid email:', normalizedEmail);
                 return res.status(400).json({ 
                     success: false,
                     message: 'Invalid email format' 
@@ -567,6 +580,7 @@ app.post('/register', authLimiter, async (req, res) => {
             }
 
             if (password.length < 8) {
+                console.error('❌ Validation failed - password too short:', password.length);
                 return res.status(400).json({ 
                     success: false,
                     message: 'Password must be at least 8 characters' 
@@ -575,6 +589,7 @@ app.post('/register', authLimiter, async (req, res) => {
         }
 
         if (!normalizedEmail) {
+            console.error('❌ Validation failed - no normalized email');
             return res.status(400).json({ 
                 success: false,
                 message: 'Email is required' 
