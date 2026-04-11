@@ -1195,11 +1195,17 @@
                 localStorage.removeItem('pendingPhone');
                 localStorage.removeItem('votp_verified_phone');
 
-                // Update navbar immediately if function exists
-                if (typeof window.updateNavbarAuthUI === 'function') {
-                    console.log('🔄 Calling updateNavbarAuthUI...');
-                    window.updateNavbarAuthUI();
-                }
+                // Update navbar multiple times to ensure it works
+                const updateNavbar = () => {
+                    if (typeof window.updateNavbarAuthUI === 'function') {
+                        console.log('🔄 Calling updateNavbarAuthUI...');
+                        window.updateNavbarAuthUI();
+                    }
+                };
+                
+                updateNavbar();
+                setTimeout(updateNavbar, 10);
+                setTimeout(updateNavbar, 400);
 
                 showAlert('✅ Profile completed successfully! Redirecting...', 'success', 2000);
 

@@ -452,11 +452,26 @@
   document.head.insertAdjacentHTML('beforeend', navbarCSS);
   document.body.insertAdjacentHTML('afterbegin', navbarHTML);
 
-  // IMMEDIATELY UPDATE NAVBAR AUTH AFTER INJECTION
-  console.log('📥 Navbar injected, updating auth state...');
+  // IMMEDIATELY UPDATE NAVBAR AUTH AFTER INJECTION (multiple attempts)
+  console.log('📥 Navbar injected, scheduling auth checks...');
+  
+  // First attempt: immediate
   setTimeout(() => {
+    console.log('🔄 Auth check attempt 1 (immediate after injection)');
     updateNavbarAuth();
-  }, 10); // Small delay to ensure DOM is ready
+  }, 5);
+  
+  // Second attempt: after brief delay
+  setTimeout(() => {
+    console.log('🔄 Auth check attempt 2 (5ms delay)');
+    updateNavbarAuth();
+  }, 10);
+  
+  // Third attempt: on next tick
+  setTimeout(() => {
+    console.log('🔄 Auth check attempt 3 (on next tick)');
+    updateNavbarAuth();
+  }, 50);
 
   // ── SCROLL BEHAVIOR ─────────────────────
   // Detect if page has a hero/dark header
@@ -509,17 +524,27 @@
   // Check localStorage for logged in user
   // Uses keys set by login.html: jwt_token, user_name, user_role, token, user
   function updateNavbarAuth() {
+    console.log('🔍 updateNavbarAuth() called');
+    
     const token = localStorage.getItem('jwt_token') || localStorage.getItem('token');
     const userName = localStorage.getItem('user_name');
     const userDataStr = localStorage.getItem('user');
     let user = null;
 
+    console.log('📦 Storage values:', {
+      jwt_token: localStorage.getItem('jwt_token'),
+      token: localStorage.getItem('token'),
+      user_name: userName,
+      user_raw: userDataStr
+    });
+
     // Try to parse user object if stored as JSON
     if (userDataStr) {
       try {
         user = JSON.parse(userDataStr);
+        console.log('✅ User JSON parsed:', user);
       } catch (e) {
-        console.warn('Could not parse user JSON:', e);
+        console.warn('❌ Could not parse user JSON:', e);
       }
     }
 
@@ -534,8 +559,18 @@
     const authArea = document.getElementById('nav-auth-area');
     const mobileAuthArea = document.getElementById('mobile-auth-area');
 
+    console.log('🔍 DOM Elements found:', {
+      navAuthArea: !!authArea,
+      mobileAuthArea: !!mobileAuthArea,
+      navAuthAreaId: authArea?.id
+    });
+
     if (!token || !displayName || !authArea) {
-      console.log('⚠️  No auth found, showing login button');
+      console.log('⚠️  No auth found or missing elements:', {
+        token: !!token,
+        displayName,
+        authArea: !!authArea
+      });
       return;
     }
 
@@ -548,7 +583,7 @@
 
       console.log('✅ Updating navbar with user:', { name, firstName, initials });
 
-      authArea.innerHTML = `
+      const navHTML = `
         <div class="nav-user-menu">
           <button class="nav-user-btn" id="nav-user-trigger">
             <span class="nav-avatar">${initials}</span>
@@ -564,17 +599,24 @@
           </div>
         </div>
       `;
+      
+      authArea.innerHTML = navHTML;
+      console.log('✅ innerHTML set. authArea now contains:', authArea.innerHTML.substring(0, 100));
 
       // Toggle dropdown
-      document.getElementById('nav-user-trigger')
-        ?.addEventListener('click', (e) => {
-          e.stopPropagation();
-          document.getElementById('nav-dropdown')
-            ?.classList.toggle('open');
-        });
+      const triggerBtn = document.getElementById('nav-user-trigger');
+      console.log('🔘 Trigger button found:', !!triggerBtn);
+      
+      triggerBtn?.addEventListener('click', (e) => {
+        console.log('🖱️  User button clicked');
+        e.stopPropagation();
+        document.getElementById('nav-dropdown')
+          ?.classList.toggle('open');
+      });
 
       // Update mobile auth area
       if (mobileAuthArea) {
+        console.log('📱 Updating mobile auth area');
         mobileAuthArea.innerHTML = `
           <div style="display:flex;flex-direction:column;gap:8px">
             <a href="dashboard.html" class="mobile-nav-link"
@@ -591,10 +633,14 @@
             </button>
           </div>
         `;
+        console.log('✅ Mobile auth area updated');
       }
+
+      console.log('✅ NAVBAR AUTH UPDATE COMPLETE');
 
     } catch (e) {
       console.error('❌ Navbar auth error:', e);
+      console.error('Stack:', e.stack);
     }
   }
 
@@ -641,12 +687,28 @@
   // Run auth check
   updateNavbarAuth();
 
-  // Listen for storage changes (e.g., login in another tab)
+  // Listen for storage changes (e.g., login in another tab or from login.html)
   window.addEventListener('storage', (e) => {
-    if (e.key === 'jwt_token' || e.key === 'user_name') {
-      console.log('📢 Storage changed, updating navbar...');
+    if (e.key === 'jwt_token' || e.key === 'user_name' || e.key === 'token' || e.key === 'user') {
+      console.log('📢 Storage changed (' + e.key + '), updating navbar...');
       updateNavbarAuth();
     }
+  });
+
+  // Also check for auth on page visibility change (user returns from login page)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      console.log('👁️  Page visible, checking auth state...');
+      updateNavbarAuth();
+    }
+  });
+
+  // Also check on DOMContentLoaded if this script loaded before that event
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('📄 DOMContentLoaded fired, checking navbar auth...');
+    setTimeout(() => {
+      updateNavbarAuth();
+    }, 50);
   });
 
   // Page body padding for fixed navbar

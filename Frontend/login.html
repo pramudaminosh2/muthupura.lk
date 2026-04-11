@@ -614,11 +614,22 @@
                     console.log('✅ Stored user:', localStorage.getItem('user'));
                     console.log('✅ Stored token:', !!localStorage.getItem('token'));
                     
-                    // Update navbar immediately if function exists
-                    if (typeof window.updateNavbarAuthUI === 'function') {
-                        console.log('🔄 Calling updateNavbarAuthUI...');
-                        window.updateNavbarAuthUI();
-                    }
+                    // Update navbar immediately and multiple times to ensure it works
+                    const updateNavbar = () => {
+                        if (typeof window.updateNavbarAuthUI === 'function') {
+                            console.log('🔄 Calling updateNavbarAuthUI...');
+                            window.updateNavbarAuthUI();
+                        }
+                    };
+                    
+                    // Try updating immediately
+                    updateNavbar();
+                    
+                    // Try again after a tiny delay
+                    setTimeout(updateNavbar, 10);
+                    
+                    // Try again before redirect
+                    setTimeout(updateNavbar, 400);
                     
                     showMessage('Login successful!', 'success');
                     setTimeout(() => { window.location.href = 'index.html'; }, 1000);
@@ -672,6 +683,21 @@
                     localStorage.setItem('jwt_token', data.token);
                     localStorage.setItem('user_role', data.user?.role || 'user');
                     localStorage.setItem('user_name', data.user?.name || name);
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    // Update navbar multiple times
+                    const updateNavbar = () => {
+                        if (typeof window.updateNavbarAuthUI === 'function') {
+                            console.log('🔄 Calling updateNavbarAuthUI (registration)...');
+                            window.updateNavbarAuthUI();
+                        }
+                    };
+                    
+                    updateNavbar();
+                    setTimeout(updateNavbar, 10);
+                    setTimeout(updateNavbar, 400);
+                    
                     showMessage('Account created!', 'success');
                     setTimeout(() => { window.location.href = 'index.html'; }, 1000);
                 } else if (data.success) {
@@ -750,21 +776,24 @@
                     // User is registered, log them in
                     console.log('📊 Storing auth data from VOTP:', { userName: data.user.name, role: data.user.role });
                     
-                    // Store both formats for compatibility
+                    // Store all keys for compatibility
                     localStorage.setItem('jwt_token', data.token);
                     localStorage.setItem('user_role', data.user?.role || 'user');
                     localStorage.setItem('user_name', data.user?.name || 'User');
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
                     
-                    // Verify storage
-                    console.log('✅ Stored user:', localStorage.getItem('user'));
+                    // Update navbar multiple times
+                    const updateNavbar = () => {
+                        if (typeof window.updateNavbarAuthUI === 'function') {
+                            console.log('🔄 Calling updateNavbarAuthUI (VOTP)...');
+                            window.updateNavbarAuthUI();
+                        }
+                    };
                     
-                    // Update navbar immediately if function exists
-                    if (typeof window.updateNavbarAuthUI === 'function') {
-                        console.log('🔄 Calling updateNavbarAuthUI...');
-                        window.updateNavbarAuthUI();
-                    }
+                    updateNavbar();
+                    setTimeout(updateNavbar, 10);
+                    setTimeout(updateNavbar, 400);
                     
                     showMessage('VOTP verified! Logging in...', 'success');
                     setTimeout(() => { window.location.href = 'index.html'; }, 1000);
