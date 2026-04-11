@@ -3586,6 +3586,16 @@
         document.addEventListener('DOMContentLoaded', () => {
             updateNavigation();
             
+            // 🔐 Update navbar auth state after page load
+            setTimeout(() => {
+                if (typeof window.updateNavbarAuthUI === 'function') {
+                    console.log('🔄 DOMContentLoaded: Updating navbar auth UI');
+                    window.updateNavbarAuthUI();
+                } else {
+                    console.log('⚠️  updateNavbarAuthUI not available yet');
+                }
+            }, 100);
+            
             // 🌐 Wake-up ping for Render cold start (silent)
             console.log('💤 Pinging backend to wake up from cold start...');
             fetch(`${API_URL}/api/health`, { method: 'GET' })

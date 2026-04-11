@@ -452,6 +452,12 @@
   document.head.insertAdjacentHTML('beforeend', navbarCSS);
   document.body.insertAdjacentHTML('afterbegin', navbarHTML);
 
+  // IMMEDIATELY UPDATE NAVBAR AUTH AFTER INJECTION
+  console.log('📥 Navbar injected, updating auth state...');
+  setTimeout(() => {
+    updateNavbarAuth();
+  }, 10); // Small delay to ensure DOM is ready
+
   // ── SCROLL BEHAVIOR ─────────────────────
   // Detect if page has a hero/dark header
   const hasHero = !document.body.dataset.lightNav && 
@@ -501,22 +507,40 @@
 
   // ── AUTH STATE ──────────────────────────
   // Check localStorage for logged in user
-  // Uses keys set by login.html: jwt_token, user_name, user_role
+  // Uses keys set by login.html: jwt_token, user_name, user_role, token, user
   function updateNavbarAuth() {
-    const token = localStorage.getItem('jwt_token');
+    const token = localStorage.getItem('jwt_token') || localStorage.getItem('token');
     const userName = localStorage.getItem('user_name');
+    const userDataStr = localStorage.getItem('user');
+    let user = null;
+
+    // Try to parse user object if stored as JSON
+    if (userDataStr) {
+      try {
+        user = JSON.parse(userDataStr);
+      } catch (e) {
+        console.warn('Could not parse user JSON:', e);
+      }
+    }
+
+    const displayName = userName || (user?.name) || (user?.username) || null;
+
+    console.log('🔐 Navbar Auth Update:', { 
+      hasToken: !!token, 
+      displayName,
+      source: userName ? 'jwt_token/user_name' : (user ? 'user JSON' : 'none')
+    });
+
     const authArea = document.getElementById('nav-auth-area');
     const mobileAuthArea = document.getElementById('mobile-auth-area');
 
-    console.log('🔐 Navbar Auth State:', { hasToken: !!token, hasUserName: !!userName });
-
-    if (!token || !userName || !authArea) {
-      console.log('⚠️  No auth state found, keeping login button');
+    if (!token || !displayName || !authArea) {
+      console.log('⚠️  No auth found, showing login button');
       return;
     }
 
     try {
-      const name = userName || 'Account';
+      const name = displayName || 'Account';
       const firstName = name.split(' ')[0];
       const initials = name.split(' ')
         .map(n => n[0] || '').join('')
@@ -574,6 +598,9 @@
     }
   }
 
+  // Make globally accessible
+  window.updateNavbarAuthUI = updateNavbarAuth;
+
   // Close dropdown on outside click
   document.addEventListener('click', e => {
     if (!e.target.closest('.nav-user-menu')) {
@@ -584,20 +611,31 @@
 
   // Global logout function
   window.navbarLogout = function() {
-    console.log('🚪 LOGOUT - Clearing auth data');
+    console.log('🚪 LOGOUT - Clearing all auth data');
+    
+    // Clear all possible auth keys for compatibility
+    localStorage.removeItem('jwt_token');
+    localStorage.removeItem('user_name');
+    localStorage.removeItem('user_role');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userData');
+    
     // Try Firebase signout if available
     if (typeof firebase !== 'undefined' && firebase.auth) {
       firebase.auth().signOut().catch(() => {});
     }
-    // Clear all auth keys used by login/register/navbar
-    localStorage.removeItem('jwt_token');
-    localStorage.removeItem('user_name');
-    localStorage.removeItem('user_role');
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userData');
     
-    console.log('✅ LOGOUT - Auth data cleared, redirecting to home');
-    window.location.href = 'index.html';
+    console.log('✅ LOGOUT - Auth data cleared');
+    
+    // Update navbar before redirect
+    updateNavbarAuth();
+    
+    // Redirect to home
+    setTimeout(() => {
+      window.location.href = 'index.html';
+    }, 200);
   };
 
   // Run auth check

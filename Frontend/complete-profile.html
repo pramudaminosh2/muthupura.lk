@@ -1178,11 +1178,15 @@
 
                 // Profile saved successfully
                 if (data.token) {
+                    console.log('📊 Storing auth data after profile completion');
                     localStorage.setItem('jwt_token', data.token);
+                    localStorage.setItem('token', data.token);
                 }
                 if (data.user) {
                     localStorage.setItem('user_name', data.user.name || profileData.name);
                     localStorage.setItem('user_role', data.user.role || 'user');
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    console.log('✅ Stored user:', localStorage.getItem('user'));
                 }
 
                 // Clear temporary storage
@@ -1190,6 +1194,12 @@
                 localStorage.removeItem('temp_votp_verified');
                 localStorage.removeItem('pendingPhone');
                 localStorage.removeItem('votp_verified_phone');
+
+                // Update navbar immediately if function exists
+                if (typeof window.updateNavbarAuthUI === 'function') {
+                    console.log('🔄 Calling updateNavbarAuthUI...');
+                    window.updateNavbarAuthUI();
+                }
 
                 showAlert('✅ Profile completed successfully! Redirecting...', 'success', 2000);
 
