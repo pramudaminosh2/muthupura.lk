@@ -523,17 +523,24 @@
 
         if (payload && !payload.name) {
           try {
-            const res = await fetch(`${API_URL}/profile`, {
+            const url = `${API_URL}/profile`;
+            console.log('📡 Fetching profile from:', url);
+            const res = await fetch(url, {
               headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
             });
-            if (res.ok) {
-              const profile = await res.json();
-              if (profile.name) {
-                payload.name = profile.name;
-              }
+            
+            if (!res.ok) {
+              throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+            }
+            
+            const profile = await res.json();
+            console.log('✅ Profile fetched:', profile);
+            
+            if (profile.name) {
+              payload.name = profile.name;
             }
           } catch (err) {
-            console.warn('Failed to fetch profile', err);
+            console.error('❌ Failed to fetch profile:', err.message);
           }
         }
 

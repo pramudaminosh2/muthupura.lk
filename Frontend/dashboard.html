@@ -650,15 +650,22 @@
             
             try {
                 const token = localStorage.getItem('token');
-                const res = await fetch(`${API_URL}/vehicles/my-listings`, {
+                const url = `${API_URL}/vehicles/my-listings`;
+                console.log('📡 Fetching my listings from:', url);
+                
+                const res = await fetch(url, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 
-                if (!res.ok) throw new Error('Failed to load listings');
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                }
+                
                 const data = await res.json();
+                console.log('✅ My listings fetched:', data.vehicles?.length);
                 renderVehicles(data.vehicles || []);
             } catch (err) {
-                console.error('Error loading listings:', err);
+                console.error('❌ Error loading listings:', err.message);
                 grid.innerHTML = `
                     <div style="grid-column: 1/-1;">
                         <div class="empty-state">
@@ -1546,13 +1553,23 @@
             if (!confirm('Delete this vehicle?')) return;
             const token = localStorage.getItem('token');
             try {
-                console.log('Calling API:', API_BASE_URL);
-                const res = await fetch(`${API_URL}/delete-vehicle/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
-                if (!res.ok) throw new Error('Failed to delete');
+                const url = `${API_URL}/delete-vehicle/${id}`;
+                console.log('📡 Calling delete API:', url);
+                
+                const res = await fetch(url, { 
+                    method: 'DELETE', 
+                    headers: { Authorization: `Bearer ${token}` } 
+                });
+                
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                }
+                
+                console.log('✅ Vehicle deleted successfully');
                 await fetchListings();
             } catch (error) {
-                console.error(error);
-                alert('Could not delete listing.');
+                console.error('❌ Delete error:', error.message);
+                alert(`Could not delete listing: ${error.message}`);
             }
         }
 
@@ -1576,21 +1593,26 @@
 
             const token = localStorage.getItem('token');
             try {
-                console.log('Calling API:', API_BASE_URL);
-                const res = await fetch(`${API_URL}/update-vehicle/${id}`, {
+                const url = `${API_URL}/update-vehicle/${id}`;
+                console.log('📡 Calling update API:', url, data);
+                
+                const res = await fetch(url, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
                     body: JSON.stringify(data)
                 });
+                
                 if (!res.ok) {
                     const body = await res.json().catch(() => null);
-                    throw new Error(body?.message || 'Update failed');
+                    throw new Error(body?.message || `HTTP ${res.status}: ${res.statusText}`);
                 }
+                
+                console.log('✅ Vehicle updated successfully');
                 alert('Vehicle updated successfully');
                 await fetchListings();
             } catch (error) {
-                console.error(error);
-                alert('Could not update listing: ' + error.message);
+                console.error('❌ Update error:', error.message);
+                alert(`Could not update listing: ${error.message}`);
             }
         }
 

@@ -133,6 +133,30 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// ✅ FIXED: Production-ready CORS configuration
+const allowedOrigins = [
+  'https://muthupura.lk',
+  'https://www.muthupura.lk',
+  'http://localhost:3000',
+  'http://127.0.0.1:5500'
+];
+
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed for this origin: ' + origin));
+    }
+  },
+  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
+
+app.options('*', cors());
+
 // ✅ FIXED: Caching headers & security headers
 app.use((req, res, next) => {
     if (req.method === 'GET') {
@@ -152,14 +176,6 @@ app.use((req, res, next) => {
     next();
 });
 
-// Handle preflight requests
-app.use((req, res, next) => {
-    if (req.method === 'OPTIONS') {
-        res.sendStatus(200);
-        return;
-    }
-    next();
-});
 app.use(session({
     secret: process.env.SESSION_SECRET || 'muthupura-session-secret',
     resave: false,
@@ -438,6 +454,12 @@ db.query('SELECT NOW() as server_time', (err, results) => {
             }
         });
 
+        db.query("ALTER TABLE users ADD COLUMN firebase_uid VARCHAR(180) NULL UNIQUE", alterErr => {
+            if (alterErr && alterErr.code !== 'ER_DUP_FIELDNAME') {
+                console.error('Failed to add firebase_uid column to users:', alterErr);
+            }
+        });
+
         // Favorites system has been removed. Legacy favorites table no longer created in schema setup.
         // If existing database has the table, drop it manually with:
         // DROP TABLE IF EXISTS favorites;
@@ -691,6 +713,145 @@ function requireAdmin(req, res, next) {
     }
     next();
 }
+
+// ✅ NEW: Middleware to verify Firebase tokens
+async function verifyFirebaseToken(req, res, next) {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+        return res.status(401).json({ error: 'No token provided' });
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ error: 'No token provided' });
+    }
+
+    try {
+        const decoded = await admin.auth().verifyIdToken(token);
+        req.firebaseUser = decoded;
+        next();
+    } catch (err) {
+        console.error('Firebase token verification failed:', err.message);
+        return res.status(403).json({ error: 'Invalid or expired Firebase token' });
+    }
+}
+
+// ✅ NEW: Firebase Authentication endpoint
+app.post('/firebase-auth', verifyFirebaseToken, async (req, res) => {
+    try {
+        const firebaseUser = req.firebaseUser;
+
+        // Extract Firebase user info
+        const email = (firebaseUser.email || '').trim().toLowerCase();
+        const name = firebaseUser.name || email.split('@')[0];
+        const uid = firebaseUser.uid;
+
+        console.log('🔐 Firebase auth attempt:', { uid, email, name });
+
+        if (!email) {
+            return res.status(400).json({
+                success: false,
+                message: 'Firebase user must have an email'
+            });
+        }
+
+        // Check if user exists in database
+        db.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
+            if (err) {
+                console.error('❌ Firebase auth - Database query error:', err.message);
+                return res.status(500).json({
+                    success: false,
+                    message: 'Internal server error'
+                });
+            }
+
+            // If user exists, return JWT
+            if (results.length > 0) {
+                const user = results[0];
+
+                // Update firebase_uid if not already set
+                if (!user.firebase_uid) {
+                    db.query('UPDATE users SET firebase_uid = ? WHERE id = ?', [uid, user.id], (updateErr) => {
+                        if (updateErr) {
+                            console.error('Error updating firebase_uid:', updateErr.message);
+                        }
+                    });
+                }
+
+                const payload = {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role
+                };
+                const token = jwt.sign(payload, SECRET, { expiresIn: '1h' });
+
+                console.log('✅ Firebase auth success (existing user):', { userId: user.id, email });
+
+                return res.json({
+                    success: true,
+                    token,
+                    user: {
+                        id: user.id,
+                        email: user.email,
+                        name: user.name,
+                        role: user.role
+                    }
+                });
+            }
+
+            // If user doesn't exist, create new user
+            console.log('📝 Creating new Firebase user:', email);
+
+            const defaultUsername = (name || email.split('@')[0]).toLowerCase().replace(/[^a-z0-9]/g, '').substr(0, 20) + Math.floor(Math.random() * 10000);
+
+            db.query(
+                'INSERT INTO users (name, email, username, firebase_uid, role, auth_provider) VALUES (?, ?, ?, ?, ?, ?)',
+                [name, email, defaultUsername, uid, 'user', 'firebase'],
+                (insertErr, insertResult) => {
+                    if (insertErr) {
+                        console.error('❌ Firebase auth - Error creating user:', insertErr.message);
+                        return res.status(500).json({
+                            success: false,
+                            message: 'Error creating user account'
+                        });
+                    }
+
+                    const newUser = {
+                        id: insertResult.insertId,
+                        name,
+                        email,
+                        role: 'user'
+                    };
+
+                    const payload = {
+                        id: newUser.id,
+                        name: newUser.name,
+                        email: newUser.email,
+                        role: newUser.role
+                    };
+                    const token = jwt.sign(payload, SECRET, { expiresIn: '1h' });
+
+                    console.log('✅ Firebase auth success (new user created):', newUser);
+
+                    return res.json({
+                        success: true,
+                        token,
+                        user: newUser
+                    });
+                }
+            );
+        });
+    } catch (err) {
+        console.error('❌ Firebase auth error:', err.message);
+        return res.status(500).json({
+            success: false,
+            message: 'Authentication failed'
+        });
+    }
+});
 
 app.post('/login', authLimiter, async (req, res) => {
     try {
@@ -2089,10 +2250,6 @@ app.post('/test-url-parsing', (req, res) => {
 
 // Multer file upload error handler 2.0
 app.use((err, req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "https://muthupuralk.web.app");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-    
     if (err && err.name === 'MulterError') {
         console.error('❌ Multer upload error:', err.code, err.field, err.message);
         if (err.code === 'LIMIT_FILE_SIZE') {
@@ -2110,10 +2267,6 @@ app.use((err, req, res, next) => {
 
 // global error handler: JSON output only
 app.use((err, req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "https://muthupuralk.web.app");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-    res.header("Access-Control-Allow-Credentials", "true");
     console.error('Unhandled error:', err);
     res.status(err.status || 500).json({ success: false, message: err.message || 'Internal server error' });
 });

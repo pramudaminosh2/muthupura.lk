@@ -585,12 +585,21 @@
 
             showMessage('Logging in...', 'info');
             try {
-                const response = await fetch(`${API_BASE_URL}/login`, {
+                const url = `${API_BASE_URL}/login`;
+                console.log('📡 Sending login request to:', url);
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const data = await response.json();
+                console.log('✅ Login response received:', { token: !!data.token, role: data.role });
+                
                 if (data.token) {
                     localStorage.setItem('jwt_token', data.token);
                     localStorage.setItem('user_role', data.role || 'user');
@@ -601,8 +610,8 @@
                     showMessage(data.message || 'Login failed', 'error');
                 }
             } catch (error) {
-                console.error(error);
-                showMessage('Connection error', 'error');
+                console.error('❌ Login error:', error.message);
+                showMessage(`Login failed: ${error.message}`, 'error');
             }
         });
 
@@ -621,12 +630,21 @@
 
             showMessage('Creating account...', 'info');
             try {
-                const response = await fetch(`${API_BASE_URL}/register`, {
+                const url = `${API_BASE_URL}/register`;
+                console.log('📡 Sending registration request to:', url);
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, email, phone, password })
                 });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const data = await response.json();
+                console.log('✅ Registration response received:', { token: !!data.token, success: data.success });
+                
                 if (data.token) {
                     localStorage.setItem('jwt_token', data.token);
                     localStorage.setItem('user_role', data.role || 'user');
@@ -640,8 +658,8 @@
                     showMessage(data.message || 'Registration failed', 'error');
                 }
             } catch (error) {
-                console.error(error);
-                showMessage('Connection error', 'error');
+                console.error('❌ Registration error:', error.message);
+                showMessage(`Registration failed: ${error.message}`, 'error');
             }
         });
 
@@ -652,12 +670,20 @@
 
             showMessage('Sending VOTP...', 'info');
             try {
-                const response = await fetch(`${API_BASE_URL}/send-votp`, {
+                const url = `${API_BASE_URL}/send-votp`;
+                console.log('📡 Sending VOTP request to:', url, { phone: mobile });
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ phone: mobile })
                 });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const data = await response.json();
+                console.log('✅ VOTP sent successfully:', { success: data.success });
                 
                 if (response.ok || data.success) {
                     showMessage('VOTP sent to your mobile!', 'success');
@@ -667,8 +693,8 @@
                     showMessage(data.message || 'Failed to send VOTP', 'error');
                 }
             } catch (error) {
-                console.error(error);
-                showMessage('Connection error', 'error');
+                console.error('❌ Send VOTP error:', error.message);
+                showMessage(`Failed to send VOTP: ${error.message}`, 'error');
             }
         }
 
@@ -682,12 +708,20 @@
 
             showMessage('Verifying VOTP...', 'info');
             try {
-                const response = await fetch(`${API_BASE_URL}/verify-votp`, {
+                const url = `${API_BASE_URL}/verify-votp`;
+                console.log('📡 Sending VOTP verification request to:', url, { phone: mobile, votpLength: votp.length });
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ phone: mobile, votp })
                 });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const data = await response.json();
+                console.log('✅ VOTP verified:', { isNewUser: data.isNewUser, hasToken: !!data.token });
                 
                 if (data.token) {
                     // User is registered, log them in
@@ -706,8 +740,8 @@
                     showMessage(data.message || 'VOTP verification failed', 'error');
                 }
             } catch (error) {
-                console.error(error);
-                showMessage('Connection error', 'error');
+                console.error('❌ Verify VOTP error:', error.message);
+                showMessage(`VOTP verification failed: ${error.message}`, 'error');
             }
         }
 

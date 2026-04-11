@@ -207,18 +207,30 @@
         async function fetchPendingVehicles() {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`${API_URL}/vehicles/pending`, {
+                const url = `${API_URL}/vehicles/pending`;
+                console.log('📡 Fetching pending vehicles from:', url);
+                
+                const response = await fetch(url, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                if (response.ok) {
-                    const vehicles = await response.json();
-                    renderVehicles(vehicles);
-                    updateStats(vehicles);
-                } else if (response.status === 401) {
-                    localStorage.removeItem('token');
-                    window.location.href = 'login.html';
+                
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        console.error('❌ Unauthorized - token expired');
+                        localStorage.removeItem('token');
+                        window.location.href = 'login.html';
+                        return;
+                    }
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
-            } catch (err) { console.error('Error fetching vehicles:', err); }
+                
+                const vehicles = await response.json();
+                console.log('✅ Pending vehicles fetched:', vehicles.length);
+                renderVehicles(vehicles);
+                updateStats(vehicles);
+            } catch (err) { 
+                console.error('❌ Error fetching vehicles:', err.message); 
+            }
         }
         function updateStats(vehicles) {
             getEl('pendingCount').textContent = vehicles.filter(v => v.status === 'pending').length;
@@ -256,50 +268,74 @@
             if (!vehicleId) { alert('Vehicle ID not found'); return; }
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`${API_URL}/vehicles/${vehicleId}/approve`, {
+                const url = `${API_URL}/vehicles/${vehicleId}/approve`;
+                console.log('📡 Approving vehicle via:', url);
+                
+                const response = await fetch(url, {
                     method: 'PATCH',
                     headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
                 });
-                if (response.ok) {
-                    alert('Vehicle approved successfully');
-                    fetchPendingVehicles();
-                } else {
-                    alert('Error approving vehicle');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
-            } catch (err) { console.error('Error:', err); alert('Error approving vehicle'); }
+                
+                console.log('✅ Vehicle approved successfully');
+                alert('Vehicle approved successfully');
+                fetchPendingVehicles();
+            } catch (err) { 
+                console.error('❌ Error approving vehicle:', err.message); 
+                alert(`Error approving vehicle: ${err.message}`); 
+            }
         }
         async function rejectVehicle(vehicleId) {
             if (!vehicleId) { alert('Vehicle ID not found'); return; }
             if (!confirm('Are you sure you want to reject this vehicle?')) return;
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`${API_URL}/vehicles/${vehicleId}/reject`, {
+                const url = `${API_URL}/vehicles/${vehicleId}/reject`;
+                console.log('📡 Rejecting vehicle via:', url);
+                
+                const response = await fetch(url, {
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                if (response.ok) {
-                    alert('Vehicle rejected successfully');
-                    fetchPendingVehicles();
-                } else {
-                    alert('Error rejecting vehicle');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
-            } catch (err) { console.error('Error:', err); alert('Error rejecting vehicle'); }
+                
+                console.log('✅ Vehicle rejected successfully');
+                alert('Vehicle rejected successfully');
+                fetchPendingVehicles();
+            } catch (err) { 
+                console.error('❌ Error rejecting vehicle:', err.message); 
+                alert(`Error rejecting vehicle: ${err.message}`); 
+            }
         }
         async function featureVehicle(vehicleId) {
             if (!vehicleId) { alert('Vehicle ID not found'); return; }
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`${API_URL}/vehicles/${vehicleId}/feature`, {
+                const url = `${API_URL}/vehicles/${vehicleId}/feature`;
+                console.log('📡 Featuring vehicle via:', url);
+                
+                const response = await fetch(url, {
                     method: 'PATCH',
                     headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
                 });
-                if (response.ok) {
-                    alert('Vehicle featured successfully');
-                    fetchPendingVehicles();
-                } else {
-                    alert('Error featuring vehicle');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
-            } catch (err) { console.error('Error:', err); alert('Error featuring vehicle'); }
+                
+                console.log('✅ Vehicle featured successfully');
+                alert('Vehicle featured successfully');
+                fetchPendingVehicles();
+            } catch (err) { 
+                console.error('❌ Error featuring vehicle:', err.message); 
+                alert(`Error featuring vehicle: ${err.message}`); 
+            }
         }
         function setupNavbarScroll() {
             const navbar = getEl('navbar');
