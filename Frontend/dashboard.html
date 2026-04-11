@@ -581,8 +581,10 @@
                     }
                 }
 
-                if (adminLink) adminLink.style.display = payload?.role === 'admin' ? 'inline-block' : 'none';
-                if (adminLinkMobile) adminLinkMobile.style.display = payload?.role === 'admin' ? 'block' : 'none';
+                // Check both role field and is_admin field
+                const isUserAdmin = payload?.role === 'admin' || payload?.is_admin === true;
+                if (adminLink) adminLink.style.display = isUserAdmin ? 'inline-block' : 'none';
+                if (adminLinkMobile) adminLinkMobile.style.display = isUserAdmin ? 'block' : 'none';
 
                 const displayName = payload.name || localStorage.getItem('userName') || payload.email || '';
                 if (userGreeting) {
@@ -1373,7 +1375,9 @@
                 }
 
                 if (adminLink) {
-                    adminLink.style.display = payload?.role === 'admin' ? 'inline-block' : 'none';
+                    // Check both role field and is_admin field
+                    const isAdmin = payload?.role === 'admin' || payload?.is_admin === true;
+                    adminLink.style.display = isAdmin ? 'inline-block' : 'none';
                 }
 
                 if (payload) {

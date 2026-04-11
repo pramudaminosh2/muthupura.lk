@@ -282,8 +282,10 @@
                     if (userGreeting) userGreeting.style.display = 'none';
                     payload = null;
                 }
-                if (adminLink) adminLink.style.display = payload?.role === 'admin' ? 'inline-block' : 'none';
-                if (adminLinkMobile) adminLinkMobile.style.display = payload?.role === 'admin' ? 'block' : 'none';
+                // Check both role field and is_admin field
+                const isUserAdmin = payload?.role === 'admin' || payload?.is_admin === true;
+                if (adminLink) adminLink.style.display = isUserAdmin ? 'inline-block' : 'none';
+                if (adminLinkMobile) adminLinkMobile.style.display = isUserAdmin ? 'block' : 'none';
                 if (payload) {
                     if (myListings) myListings.style.display = 'block';
                     if (myListingsMobile) myListingsMobile.style.display = 'block';

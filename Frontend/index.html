@@ -2342,10 +2342,16 @@
         const myListingsLinkMobile = document.getElementById("mylistings-link-mobile");
         const adminLink = document.getElementById("admin-link");
         
-        // Hide login button
+        // Hide login button and convert to logout button
         if (loginBtn) {
-            loginBtn.style.display = "none";
-            console.log('✅ Hidden login button');
+            loginBtn.textContent = 'Logout';
+            loginBtn.classList.add('logout-btn');
+            loginBtn.href = '#';
+            loginBtn.onclick = (e) => {
+                e.preventDefault();
+                window.performLogout();
+            };
+            console.log('✅ Set up logout button');
         }
         
         // Show user greeting
@@ -2368,11 +2374,15 @@
         }
         
         // Show admin link ONLY if user is admin
-        const userRole = user?.role || localStorage.getItem('user_role');
-        if (userRole === 'admin') {
+        // Check both 'role' field and 'is_admin' field (backend might return either)
+        const userRole = user?.role;
+        const isAdminUser = user?.is_admin === true;  // only true if explicitly true
+        const userIsAdmin = userRole === 'admin' || isAdminUser;
+        
+        if (userIsAdmin) {
             if (adminLink) {
                 adminLink.style.display = "inline-block";
-                console.log('✅ Showed Admin link');
+                console.log('✅ Showed Admin link (user is admin)');
             }
         } else {
             if (adminLink) {
@@ -3266,7 +3276,10 @@
                 }
 
                 if (adminLink) {
-                    adminLink.style.display = payload?.role === 'admin' ? 'inline-block' : 'none';
+                    // Check both role field and is_admin field
+                    const isAdmin = payload?.role === 'admin' || payload?.is_admin === true;
+                    adminLink.style.display = isAdmin ? 'inline-block' : 'none';
+                    console.log(`👤 Admin link ${isAdmin ? 'shown' : 'hidden'} for user`);
                 }
 
                 if (payload) {
