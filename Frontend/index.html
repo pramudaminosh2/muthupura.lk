@@ -2296,6 +2296,70 @@
             }
         }
     </style>
+
+    <!-- Global Navbar Auth Update Function -->
+    <script>
+    /**
+     * Global function to update navbar auth state
+     * Reads from localStorage and updates navbar UI
+     * Called after login, on page load, and when auth state changes
+     */
+    window.updateNavbarAuthUI = function() {
+        // Try to get user data from localStorage
+        const userJson = localStorage.getItem("user");
+        const userName = localStorage.getItem("user_name");
+        const token = localStorage.getItem("token") || localStorage.getItem("jwt_token");
+        
+        console.log('🔍 updateNavbarAuthUI called -', { 
+            hasToken: !!token, 
+            hasUserJson: !!userJson,
+            hasUserName: !!userName 
+        });
+        
+        // Try to parse user object
+        let user = null;
+        if (userJson) {
+            try {
+                user = JSON.parse(userJson);
+                console.log('✅ Parsed user JSON:', user.name);
+            } catch (e) {
+                console.warn('⚠️  Could not parse user JSON:', e.message);
+            }
+        }
+        
+        // Determine display name
+        const displayName = user?.name || userName;
+        
+        if (!token || !displayName) {
+            console.log('❌ No auth data found, navbar showing login button');
+            return;
+        }
+        
+        // Find navbar login button
+        const loginBtn = document.getElementById("nav-login-btn");
+        const userSection = document.getElementById("nav-user-section");
+        const usernameText = document.getElementById("nav-username");
+        
+        // Hide login button
+        if (loginBtn) {
+            loginBtn.style.display = "none";
+            console.log('✅ Hidden login button');
+        }
+        
+        // Show user section
+        if (userSection) {
+            userSection.style.display = "flex";
+            console.log('✅ Showed user section');
+        }
+        
+        // Update username text
+        if (usernameText) {
+            const firstName = displayName.split(' ')[0];
+            usernameText.textContent = `Hi, ${firstName}`;
+            console.log('✅ Updated navbar username:', firstName);
+        }
+    };
+    </script>
 </head>
 <body>
     <div class="bg-aurora" aria-hidden="true">
@@ -3070,69 +3134,6 @@
 
     <script src="config.js"></script>
     
-    <!-- Global Navbar Update Function -->
-    <script>
-    /**
-     * Global function to update navbar auth state
-     * Reads from localStorage and updates navbar UI
-     * Called after login, on page load, and when auth state changes
-     */
-    window.updateNavbarAuthUI = function() {
-        // Try to get user data from localStorage
-        const userJson = localStorage.getItem("user");
-        const userName = localStorage.getItem("user_name");
-        const token = localStorage.getItem("token") || localStorage.getItem("jwt_token");
-        
-        console.log('🔍 updateNavbarAuthUI called -', { 
-            hasToken: !!token, 
-            hasUserJson: !!userJson,
-            hasUserName: !!userName 
-        });
-        
-        // Try to parse user object
-        let user = null;
-        if (userJson) {
-            try {
-                user = JSON.parse(userJson);
-                console.log('✅ Parsed user JSON:', user.name);
-            } catch (e) {
-                console.warn('⚠️  Could not parse user JSON:', e.message);
-            }
-        }
-        
-        // Determine display name
-        const displayName = user?.name || userName;
-        
-        if (!token || !displayName) {
-            console.log('❌ No auth data found, navbar showing login button');
-            return;
-        }
-        
-        // Find navbar login button
-        const loginBtn = document.getElementById("nav-login-btn");
-        const userSection = document.getElementById("nav-user-section");
-        const usernameText = document.getElementById("nav-username");
-        
-        // Hide login button
-        if (loginBtn) {
-            loginBtn.style.display = "none";
-            console.log('✅ Hidden login button');
-        }
-        
-        // Show user section
-        if (userSection) {
-            userSection.style.display = "flex";
-            console.log('✅ Showed user section');
-        }
-        
-        // Update username text
-        if (usernameText) {
-            const firstName = displayName.split(' ')[0];
-            usernameText.textContent = `Hi, ${firstName}`;
-            console.log('✅ Updated navbar username:', firstName);
-        }
-    };
-    </script>
     <script>
         const API_URL = API_BASE_URL;
         console.log('Using API URL:', API_URL);
@@ -3655,8 +3656,6 @@
                 if (typeof window.updateNavbarAuthUI === 'function') {
                     console.log('🔄 DOMContentLoaded: Updating navbar auth UI');
                     window.updateNavbarAuthUI();
-                } else {
-                    console.log('⚠️  updateNavbarAuthUI not available yet');
                 }
             }, 100);
             
