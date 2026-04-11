@@ -520,228 +520,382 @@ async function uploadToFirebase(file) {
 const bcrypt = require('bcrypt');
 
 app.post('/register', authLimiter, async (req, res) => {
+    console.log('📥 REGISTER - Incoming request received');
+
     try {
+        // ============================================
+        // 1. EXTRACT & LOG REQUEST DATA
+        // ============================================
         const { name, email, password, idToken, phone, provider } = req.body;
 
-        console.log('📥 Register request received:', {
+        console.log('📥 REGISTER - Request body:', {
             hasName: !!name,
             hasEmail: !!email,
             hasPassword: !!password,
             hasPhone: !!phone,
             hasIdToken: !!idToken,
             nameLength: name ? name.length : 0,
+            emailLength: email ? email.length : 0,
             passwordLength: password ? password.length : 0,
             phoneLength: phone ? phone.length : 0
         });
 
-        // If idToken is provided (from Firebase Auth), verify it
+        // ============================================
+        // 2. VALIDATE INPUT FOR LOCAL AUTH
+        // ============================================
         let firebaseUser = null;
         let normalizedEmail = null;
         let normalizedName = null;
         let normalizedPhone = null;
         let authProvider = provider || 'local';
+        let hashedPassword = null;
 
         if (idToken) {
+            // Firebase OAuth flow
+            console.log('🔐 REGISTER - Firebase OAuth flow detected');
             try {
-                // Verify Firebase idToken with Admin SDK
                 firebaseUser = await admin.auth().verifyIdToken(idToken);
                 normalizedEmail = (firebaseUser.email || '').trim().toLowerCase();
                 normalizedName = (name || firebaseUser.name || firebaseUser.email.split('@')[0]).trim();
                 normalizedPhone = (phone || '').replace(/\D/g, '');
                 authProvider = provider || (firebaseUser.provider === 'anonymous' ? 'local' : firebaseUser.provider);
+                
+                console.log('✅ REGISTER - Firebase token verified:', { 
+                    uid: firebaseUser.uid, 
+                    email: normalizedEmail 
+                });
             } catch (tokenErr) {
-                console.error('Firebase idToken verification failed:', tokenErr);
-                return res.status(401).json({ 
+                console.error('❌ REGISTER - Firebase token verification FAILED:', {
+                    message: tokenErr.message,
+                    code: tokenErr.code
+                });
+                return res.status(401).json({
                     success: false,
-                    message: 'Invalid Firebase token' 
+                    message: 'Invalid or expired Firebase token',
+                    error: tokenErr.message
                 });
             }
         } else {
-            // Local auth (email/password)
+            // Local email/password auth - STRICT VALIDATION
+            console.log('🔐 REGISTER - Local email/password flow');
+
+            // Check required fields
             if (!name || !email || !password) {
-                console.error('❌ Validation failed - missing required fields:', { name: !!name, email: !!email, password: !!password });
-                return res.status(400).json({ 
+                console.error('❌ REGISTER - VALIDATION FAILED: Missing required fields');
+                return res.status(400).json({
                     success: false,
-                    message: 'Name, email, and password are required' 
+                    message: 'All fields are required: name, email, password'
                 });
             }
 
+            // Normalize inputs
             normalizedEmail = email.trim().toLowerCase();
             normalizedName = name.trim();
             normalizedPhone = (phone || '').replace(/\D/g, '');
 
-            // Validate field lengths against database schema
-            if (normalizedName.length > 100) {
-                console.error('❌ Validation failed - name too long:', normalizedName.length);
-                return res.status(400).json({ 
+            // Validate name
+            if (!normalizedName || normalizedName.length === 0) {
+                console.error('❌ REGISTER - VALIDATION FAILED: Name is empty');
+                return res.status(400).json({
                     success: false,
-                    message: 'Name must be 100 characters or less' 
+                    message: 'Name cannot be empty'
+                });
+            }
+
+            if (normalizedName.length > 100) {
+                console.error('❌ REGISTER - VALIDATION FAILED: Name too long', { length: normalizedName.length });
+                return res.status(400).json({
+                    success: false,
+                    message: 'Name must be 100 characters or less'
+                });
+            }
+
+            // Validate email format
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(normalizedEmail)) {
+                console.error('❌ REGISTER - VALIDATION FAILED: Invalid email format', { email: normalizedEmail });
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid email format'
                 });
             }
 
             if (normalizedEmail.length > 180) {
-                console.error('❌ Validation failed - email too long:', normalizedEmail.length);
-                return res.status(400).json({ 
+                console.error('❌ REGISTER - VALIDATION FAILED: Email too long', { length: normalizedEmail.length });
+                return res.status(400).json({
                     success: false,
-                    message: 'Email must be 180 characters or less' 
+                    message: 'Email must be 180 characters or less'
                 });
             }
 
-            if (normalizedPhone && normalizedPhone.length > 20) {
-                console.error('❌ Validation failed - phone too long:', normalizedPhone.length);
-                return res.status(400).json({ 
+            // Validate password
+            if (typeof password !== 'string' || password.length === 0) {
+                console.error('❌ REGISTER - VALIDATION FAILED: Password is empty or invalid type');
+                return res.status(400).json({
                     success: false,
-                    message: 'Phone must be 20 characters or less' 
-                });
-            }
-
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailPattern.test(normalizedEmail)) {
-                console.error('❌ Validation failed - invalid email:', normalizedEmail);
-                return res.status(400).json({ 
-                    success: false,
-                    message: 'Invalid email format' 
+                    message: 'Password must be a non-empty string'
                 });
             }
 
             if (password.length < 8) {
-                console.error('❌ Validation failed - password too short:', password.length);
-                return res.status(400).json({ 
+                console.error('❌ REGISTER - VALIDATION FAILED: Password too short', { length: password.length });
+                return res.status(400).json({
                     success: false,
-                    message: 'Password must be at least 8 characters' 
+                    message: 'Password must be at least 8 characters'
+                });
+            }
+
+            if (password.length > 128) {
+                console.error('❌ REGISTER - VALIDATION FAILED: Password too long', { length: password.length });
+                return res.status(400).json({
+                    success: false,
+                    message: 'Password must be 128 characters or less'
+                });
+            }
+
+            // Validate phone (optional)
+            if (normalizedPhone && normalizedPhone.length > 20) {
+                console.error('❌ REGISTER - VALIDATION FAILED: Phone too long', { length: normalizedPhone.length });
+                return res.status(400).json({
+                    success: false,
+                    message: 'Phone must be 20 characters or less'
+                });
+            }
+
+            console.log('✅ REGISTER - Input validation PASSED');
+        }
+
+        // ============================================
+        // 3. FINAL EMAIL CHECK
+        // ============================================
+        if (!normalizedEmail) {
+            console.error('❌ REGISTER - VALIDATION FAILED: No normalized email after processing');
+            return res.status(400).json({
+                success: false,
+                message: 'Email is required'
+            });
+        }
+
+        // ============================================
+        // 4. HASH PASSWORD SAFELY (if local auth)
+        // ============================================
+        if (!idToken && password) {
+            console.log('🔐 REGISTER - Hashing password...');
+            try {
+                hashedPassword = await bcrypt.hash(password, 10);
+                console.log('✅ REGISTER - Password hashed successfully');
+            } catch (bcryptErr) {
+                console.error('❌ REGISTER - BCRYPT ERROR: Password hashing failed:', {
+                    message: bcryptErr.message,
+                    code: bcryptErr.code
+                });
+                return res.status(500).json({
+                    success: false,
+                    message: 'Password hashing failed',
+                    error: 'Server error during password processing'
                 });
             }
         }
 
-        if (!normalizedEmail) {
-            console.error('❌ Validation failed - no normalized email');
-            return res.status(400).json({ 
-                success: false,
-                message: 'Email is required' 
-            });
-        }
-
-        // Generate username from name
+        // ============================================
+        // 5. GENERATE USERNAME
+        // ============================================
         const username = (normalizedName || normalizedEmail.split('@')[0])
             .toLowerCase()
             .replace(/[^a-z0-9]/g, '')
             .substring(0, 20) || 'user' + Math.floor(Math.random() * 10000);
 
-        // UPSERT: Try to find existing user by email, or insert new one
+        console.log('✅ REGISTER - Generated username:', { username });
+
+        // ============================================
+        // 6. CHECK IF EMAIL ALREADY EXISTS
+        // ============================================
+        console.log('🔍 REGISTER - Checking if email already exists...');
+
         db.query(
-            `INSERT INTO users (firebase_uid, name, username, email, phone, password, role, auth_provider)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE
-                name = IF(VALUES(name) != '', VALUES(name), name),
-                phone = IF(VALUES(phone) != '', VALUES(phone), phone),
-                auth_provider = IF(VALUES(auth_provider) != 'local', VALUES(auth_provider), auth_provider),
-                firebase_uid = IF(VALUES(firebase_uid) != '', VALUES(firebase_uid), firebase_uid)`,
-            [
-                firebaseUser?.uid || null,
-                normalizedName,
-                username,
-                normalizedEmail,
-                normalizedPhone || null,
-                idToken ? null : (password ? await bcrypt.hash(password, 10) : null),
-                'user',
-                authProvider
-            ],
-            (err, result) => {
-                if (err) {
-                    console.error('❌ Register database error:', {
-                        message: err.message,
-                        code: err.code,
-                        errno: err.errno,
-                        sql: err.sql
+            'SELECT id, name, email, role FROM users WHERE email = ?',
+            [normalizedEmail],
+            async (selectErr, existingUsers) => {
+                if (selectErr) {
+                    console.error('❌ REGISTER - DB SELECT ERROR:', {
+                        message: selectErr.message,
+                        code: selectErr.code,
+                        errno: selectErr.errno
                     });
-                    
-                    if (err.code === 'ER_DUP_ENTRY') {
-                        // Email already exists - return success anyway so OAuth flows work
-                        db.query('SELECT id, name, email, role FROM users WHERE email = ?', [normalizedEmail], (selectErr, users) => {
-                            if (selectErr) {
-                                console.error('❌ Error retrieving duplicate user:', selectErr.message);
-                                return res.status(500).json({ 
-                                    success: false,
-                                    message: 'Database error' 
-                                });
-                            }
-                            
-                            if (!users || !users.length) {
-                                console.error('❌ No user found for duplicate email:', normalizedEmail);
-                                return res.status(500).json({ 
-                                    success: false,
-                                    message: 'Database error' 
-                                });
-                            }
-                            const user = users[0];
+                    return res.status(500).json({
+                        success: false,
+                        message: 'Database error',
+                        error: 'Failed to check existing email'
+                    });
+                }
+
+                if (existingUsers && existingUsers.length > 0) {
+                    console.warn('⚠️  REGISTER - Email already exists:', { email: normalizedEmail });
+                    const existingUser = existingUsers[0];
+
+                    // For OAuth flows, silently succeed to prevent duplicate account creation
+                    if (idToken) {
+                        console.log('ℹ️  REGISTER - OAuth flow: Email exists, returning existing user');
+                        try {
                             const token = jwt.sign(
-                                { id: user.id, name: user.name, email: user.email, role: user.role },
+                                { id: existingUser.id, name: existingUser.name, email: existingUser.email, role: existingUser.role },
                                 SECRET,
                                 { expiresIn: '6h' }
                             );
                             return res.status(200).json({
                                 success: true,
-                                message: 'User already exists',
-                                user: { id: user.id, name: user.name, email: user.email, role: user.role },
+                                message: 'User already registered',
+                                user: existingUser,
                                 token
                             });
+                        } catch (jwtErr) {
+                            console.error('❌ REGISTER - JWT SIGN ERROR:', jwtErr.message);
+                            return res.status(500).json({
+                                success: false,
+                                message: 'Token generation failed'
+                            });
+                        }
+                    } else {
+                        // For local auth, reject duplicate
+                        console.log('❌ REGISTER - Email already registered (local auth)');
+                        return res.status(400).json({
+                            success: false,
+                            message: 'Email is already registered'
                         });
-                        return;
                     }
-                    console.error('Register upsert error:', err);
-                    return res.status(500).json({ 
-                        success: false,
-                        message: 'Internal server error' 
-                    });
                 }
 
-                const userId = result.insertId || result.affectedRows > 0;
-                
-                // Get the user record
-                db.query('SELECT id, name, email, role FROM users WHERE email = ?', [normalizedEmail], (selectErr, users) => {
-                    if (selectErr) {
-                        console.error('❌ Error retrieving user after registration:', selectErr.message);
-                        return res.status(500).json({ 
-                            success: false,
-                            message: 'Failed to retrieve user' 
-                        });
-                    }
-                    
-                    if (!users || !users.length) {
-                        console.error('❌ No user found after registration for email:', normalizedEmail);
-                        return res.status(500).json({ 
-                            success: false,
-                            message: 'Failed to retrieve user' 
-                        });
-                    }
+                console.log('✅ REGISTER - Email is unique, proceeding with registration');
 
-                    const user = users[0];
-                    const token = jwt.sign(
-                        { id: user.id, name: user.name, email: user.email, role: user.role },
-                        SECRET,
-                        { expiresIn: '6h' }
-                    );
+                // ============================================
+                // 7. INSERT NEW USER
+                // ============================================
+                console.log('💾 REGISTER - Inserting new user...');
 
-                    res.status(201).json({
-                        success: true,
-                        message: 'User registered successfully',
-                        user: { id: user.id, name: user.name, email: user.email, role: user.role },
-                        token
-                    });
-                });
+                db.query(
+                    `INSERT INTO users (firebase_uid, name, username, email, phone, password, role, auth_provider)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                    [
+                        firebaseUser?.uid || null,
+                        normalizedName,
+                        username,
+                        normalizedEmail,
+                        normalizedPhone || null,
+                        hashedPassword || null,
+                        'user',
+                        authProvider
+                    ],
+                    (insertErr, result) => {
+                        if (insertErr) {
+                            console.error('❌ REGISTER - DB INSERT ERROR:', {
+                                message: insertErr.message,
+                                code: insertErr.code,
+                                errno: insertErr.errno,
+                                sql: insertErr.sql
+                            });
+
+                            // Handle specific error codes
+                            if (insertErr.code === 'ER_DUP_ENTRY') {
+                                return res.status(400).json({
+                                    success: false,
+                                    message: 'Email or username already exists',
+                                    error: 'Duplicate entry'
+                                });
+                            }
+
+                            return res.status(500).json({
+                                success: false,
+                                message: 'Database insert failed',
+                                error: process.env.NODE_ENV === 'development' ? insertErr.message : 'Server error'
+                            });
+                        }
+
+                        console.log('✅ REGISTER - User inserted successfully:', { userId: result.insertId });
+
+                        // ============================================
+                        // 8. RETRIEVE USER & GENERATE TOKEN
+                        // ============================================
+                        console.log('🔑 REGISTER - Retrieving user record and generating token...');
+
+                        db.query(
+                            'SELECT id, name, email, role FROM users WHERE email = ?',
+                            [normalizedEmail],
+                            (retrieveErr, users) => {
+                                if (retrieveErr) {
+                                    console.error('❌ REGISTER - DB RETRIEVE ERROR:', {
+                                        message: retrieveErr.message,
+                                        code: retrieveErr.code
+                                    });
+                                    return res.status(500).json({
+                                        success: false,
+                                        message: 'Failed to retrieve user after registration'
+                                    });
+                                }
+
+                                if (!users || users.length === 0) {
+                                    console.error('❌ REGISTER - No user found after INSERT (email: ' + normalizedEmail + ')');
+                                    return res.status(500).json({
+                                        success: false,
+                                        message: 'User registration failed - user not found after insert'
+                                    });
+                                }
+
+                                const user = users[0];
+
+                                // Generate JWT token
+                                try {
+                                    const token = jwt.sign(
+                                        { id: user.id, name: user.name, email: user.email, role: user.role },
+                                        SECRET,
+                                        { expiresIn: '6h' }
+                                    );
+
+                                    console.log('✅ REGISTER - User registered and token generated successfully');
+                                    console.log('✅ REGISTER - New user:', { userId: user.id, email: user.email, name: user.name });
+
+                                    return res.status(201).json({
+                                        success: true,
+                                        message: 'User registered successfully',
+                                        user: {
+                                            id: user.id,
+                                            name: user.name,
+                                            email: user.email,
+                                            role: user.role
+                                        },
+                                        token
+                                    });
+                                } catch (jwtErr) {
+                                    console.error('❌ REGISTER - JWT SIGN ERROR:', {
+                                        message: jwtErr.message,
+                                        code: jwtErr.code
+                                    });
+                                    return res.status(500).json({
+                                        success: false,
+                                        message: 'Token generation failed'
+                                    });
+                                }
+                            }
+                        );
+                    }
+                );
             }
         );
     } catch (err) {
-        console.error('❌ Unexpected error in /register:', {
+        console.error('❌ REGISTER - UNEXPECTED ERROR:', {
             message: err.message,
             stack: err.stack,
-            code: err.code
+            code: err.code,
+            name: err.name
         });
-        res.status(500).json({
-            success: false,
-            message: 'Unexpected server error',
-            error: process.env.NODE_ENV === 'development' ? err.message : undefined
-        });
+
+        // Ensure we never send 500 without proper response
+        if (!res.headersSent) {
+            return res.status(500).json({
+                success: false,
+                message: 'Internal server error',
+                error: process.env.NODE_ENV === 'development' ? err.message : 'Unexpected server error'
+            });
+        }
     }
 });
 
