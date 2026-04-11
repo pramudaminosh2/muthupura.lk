@@ -598,11 +598,12 @@
                 }
                 
                 const data = await response.json();
-                console.log('✅ Login response received:', { token: !!data.token, role: data.role });
+                console.log('✅ Login response received:', { token: !!data.token, userName: data.user?.name });
                 
-                if (data.token) {
+                if (data.token && data.user) {
+                    console.log('📊 Storing auth data:', { userName: data.user.name, role: data.user.role });
                     localStorage.setItem('jwt_token', data.token);
-                    localStorage.setItem('user_role', data.role || 'user');
+                    localStorage.setItem('user_role', data.user?.role || 'user');
                     localStorage.setItem('user_name', data.user?.name || 'User');
                     showMessage('Login successful!', 'success');
                     setTimeout(() => { window.location.href = 'index.html'; }, 1000);
@@ -649,12 +650,13 @@
                 }
                 
                 const data = await response.json();
-                console.log('✅ Registration response received:', { token: !!data.token, success: data.success });
+                console.log('✅ Registration response received:', { token: !!data.token, success: data.success, userName: data.user?.name });
                 
-                if (data.token) {
+                if (data.token && data.user) {
+                    console.log('📊 Storing auth data:', { userName: data.user.name, role: data.user.role });
                     localStorage.setItem('jwt_token', data.token);
-                    localStorage.setItem('user_role', data.role || 'user');
-                    localStorage.setItem('user_name', name);
+                    localStorage.setItem('user_role', data.user?.role || 'user');
+                    localStorage.setItem('user_name', data.user?.name || name);
                     showMessage('Account created!', 'success');
                     setTimeout(() => { window.location.href = 'index.html'; }, 1000);
                 } else if (data.success) {
@@ -727,12 +729,13 @@
                 }
                 
                 const data = await response.json();
-                console.log('✅ VOTP verified:', { isNewUser: data.isNewUser, hasToken: !!data.token });
+                console.log('✅ VOTP verified:', { isNewUser: data.isNewUser, hasToken: !!data.token, userName: data.user?.name });
                 
-                if (data.token) {
+                if (data.token && data.user) {
                     // User is registered, log them in
+                    console.log('📊 Storing auth data from VOTP:', { userName: data.user.name, role: data.user.role });
                     localStorage.setItem('jwt_token', data.token);
-                    localStorage.setItem('user_role', data.role || 'user');
+                    localStorage.setItem('user_role', data.user?.role || 'user');
                     localStorage.setItem('user_name', data.user?.name || 'User');
                     showMessage('VOTP verified! Logging in...', 'success');
                     setTimeout(() => { window.location.href = 'index.html'; }, 1000);

@@ -501,21 +501,28 @@
 
   // ── AUTH STATE ──────────────────────────
   // Check localStorage for logged in user
+  // Uses keys set by login.html: jwt_token, user_name, user_role
   function updateNavbarAuth() {
-    const token = localStorage.getItem('authToken');
-    const userData = localStorage.getItem('userData');
+    const token = localStorage.getItem('jwt_token');
+    const userName = localStorage.getItem('user_name');
     const authArea = document.getElementById('nav-auth-area');
     const mobileAuthArea = document.getElementById('mobile-auth-area');
 
-    if (!token || !userData || !authArea) return;
+    console.log('🔐 Navbar Auth State:', { hasToken: !!token, hasUserName: !!userName });
+
+    if (!token || !userName || !authArea) {
+      console.log('⚠️  No auth state found, keeping login button');
+      return;
+    }
 
     try {
-      const user = JSON.parse(userData);
-      const name = user.name || user.email || 'Account';
+      const name = userName || 'Account';
       const firstName = name.split(' ')[0];
       const initials = name.split(' ')
         .map(n => n[0] || '').join('')
         .toUpperCase().slice(0, 2) || 'U';
+
+      console.log('✅ Updating navbar with user:', { name, firstName, initials });
 
       authArea.innerHTML = `
         <div class="nav-user-menu">
@@ -563,7 +570,7 @@
       }
 
     } catch (e) {
-      console.error('Navbar auth error:', e);
+      console.error('❌ Navbar auth error:', e);
     }
   }
 
@@ -577,17 +584,32 @@
 
   // Global logout function
   window.navbarLogout = function() {
+    console.log('🚪 LOGOUT - Clearing auth data');
     // Try Firebase signout if available
     if (typeof firebase !== 'undefined' && firebase.auth) {
       firebase.auth().signOut().catch(() => {});
     }
+    // Clear all auth keys used by login/register/navbar
+    localStorage.removeItem('jwt_token');
+    localStorage.removeItem('user_name');
+    localStorage.removeItem('user_role');
     localStorage.removeItem('authToken');
     localStorage.removeItem('userData');
+    
+    console.log('✅ LOGOUT - Auth data cleared, redirecting to home');
     window.location.href = 'index.html';
   };
 
   // Run auth check
   updateNavbarAuth();
+
+  // Listen for storage changes (e.g., login in another tab)
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'jwt_token' || e.key === 'user_name') {
+      console.log('📢 Storage changed, updating navbar...');
+      updateNavbarAuth();
+    }
+  });
 
   // Page body padding for fixed navbar
   document.body.style.paddingTop = '0';
