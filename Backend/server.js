@@ -1166,6 +1166,7 @@ app.post('/login', authLimiter, async (req, res) => {
                         user: {
                             id: user.id,
                             name: user.name,
+                            username: user.username || user.name.toLowerCase(),
                             email: user.email,
                             role: user.role
                         }
@@ -1246,6 +1247,7 @@ app.post('/login', authLimiter, async (req, res) => {
                     user: {
                         id: user.id,
                         name: user.name,
+                        username: user.username || user.name.toLowerCase(),
                         email: user.email,
                         role: user.role
                     }
