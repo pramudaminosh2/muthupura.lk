@@ -2335,10 +2335,12 @@
             return;
         }
         
-        // Find navbar login button
-        const loginBtn = document.getElementById("nav-login-btn");
-        const userSection = document.getElementById("nav-user-section");
-        const usernameText = document.getElementById("nav-username");
+        // Find navbar elements (using correct IDs from premium navbar)
+        const loginBtn = document.getElementById("auth-link");
+        const userGreeting = document.getElementById("user-greeting");
+        const myListingsLink = document.getElementById("mylistings-link");
+        const myListingsLinkMobile = document.getElementById("mylistings-link-mobile");
+        const adminLink = document.getElementById("admin-link");
         
         // Hide login button
         if (loginBtn) {
@@ -2346,17 +2348,29 @@
             console.log('✅ Hidden login button');
         }
         
-        // Show user section
-        if (userSection) {
-            userSection.style.display = "flex";
-            console.log('✅ Showed user section');
+        // Show user greeting
+        if (userGreeting) {
+            const firstName = displayName.split(' ')[0];
+            userGreeting.textContent = `Welcome, ${firstName}!`;
+            userGreeting.style.display = "inline-block";
+            console.log('✅ Showed user greeting:', firstName);
         }
         
-        // Update username text
-        if (usernameText) {
-            const firstName = displayName.split(' ')[0];
-            usernameText.textContent = `Hi, ${firstName}`;
-            console.log('✅ Updated navbar username:', firstName);
+        // Show My Listings link if not visible
+        if (myListingsLink) {
+            myListingsLink.style.display = "block";
+            console.log('✅ Showed My Listings link');
+        }
+        
+        if (myListingsLinkMobile) {
+            myListingsLinkMobile.style.display = "block";
+            console.log('✅ Showed Mobile My Listings link');
+        }
+        
+        // Show admin link
+        if (adminLink) {
+            adminLink.style.display = "inline-block";
+            console.log('✅ Showed Admin link');
         }
     };
     </script>
@@ -3656,6 +3670,8 @@
                 if (typeof window.updateNavbarAuthUI === 'function') {
                     console.log('🔄 DOMContentLoaded: Updating navbar auth UI');
                     window.updateNavbarAuthUI();
+                } else {
+                    console.warn('⚠️  updateNavbarAuthUI function not available - ensure navbar.js is loaded');
                 }
             }, 100);
             
