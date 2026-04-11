@@ -2367,10 +2367,18 @@
             console.log('✅ Showed Mobile My Listings link');
         }
         
-        // Show admin link
-        if (adminLink) {
-            adminLink.style.display = "inline-block";
-            console.log('✅ Showed Admin link');
+        // Show admin link ONLY if user is admin
+        const userRole = user?.role || localStorage.getItem('user_role');
+        if (userRole === 'admin') {
+            if (adminLink) {
+                adminLink.style.display = "inline-block";
+                console.log('✅ Showed Admin link');
+            }
+        } else {
+            if (adminLink) {
+                adminLink.style.display = "none";
+                console.log('✅ Hidden Admin link (non-admin user)');
+            }
         }
     };
     </script>
@@ -3702,16 +3710,6 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             updateNavigation();
-            
-            // 🔐 Update navbar auth state after page load
-            setTimeout(() => {
-                if (typeof window.updateNavbarAuthUI === 'function') {
-                    console.log('🔄 DOMContentLoaded: Updating navbar auth UI');
-                    window.updateNavbarAuthUI();
-                } else {
-                    console.warn('⚠️  updateNavbarAuthUI function not available - ensure navbar.js is loaded');
-                }
-            }, 100);
             
             // 🌐 Wake-up ping for Render cold start (silent)
             console.log('💤 Pinging backend to wake up from cold start...');
