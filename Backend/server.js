@@ -570,6 +570,31 @@ app.post('/register', authLimiter, async (req, res) => {
             normalizedName = name.trim();
             normalizedPhone = (phone || '').replace(/\D/g, '');
 
+            // Validate field lengths against database schema
+            if (normalizedName.length > 100) {
+                console.error('❌ Validation failed - name too long:', normalizedName.length);
+                return res.status(400).json({ 
+                    success: false,
+                    message: 'Name must be 100 characters or less' 
+                });
+            }
+
+            if (normalizedEmail.length > 180) {
+                console.error('❌ Validation failed - email too long:', normalizedEmail.length);
+                return res.status(400).json({ 
+                    success: false,
+                    message: 'Email must be 180 characters or less' 
+                });
+            }
+
+            if (normalizedPhone && normalizedPhone.length > 20) {
+                console.error('❌ Validation failed - phone too long:', normalizedPhone.length);
+                return res.status(400).json({ 
+                    success: false,
+                    message: 'Phone must be 20 characters or less' 
+                });
+            }
+
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailPattern.test(normalizedEmail)) {
                 console.error('❌ Validation failed - invalid email:', normalizedEmail);
@@ -604,8 +629,8 @@ app.post('/register', authLimiter, async (req, res) => {
 
         // UPSERT: Try to find existing user by email, or insert new one
         db.query(
-            `INSERT INTO users (firebase_uid, name, username, email, phone, password, role, auth_provider, createdAt)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+            `INSERT INTO users (firebase_uid, name, username, email, phone, password, role, auth_provider)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
              ON DUPLICATE KEY UPDATE
                 name = IF(VALUES(name) != '', VALUES(name), name),
                 phone = IF(VALUES(phone) != '', VALUES(phone), phone),
@@ -848,6 +873,23 @@ app.post('/firebase-auth', verifyFirebaseToken, async (req, res) => {
             // If user doesn't exist, create new user
             console.log('📝 Creating new Firebase user:', email);
 
+            // Validate field lengths
+            if (name.length > 100) {
+                console.error('❌ Firebase auth - name too long:', name.length);
+                return res.status(400).json({
+                    success: false,
+                    message: 'Name must be 100 characters or less'
+                });
+            }
+
+            if (email.length > 180) {
+                console.error('❌ Firebase auth - email too long:', email.length);
+                return res.status(400).json({
+                    success: false,
+                    message: 'Email must be 180 characters or less'
+                });
+            }
+
             const defaultUsername = (name || email.split('@')[0]).toLowerCase().replace(/[^a-z0-9]/g, '').substr(0, 20) + Math.floor(Math.random() * 10000);
 
             db.query(
@@ -855,7 +897,12 @@ app.post('/firebase-auth', verifyFirebaseToken, async (req, res) => {
                 [name, email, defaultUsername, uid, 'user', 'firebase'],
                 (insertErr, insertResult) => {
                     if (insertErr) {
-                        console.error('❌ Firebase auth - Error creating user:', insertErr.message);
+                        console.error('❌ Firebase auth - Error creating user:', {
+                            message: insertErr.message,
+                            code: insertErr.code,
+                            errno: insertErr.errno,
+                            sql: insertErr.sql
+                        });
                         return res.status(500).json({
                             success: false,
                             message: 'Error creating user account'
