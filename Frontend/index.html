@@ -24,6 +24,7 @@
             position: relative;
             min-height: 100vh;
             background-color: #fafbff;
+            overflow-x: hidden;
         }
 
         /* ===== CSS VARIABLES ===== */
@@ -127,6 +128,8 @@
             box-shadow: none;
             transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
             padding: 0;
+            width: 100%;
+            overflow: hidden;
         }
 
         .premium-navbar.scrolled {
@@ -146,6 +149,9 @@
             align-items: center;
             justify-content: space-between;
             gap: 40px;
+            width: 100%;
+            box-sizing: border-box;
+            overflow-x: hidden;
         }
 
         .navbar-left {
@@ -252,6 +258,7 @@
             border-left: 2px solid var(--accent);
             padding-left: 24px;
             margin-left: auto;
+            min-width: 0;
         }
 
         .user-greeting {
@@ -264,6 +271,9 @@
             white-space: nowrap;
             font-weight: 600;
             letter-spacing: 0.5px;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .nav-link-auth {
@@ -460,16 +470,25 @@
             }
 
             .navbar-right {
-                gap: 12px;
+                gap: 8px;
+                padding-left: 12px;
             }
 
             .user-greeting {
-                display: none;
+                max-width: 90px;
+                font-size: 0.8rem;
+                padding: 6px 10px;
+                display: none;  /* Hidden by default on mobile */
+            }
+
+            .user-greeting.show {
+                display: inline-block;  /* Only show when needed */
             }
 
             .nav-link-auth {
                 padding: 8px 16px;
                 font-size: 0.9rem;
+                white-space: nowrap;
             }
 
             .nav-link-admin {
@@ -478,7 +497,7 @@
 
             .navbar-container {
                 padding: 0 16px;
-                gap: 16px;
+                gap: 8px;
             }
         }
 
@@ -3287,7 +3306,12 @@
                     const displayName = payload.name || localStorage.getItem('userName') || payload.email || '';
                     if (userGreeting) {
                         userGreeting.textContent = displayName ? `Hi, ${displayName}` : 'Hi';
-                        userGreeting.style.display = 'inline-block';
+                        // For mobile: add 'show' class; for desktop: set display
+                        if (window.innerWidth <= 768) {
+                            userGreeting.classList.add('show');
+                        } else {
+                            userGreeting.style.display = 'inline-block';
+                        }
                     }
                     if (authLink) {
                         authLink.textContent = 'Logout';
