@@ -183,7 +183,9 @@
                     if (myListingsMobile) myListingsMobile.style.display = 'block';
                     const displayName = payload.name || localStorage.getItem('userName') || payload.email || '';
                     if (userGreeting) {
-                        userGreeting.textContent = displayName ? `Hi, ${displayName}` : 'Hi';
+                        // Show only first name to prevent overflow on mobile
+                        const firstName = displayName ? displayName.split(' ')[0] : 'User';
+                        userGreeting.textContent = `Hi, ${firstName}`;
                         userGreeting.style.display = 'inline-block';
                     }
                     if (authLink) {

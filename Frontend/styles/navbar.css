@@ -366,18 +366,27 @@
     display: flex !important;
   }
 
+  .navbar-logo-img {
+    height: 32px;
+  }
+
+  .navbar-brand-text {
+    display: none;
+  }
+
   .user-greeting {
     display: inline-block !important;
-    font-size: 0.75rem;
-    padding: 4px 8px;
-    max-width: 80px;
+    font-size: 0.7rem;
+    padding: 3px 6px;
+    max-width: 70px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .nav-link-auth {
-    display: none !important;
+    padding: 6px 12px;
+    font-size: 0.8rem;
   }
 
   .nav-link-admin {
@@ -386,7 +395,7 @@
 
   .navbar-container {
     padding: 0 16px;
-    gap: 16px;
+    gap: 12px;
   }
 }
 

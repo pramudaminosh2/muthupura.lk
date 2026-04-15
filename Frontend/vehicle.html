@@ -893,6 +893,9 @@
                 const adminLink = getEl('admin-link');
                 const myListings = getEl('mylistings-link');
                 const userGreeting = getEl('user-greeting');
+                const authLinkMobile = getEl('auth-link-mobile');
+                const adminLinkMobile = getEl('admin-link-mobile');
+                const myListingsMobile = getEl('mylistings-link-mobile');
 
                 if (!payload || (payload.exp && Date.now() >= payload.exp * 1000)) {
                     localStorage.removeItem('token');
@@ -920,12 +923,18 @@
                 if (adminLink) {
                     adminLink.style.display = payload?.role === 'admin' ? 'inline-block' : 'none';
                 }
+                if (adminLinkMobile) {
+                    adminLinkMobile.style.display = payload?.role === 'admin' ? 'block' : 'none';
+                }
 
                 if (payload) {
                     if (myListings) myListings.style.display = 'inline-block';
+                    if (myListingsMobile) myListingsMobile.style.display = 'block';
                     const displayName = payload.name || localStorage.getItem('userName') || payload.email || '';
                     if (userGreeting) {
-                        userGreeting.textContent = displayName ? `Hi, ${displayName}` : 'Hi';
+                        // Show only first name to prevent overflow on mobile
+                        const firstName = displayName ? displayName.split(' ')[0] : 'User';
+                        userGreeting.textContent = `Hi, ${firstName}`;
                         userGreeting.style.display = 'inline-block';
                     }
                     if (authLink) {
@@ -934,18 +943,34 @@
                         authLink.href = '#';
                         authLink.onclick = (e) => {
                             e.preventDefault();
-                            localStorage.removeItem('token');
-                            localStorage.removeItem('userName');
-                            location.reload();
+                            window.performLogout?.() || (localStorage.removeItem('token'), localStorage.removeItem('userName'), location.reload());
+                        };
+                    }
+                    if (authLinkMobile) {
+                        authLinkMobile.textContent = 'Logout';
+                        authLinkMobile.classList.remove('nav-login-btn');
+                        authLinkMobile.classList.add('nav-logout-btn');
+                        authLinkMobile.href = '#';
+                        authLinkMobile.onclick = (e) => {
+                            e.preventDefault();
+                            window.performLogout?.() || (localStorage.removeItem('token'), localStorage.removeItem('userName'), location.reload());
                         };
                     }
                 } else {
                     if (myListings) myListings.style.display = 'none';
+                    if (myListingsMobile) myListingsMobile.style.display = 'none';
                     if (authLink) {
                         authLink.textContent = 'Login';
                         authLink.classList.remove('logout-btn');
                         authLink.href = 'login.html';
                         authLink.onclick = null;
+                    }
+                    if (authLinkMobile) {
+                        authLinkMobile.textContent = 'Login';
+                        authLinkMobile.classList.add('nav-login-btn');
+                        authLinkMobile.classList.remove('nav-logout-btn');
+                        authLinkMobile.href = 'login.html';
+                        authLinkMobile.onclick = null;
                     }
                 }
                 syncMobileAuth();
