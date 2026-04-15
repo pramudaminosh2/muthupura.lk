@@ -3168,6 +3168,7 @@
             try {
                 let payload = getTokenPayload();
                 const authLink = getEl('auth-link');
+                const authLinkMobile = getEl('auth-link-mobile');
                 const adminLink = getEl('admin-link');
                 const myListings = getEl('mylistings-link');
                 const userGreeting = getEl('user-greeting');
@@ -3218,40 +3219,46 @@
                         // Show only first name
                         const firstName = displayName.split(' ')[0];
                         userGreeting.textContent = `Hi, ${firstName}`;
-                        // For mobile: add 'show' class; for desktop: set display
-                        if (window.innerWidth <= 768) {
-                            userGreeting.classList.add('show');
-                        } else {
-                            userGreeting.style.display = 'inline-block';
-                        }
+                        userGreeting.style.display = 'inline-block';
                     }
-                    // Hide logout button from navbar (it moved to hamburger menu)
+                    // Show logout button in navbar
                     if (authLink) {
-                        authLink.style.display = 'none';
-                        console.log('✅ Hidden logout button from navbar in updateNavigation');
+                        authLink.textContent = 'Logout';
+                        authLink.style.display = 'inline-block';
+                        authLink.classList.remove('nav-login-btn');
+                        authLink.classList.add('nav-logout-btn');
+                        authLink.href = '#';
+                        authLink.onclick = (e) => {
+                            e.preventDefault();
+                            window.performLogout();
+                        };
                     }
-                    
-                    // Show logout button in mobile hamburger menu
-                    const mobileLogoutBtn = getEl('mobile-logout-btn');
-                    if (mobileLogoutBtn) {
-                        mobileLogoutBtn.style.display = 'block';
-                        console.log('✅ Showed mobile logout button in hamburger menu');
+                    if (authLinkMobile) {
+                        authLinkMobile.textContent = 'Logout';
+                        authLinkMobile.classList.remove('nav-login-btn');
+                        authLinkMobile.classList.add('nav-logout-btn');
+                        authLinkMobile.href = '#';
+                        authLinkMobile.onclick = (e) => {
+                            e.preventDefault();
+                            window.performLogout();
+                        };
                     }
                 } else {
                     if (myListings) myListings.style.display = 'none';
                     if (authLink) {
-                        authLink.style.display = 'inline-block'; // Show login button
+                        authLink.style.display = 'inline-block';
                         authLink.textContent = 'Login';
-                        authLink.classList.remove('logout-btn');
+                        authLink.classList.add('nav-login-btn');
+                        authLink.classList.remove('nav-logout-btn');
                         authLink.href = 'login.html';
                         authLink.onclick = null;
                     }
-                    
-                    // Hide mobile logout button when not logged in
-                    const mobileLogoutBtn = getEl('mobile-logout-btn');
-                    if (mobileLogoutBtn) {
-                        mobileLogoutBtn.style.display = 'none';
-                        console.log('✅ Hidden mobile logout button (not logged in)');
+                    if (authLinkMobile) {
+                        authLinkMobile.textContent = 'Login';
+                        authLinkMobile.classList.add('nav-login-btn');
+                        authLinkMobile.classList.remove('nav-logout-btn');
+                        authLinkMobile.href = 'login.html';
+                        authLinkMobile.onclick = null;
                     }
                 }
                 syncMobileAuth();
