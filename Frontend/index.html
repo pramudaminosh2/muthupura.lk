@@ -274,6 +274,11 @@
             max-width: 150px;
             overflow: hidden;
             text-overflow: ellipsis;
+            display: none;  /* Hidden by default */
+        }
+        
+        .user-greeting.show-on-desktop {
+            display: inline-block;  /* Show on desktop when logged in */
         }
 
         .nav-link-auth {
@@ -327,9 +332,8 @@
             text-transform: uppercase;
         }
 
-        .nav-link-admin:hover {
-            background: rgba(79, 110, 247, 0.1);
-            color: var(--accent);
+        .mobile-menu-logout:hover {
+            background: rgba(209, 40, 69, 0.1);
         }
 
         .hamburger-menu {
@@ -2361,24 +2365,25 @@
         const myListingsLinkMobile = document.getElementById("mylistings-link-mobile");
         const adminLink = document.getElementById("admin-link");
         
-        // Hide login button and convert to logout button
+        // Hide login button from navbar (logout moved to hamburger menu)
         if (loginBtn) {
-            loginBtn.textContent = 'Logout';
-            loginBtn.classList.add('logout-btn');
-            loginBtn.href = '#';
-            loginBtn.onclick = (e) => {
-                e.preventDefault();
-                window.performLogout();
-            };
-            console.log('✅ Set up logout button');
+            loginBtn.style.display = 'none';
+            console.log('✅ Hidden login/logout button from navbar');
         }
         
-        // Show user greeting
-        if (userGreeting) {
+        // Show user greeting (first name only)
+        if (userGreeting && displayName) {
             const firstName = displayName.split(' ')[0];
-            userGreeting.textContent = `Welcome, ${firstName}!`;
+            userGreeting.textContent = `Hi, ${firstName}`;
             userGreeting.style.display = "inline-block";
             console.log('✅ Showed user greeting:', firstName);
+        }
+        
+        // Show mobile logout button in hamburger menu
+        const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+        if (mobileLogoutBtn) {
+            mobileLogoutBtn.style.display = 'block';
+            console.log('✅ Showed mobile logout in updateNavbarAuthUI');
         }
         
         // Show My Listings link if not visible
@@ -2441,7 +2446,7 @@
 
             <div class="navbar-right">
                 <span id="user-greeting" class="user-greeting" style="display:none;"></span>
-                <a href="login.html" class="nav-link-auth" id="auth-link">Login</a>
+                <a href="login.html" class="nav-link-auth" id="auth-link" style="display:none;">Login</a>
                 <a href="admin.html" class="nav-link-admin" id="admin-link" style="display:none;">Admin</a>
             </div>
 
@@ -2462,6 +2467,7 @@
         <div class="mobile-menu-divider"></div>
         <a href="login.html" class="mobile-menu-link mobile-menu-auth" id="auth-link-mobile">Login</a>
         <a href="admin.html" class="mobile-menu-link mobile-menu-admin" id="admin-link-mobile" style="display:none;">Admin</a>
+        <button class="mobile-menu-link mobile-menu-logout" id="mobile-logout-btn" style="display:none; border:none; background:none; padding:14px 28px; text-align:left; width:100%; font-family:Poppins; font-size:15px; color:#d12845; cursor:pointer; font-weight:600;" onclick="window.performLogout()">🚪 Logout</button>
     </div>
 
     <!-- Hero Section (PART A) -->
@@ -3304,8 +3310,10 @@
                 if (payload) {
                     if (myListings) myListings.style.display = 'inline-block';
                     const displayName = payload.name || localStorage.getItem('userName') || payload.email || '';
-                    if (userGreeting) {
-                        userGreeting.textContent = displayName ? `Hi, ${displayName}` : 'Hi';
+                    if (userGreeting && displayName) {
+                        // Show only first name
+                        const firstName = displayName.split(' ')[0];
+                        userGreeting.textContent = `Hi, ${firstName}`;
                         // For mobile: add 'show' class; for desktop: set display
                         if (window.innerWidth <= 768) {
                             userGreeting.classList.add('show');
@@ -3313,22 +3321,33 @@
                             userGreeting.style.display = 'inline-block';
                         }
                     }
+                    // Hide logout button from navbar (it moved to hamburger menu)
                     if (authLink) {
-                        authLink.textContent = 'Logout';
-                        authLink.classList.add('logout-btn');
-                        authLink.href = '#';
-                        authLink.onclick = (e) => {
-                            e.preventDefault();
-                            window.performLogout();
-                        };
+                        authLink.style.display = 'none';
+                        console.log('✅ Hidden logout button from navbar in updateNavigation');
+                    }
+                    
+                    // Show logout button in mobile hamburger menu
+                    const mobileLogoutBtn = getEl('mobile-logout-btn');
+                    if (mobileLogoutBtn) {
+                        mobileLogoutBtn.style.display = 'block';
+                        console.log('✅ Showed mobile logout button in hamburger menu');
                     }
                 } else {
                     if (myListings) myListings.style.display = 'none';
                     if (authLink) {
+                        authLink.style.display = 'inline-block'; // Show login button
                         authLink.textContent = 'Login';
                         authLink.classList.remove('logout-btn');
                         authLink.href = 'login.html';
                         authLink.onclick = null;
+                    }
+                    
+                    // Hide mobile logout button when not logged in
+                    const mobileLogoutBtn = getEl('mobile-logout-btn');
+                    if (mobileLogoutBtn) {
+                        mobileLogoutBtn.style.display = 'none';
+                        console.log('✅ Hidden mobile logout button (not logged in)');
                     }
                 }
                 syncMobileAuth();
@@ -3338,25 +3357,9 @@
         }
 
         function syncMobileAuth() {
-            const desktopAuthLink = getEl('auth-link');
-            const mobileAuthLink = getEl('auth-link-mobile');
-            if (desktopAuthLink && mobileAuthLink) {
-                mobileAuthLink.textContent = desktopAuthLink.textContent;
-                mobileAuthLink.href = desktopAuthLink.href;
-                
-                // For logout button, use performLogout function
-                if (desktopAuthLink.classList.contains('logout-btn')) {
-                    mobileAuthLink.onclick = (e) => {
-                        e.preventDefault();
-                        window.performLogout();
-                    };
-                    mobileAuthLink.classList.add('logout-btn');
-                } else {
-                    // For login button, just set href
-                    mobileAuthLink.onclick = null;
-                    mobileAuthLink.classList.remove('logout-btn');
-                }
-            }
+            // Mobile auth button is now separate from navbar button
+            // This function can be used for other syncs if needed
+            console.log('✅ Mobile auth sync completed');
         }
 
         async function fetchVehicles() {
