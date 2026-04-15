@@ -249,6 +249,18 @@
                 padding: 0 16px;
                 gap: 8px;
             }
+
+            /* Hide logout button on mobile - show only in hamburger menu */
+            #nav-logout-btn {
+                display: none !important;
+            }
+        }
+
+        /* Show logout button on desktop */
+        @media (min-width: 769px) {
+            #nav-logout-btn {
+                display: inline-block !important;
+            }
         }
 
         @media (max-width: 640px) {
@@ -583,9 +595,9 @@
                             </div>
                         </div>
                         <div id="votpSection" style="display: none;">
-                            <div class="votp-status" id="votpStatus">✅ VOTP sent to your mobile</div>
+                            <div class="votp-status" id="votpStatus">✅ OTP sent to your mobile</div>
                             <div class="form-group">
-                                <label>Enter VOTP (4 digits)</label>
+                                <label>Enter OTP (4 digits)</label>
                                 <div class="otp-group">
                                     <input type="text" class="otp-input" maxlength="1" placeholder="0" inputmode="numeric">
                                     <input type="text" class="otp-input" maxlength="1" placeholder="0" inputmode="numeric">
@@ -621,7 +633,7 @@
                         <input type="email" id="regEmail" placeholder="your@email.com" required>
                     </div>
                     <div class="form-group">
-                        <label for="regPhone">Phone Number</label>
+                        <label for="regPhone">Phone Number <span style="color: #999; font-size: 12px;">(Optional)</span></label>
                         <input type="tel" id="regPhone" placeholder="+94 77 123 4567" required>
                     </div>
                     <div class="form-group">
@@ -837,8 +849,8 @@
             const phone = document.getElementById('regPhone').value.trim();
             const password = document.getElementById('regPassword').value;
 
-            if (!name || !validateEmail(email) || !validatePhone(phone) || !validatePassword(password)) {
-                showMessage('Fill all fields correctly', 'error');
+            if (!name || !validateEmail(email) || !validatePassword(password)) {
+                showMessage('Please fill: name, email, and password (phone is optional)', 'error');
                 return;
             }
 
@@ -849,7 +861,7 @@
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, phone, password })
+                    body: JSON.stringify({ name, email, phone: phone || null, password })
                 });
                 
                 if (!response.ok) {
@@ -899,15 +911,15 @@
             }
         });
 
-        // ===== MOBILE VOTP VERIFICATION =====
+        // ===== MOBILE OTP VERIFICATION =====
         async function sendVotp() {
             const mobile = document.getElementById('mobileNumber').value.trim();
             if (!validatePhone(mobile)) { showMessage('Invalid phone number', 'error'); return; }
 
-            showMessage('Sending VOTP...', 'info');
+            showMessage('Sending OTP...', 'info');
             try {
-                const url = `${API_BASE_URL}/send-votp`;
-                console.log('📡 Sending VOTP request to:', url, { phone: mobile });
+                const url = `${API_BASE_URL}/send-otp`;
+                console.log('📡 Sending OTP request to:', url, { phone: mobile });
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -919,37 +931,37 @@
                 }
                 
                 const data = await response.json();
-                console.log('✅ VOTP sent successfully:', { success: data.success });
+                console.log('✅ OTP sent successfully:', { message: data.message });
                 
-                if (response.ok || data.success) {
-                    showMessage('VOTP sent to your mobile!', 'success');
+                if (response.ok) {
+                    showMessage('OTP sent to your mobile!', 'success');
                     document.getElementById('votpSection').style.display = 'block';
                     document.querySelector('button[onclick="sendVotp()"]').disabled = true;
                 } else {
-                    showMessage(data.message || 'Failed to send VOTP', 'error');
+                    showMessage(data.message || 'Failed to send OTP', 'error');
                 }
             } catch (error) {
-                console.error('❌ Send VOTP error:', error.message);
-                showMessage(`Failed to send VOTP: ${error.message}`, 'error');
+                console.error('❌ Send OTP error:', error.message);
+                showMessage(`Failed to send OTP: ${error.message}`, 'error');
             }
         }
 
         async function verifyVotp() {
             const mobile = document.getElementById('mobileNumber').value.trim();
             const otpInputs = document.querySelectorAll('#votpSection .otp-input');
-            let votp = '';
-            otpInputs.forEach(input => { votp += input.value; });
+            let otp = '';
+            otpInputs.forEach(input => { otp += input.value; });
 
-            if (votp.length !== 4) { showMessage('Enter all 4 digits of VOTP', 'error'); return; }
+            if (otp.length !== 4) { showMessage('Enter all 4 digits of OTP', 'error'); return; }
 
-            showMessage('Verifying VOTP...', 'info');
+            showMessage('Verifying OTP...', 'info');
             try {
-                const url = `${API_BASE_URL}/verify-votp`;
-                console.log('📡 Sending VOTP verification request to:', url, { phone: mobile, votpLength: votp.length });
+                const url = `${API_BASE_URL}/verify-otp`;
+                console.log('📡 Sending OTP verification request to:', url, { phone: mobile, otpLength: otp.length });
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone: mobile, votp })
+                    body: JSON.stringify({ phone: mobile, otp })
                 });
                 
                 if (!response.ok) {
@@ -957,11 +969,11 @@
                 }
                 
                 const data = await response.json();
-                console.log('✅ VOTP verified:', { isNewUser: data.isNewUser, hasToken: !!data.token, userName: data.user?.name });
+                console.log('✅ OTP verified:', { isNewUser: data.isNewUser, hasToken: !!data.token, userName: data.user?.name });
                 
                 if (data.token && data.user) {
                     // User is registered, log them in
-                    console.log('📊 Storing auth data from VOTP:', { userName: data.user.name, role: data.user.role });
+                    console.log('📊 Storing auth data from OTP:', { userName: data.user.name, role: data.user.role });
                     
                     // Store all keys for compatibility
                     localStorage.setItem('jwt_token', data.token);
@@ -982,20 +994,20 @@
                     setTimeout(updateNavbar, 10);
                     setTimeout(updateNavbar, 400);
                     
-                    showMessage('VOTP verified! Logging in...', 'success');
+                    showMessage('OTP verified! Logging in...', 'success');
                     setTimeout(() => { window.location.href = 'index.html'; }, 1000);
                 } else if (data.isNewUser || data.needsRegistration) {
                     // New user, redirect to complete profile
                     showMessage('Welcome! Completing your profile...', 'success');
                     localStorage.setItem('temp_mobile', mobile);
-                    localStorage.setItem('temp_votp_verified', 'true');
+                    localStorage.setItem('temp_otp_verified', 'true');
                     setTimeout(() => { window.location.href = 'complete-profile.html'; }, 1500);
                 } else {
-                    showMessage(data.message || 'VOTP verification failed', 'error');
+                    showMessage(data.message || 'OTP verification failed', 'error');
                 }
             } catch (error) {
-                console.error('❌ Verify VOTP error:', error.message);
-                showMessage(`VOTP verification failed: ${error.message}`, 'error');
+                console.error('❌ Verify OTP error:', error.message);
+                showMessage(`OTP verification failed: ${error.message}`, 'error');
             }
         }
 
