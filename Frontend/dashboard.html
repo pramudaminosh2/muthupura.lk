@@ -1271,8 +1271,47 @@
     </style>
 </head>
 <body data-light-nav="true">
-    <!-- Navbar Container (dynamically loaded by navbar.js) -->
-    <div id="navbar-container"></div>
+    <nav class="premium-navbar" id="navbar">
+        <div class="navbar-container">
+            <div class="navbar-left">
+                <a href="index.html" class="navbar-logo">
+                    <img src="logo.PNG" alt="Muthupura.lk" class="navbar-logo-img">
+                    <span class="navbar-brand-text">Muthupura.lk</span>
+                </a>
+            </div>
+
+            <div class="navbar-center" id="navbar-center">
+                <a href="index.html" class="nav-link" data-page="home">Home</a>
+                <a href="post.html" class="nav-link" data-page="post">Post Ad</a>
+                <a href="dashboard.html" class="nav-link" id="mylistings-link" data-page="dashboard" style="display:none;">My Listings</a>
+                <a href="about.html" class="nav-link" data-page="about">About Us</a>
+                <a href="contact.html" class="nav-link" data-page="contact">Contact Us</a>
+            </div>
+
+            <div class="navbar-right">
+                <span id="user-greeting" class="user-greeting" style="display:none;"></span>
+                <a href="login.html" class="nav-link-auth" id="auth-link">Login</a>
+                <a href="admin.html" class="nav-link-admin" id="admin-link" style="display:none;">Admin</a>
+            </div>
+
+            <button class="hamburger-menu" id="hamburger-btn" aria-label="Toggle menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="mobile-menu-dropdown" id="mobile-menu">
+        <a href="index.html" class="mobile-menu-link" data-page="home">Home</a>
+        <a href="post.html" class="mobile-menu-link" data-page="post">Post Ad</a>
+        <a href="dashboard.html" class="mobile-menu-link" id="mylistings-link-mobile" data-page="dashboard" style="display:none;">My Listings</a>
+        <a href="about.html" class="mobile-menu-link" data-page="about">About Us</a>
+        <a href="contact.html" class="mobile-menu-link" data-page="contact">Contact Us</a>
+        <div class="mobile-menu-divider"></div>
+        <a href="login.html" class="mobile-menu-link mobile-menu-auth" id="auth-link-mobile">Login</a>
+        <a href="admin.html" class="mobile-menu-link mobile-menu-admin" id="admin-link-mobile" style="display:none;">Admin</a>
+    </div>
 
     <div class="container" style="margin-top: 100px;">
 
