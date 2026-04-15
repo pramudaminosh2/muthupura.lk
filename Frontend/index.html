@@ -2360,15 +2360,21 @@
         
         // Find navbar elements (using correct IDs from premium navbar)
         const loginBtn = document.getElementById("auth-link");
+        const logoutBtn = document.getElementById("logout-btn");
         const userGreeting = document.getElementById("user-greeting");
         const myListingsLink = document.getElementById("mylistings-link");
         const myListingsLinkMobile = document.getElementById("mylistings-link-mobile");
         const adminLink = document.getElementById("admin-link");
         
-        // Hide login button from navbar (logout moved to hamburger menu)
+        // Hide login button and show logout button from desktop navbar
         if (loginBtn) {
             loginBtn.style.display = 'none';
-            console.log('✅ Hidden login/logout button from navbar');
+            console.log('✅ Hidden login button from navbar');
+        }
+        
+        if (logoutBtn) {
+            logoutBtn.style.display = 'inline-block';
+            console.log('✅ Showed desktop logout button');
         }
         
         // Show user greeting (first name only)
@@ -2446,7 +2452,8 @@
 
             <div class="navbar-right">
                 <span id="user-greeting" class="user-greeting" style="display:none;"></span>
-                <a href="login.html" class="nav-link-auth" id="auth-link" style="display:none;">Login</a>
+                <a href="login.html" class="nav-link-auth" id="auth-link">Login</a>
+                <button class="nav-link-auth logout-btn" id="logout-btn" style="display:none; background:none; border:none; padding:10px 22px; cursor:pointer;" onclick="window.performLogout()">🚪 Logout</button>
                 <a href="admin.html" class="nav-link-admin" id="admin-link" style="display:none;">Admin</a>
             </div>
 
