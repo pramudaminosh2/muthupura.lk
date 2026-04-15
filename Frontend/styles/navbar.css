@@ -362,16 +362,22 @@
   }
 
   .navbar-right {
-    gap: 12px;
+    gap: 8px;
+    display: flex !important;
   }
 
   .user-greeting {
-    display: none;
+    display: inline-block !important;
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    max-width: 80px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .nav-link-auth {
-    padding: 8px 16px;
-    font-size: 0.9rem;
+    display: none !important;
   }
 
   .nav-link-admin {
