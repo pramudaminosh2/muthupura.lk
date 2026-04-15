@@ -606,7 +606,7 @@
             box-shadow: 0 10px 25px rgba(142, 82, 248, 0.35);
         }
 
-        .hamburger {
+        .hamburger-menu {
             display: flex;
             flex-direction: column;
             gap: 5px;
@@ -618,136 +618,119 @@
         }
 
         @media (min-width: 768px) {
-            .hamburger {
+            .hamburger-menu {
                 display: none;
             }
         }
 
-        .hamburger span {
+        .hamburger-line {
             width: 24px;
-            height: 2px;
-            background: #1f2d52;
+            height: 2.5px;
+            background: var(--text);
             border-radius: 2px;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(8px, 8px);
+        .hamburger-menu.active .hamburger-line:nth-child(1) {
+            transform: rotate(45deg) translate(10px, 10px);
         }
 
-        .hamburger.active span:nth-child(2) {
+        .hamburger-menu.active .hamburger-line:nth-child(2) {
             opacity: 0;
+            transform: translateX(-10px);
         }
 
-        .hamburger.active span:nth-child(3) {
+        .hamburger-menu.active .hamburger-line:nth-child(3) {
             transform: rotate(-45deg) translate(7px, -7px);
         }
 
         /* Mobile menu */
-        .mobile-menu {
+        .mobile-menu-dropdown {
             display: none;
             position: fixed;
             top: 70px;
             left: 0;
             right: 0;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(248, 250, 255, 0.95) 100%);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(200, 210, 230, 0.3);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            background: rgba(5, 10, 30, 0.97);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
             flex-direction: column;
-            padding: 16px;
-            gap: 8px;
-            z-index: 999;
-            max-height: calc(100vh - 70px);
-            overflow-y: auto;
-            animation: slideDown 0.25s ease forwards;
+            gap: 0;
+            z-index: 9998;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            transform: translateY(-110%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .mobile-menu.active {
+        .mobile-menu-dropdown.active {
             display: flex;
+            transform: translateY(0);
         }
 
-        .mobile-menu a {
+        .mobile-menu-link {
             display: block;
-            padding: 12px 16px;
+            padding: 14px 28px;
             text-decoration: none;
-            color: #1f2d52;
+            color: rgba(255,255,255,0.9);
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px;
             font-weight: 500;
-            border-radius: 12px;
-            transition: all 0.22s ease;
-            background: rgba(255, 255, 255, 0.4);
-            border: 1px solid rgba(58, 111, 248, 0.1);
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            letter-spacing: 0.5px;
         }
 
-        .mobile-menu a:hover {
-            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
-            color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(58, 111, 248, 0.2);
-            border-color: #3a6ff8;
+        .mobile-menu-link:hover {
+            border-left-color: var(--accent1);
+            color: white;
+            background: rgba(255,255,255,0.05);
         }
 
-        #auth-link-mobile {
-            padding: 12px 16px;
-            background: rgba(58, 111, 248, 0.08);
-            border-radius: 12px;
-            text-decoration: none;
-            color: #1f2d52;
-            font-weight: 500;
-            transition: all 0.22s ease;
-            display: block;
-            border: 1px solid rgba(58, 111, 248, 0.15);
+        .mobile-menu-link.active {
+            background: rgba(255,255,255,0.05);
+            color: white;
+            border-left-color: var(--accent1);
+            font-weight: 700;
         }
 
-        #auth-link-mobile:hover {
-            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
-            color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(58, 111, 248, 0.25);
+        .mobile-menu-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            margin: 8px 0;
         }
 
-        #auth-link-mobile.logout-btn {
-            background: rgba(209, 40, 69, 0.08);
-            color: #d12845;
-            border: 1px solid rgba(209, 40, 69, 0.2);
+        .mobile-menu-auth {
+            border: 2px solid var(--accent1);
+            color: var(--accent1);
+            margin: 12px;
+            border-radius: 10px;
+            text-align: center;
+            background: transparent !important;
+            padding: 12px 24px !important;
+            border-left: 2px solid var(--accent1) !important;
         }
 
-        #auth-link-mobile.logout-btn:hover {
-            background: #d12845;
-            color: #fff;
-            border-color: #d12845;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(209, 40, 69, 0.25);
+        .mobile-menu-auth:hover {
+            background: var(--accent1) !important;
+            color: #ffffff;
+            border-left-color: var(--accent1);
         }
 
-        #admin-link-mobile {
-            display: block;
-            padding: 12px 16px;
-            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
-            color: #fff;
-            text-decoration: none;
-            border-radius: 12px;
-            font-weight: 600;
+        .mobile-menu-admin {
             font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            box-shadow: 0 6px 20px rgba(58, 111, 248, 0.15);
-            transition: all 0.22s ease;
+            color: rgba(30, 42, 74, 0.6);
+            padding: 10px 24px;
+            border-left-color: transparent !important;
         }
 
-        #admin-link-mobile:hover {
+        .mobile-menu-admin:hover {
+            background: rgba(79, 110, 247, 0.08);
+            color: var(--accent1);
+            border-left-color: transparent;
+        }
+
             transform: translateY(-2px) scale(1.02);
             box-shadow: 0 10px 25px rgba(142, 82, 248, 0.35);
         }
@@ -777,24 +760,24 @@
                 <span id="user-greeting" style="display:none;"></span>
                 <a id="auth-link" href="login.html">Login</a>
                 <a id="admin-link" href="admin.html" style="display:none;">Admin</a>
-                <button class="hamburger" id="navbar-hamburger" aria-label="Toggle menu">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                <button class="hamburger-menu" id="hamburger-btn" aria-label="Toggle menu">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
                 </button>
             </div>
         </div>
     </nav>
 
-    <div class="mobile-menu" id="mobile-menu">
-        <a href="index.html">Home</a>
-        <a href="post.html">Post Ad</a>
-        <a href="dashboard.html" id="mylistings-link-mobile" style="display:none;">My Listings</a>
-        <a href="about.html">About Us</a>
-        <a href="contact.html">Contact Us</a>
-        <hr style="border: none; border-top: 1px solid rgba(200, 210, 230, 0.3); margin: 8px 0;">
-        <a id="auth-link-mobile" href="login.html">Login</a>
-        <a id="admin-link-mobile" href="admin.html" style="display:none;">Admin</a>
+    <div class="mobile-menu-dropdown" id="mobile-menu">
+        <a href="index.html" class="mobile-menu-link">Home</a>
+        <a href="post.html" class="mobile-menu-link">Post Ad</a>
+        <a href="dashboard.html" id="mylistings-link-mobile" class="mobile-menu-link" style="display:none;">My Listings</a>
+        <a href="about.html" class="mobile-menu-link">About Us</a>
+        <a href="contact.html" class="mobile-menu-link">Contact Us</a>
+        <div class="mobile-menu-divider"></div>
+        <a id="auth-link-mobile" href="login.html" class="mobile-menu-link mobile-menu-auth">Login</a>
+        <a id="admin-link-mobile" href="admin.html" class="mobile-menu-link mobile-menu-admin" style="display:none;">Admin</a>
     </div>
 
     <div class="container">
@@ -1237,7 +1220,7 @@
         }
 
         function setupHamburgerMenu() {
-            const hamburger = document.getElementById('hamburger');
+            const hamburger = document.getElementById('hamburger-btn');
             const mobileMenu = document.getElementById('mobile-menu');
             if (!hamburger || !mobileMenu) return;
 

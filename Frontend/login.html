@@ -97,15 +97,177 @@
         .nav-link-auth { font-family: 'Poppins', sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--accent); text-decoration: none; padding: 10px 22px; border: 2.2px solid var(--accent); border-radius: 10px; cursor: pointer; display: inline-block; }
         .nav-link-auth:hover { background: var(--accent); color: #ffffff; }
 
-        .hamburger-menu { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; }
-        .mobile-menu-dropdown { display: none; position: fixed; top: var(--navbar-height); left: 0; right: 0; background: rgba(5, 10, 30, 0.97); z-index: 9998; }
-        .mobile-menu-dropdown.active { display: flex; }
+        .hamburger-menu {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            transition: all 0.3s ease;
+            margin-right: -8px;
+        }
+
+        .hamburger-line {
+            width: 24px;
+            height: 2.5px;
+            background: var(--text-dark);
+            border-radius: 2px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(1) {
+            transform: rotate(45deg) translate(10px, 10px);
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+
+        .hamburger-menu.active .hamburger-line:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        .mobile-menu-dropdown {
+            display: none;
+            position: fixed;
+            top: var(--navbar-height);
+            left: 0;
+            right: 0;
+            max-height: 400px;
+            background: rgba(5, 10, 30, 0.97);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+            flex-direction: column;
+            gap: 0;
+            z-index: 9998;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            transform: translateY(-110%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .mobile-menu-dropdown.active {
+            display: flex;
+            transform: translateY(0);
+        }
+
+        .mobile-menu-link {
+            display: block;
+            padding: 14px 28px;
+            text-decoration: none;
+            color: rgba(255,255,255,0.9);
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            letter-spacing: 0.5px;
+        }
+
+        .mobile-menu-link:hover {
+            border-left-color: var(--accent);
+            color: white;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .mobile-menu-link.active {
+            background: rgba(255,255,255,0.05);
+            color: white;
+            border-left-color: var(--accent);
+            font-weight: 700;
+        }
+
+        .mobile-menu-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            margin: 8px 0;
+        }
+
+        .mobile-menu-auth {
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            margin: 12px 12px;
+            border-radius: 10px;
+            text-align: center;
+            background: transparent;
+            padding: 12px 24px;
+        }
+
+        .mobile-menu-auth:hover {
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        .mobile-menu-admin {
+            font-size: 0.85rem;
+            color: rgba(30, 42, 74, 0.6);
+            padding: 10px 24px;
+        }
+
+        .mobile-menu-admin:hover {
+            background: rgba(79, 110, 247, 0.08);
+            color: var(--accent);
+            border-left-color: transparent;
+        }
 
         @media (max-width: 768px) {
-            .navbar-center { display: none; }
-            .hamburger-menu { display: flex; }
-            .navbar-container { padding: 0 16px; }
-            .user-greeting { display: none; }
+            .navbar-center {
+                display: none;
+            }
+
+            .hamburger-menu {
+                display: flex;
+            }
+
+            .navbar-right {
+                gap: 8px;
+                padding-left: 12px;
+            }
+
+            .user-greeting {
+                max-width: 90px;
+                font-size: 0.8rem;
+                padding: 6px 10px;
+                display: none;
+            }
+
+            .user-greeting.show {
+                display: inline-block;
+            }
+
+            .nav-link-auth {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+                white-space: nowrap;
+            }
+
+            .navbar-container {
+                padding: 0 16px;
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .navbar-container {
+                padding: 0 12px;
+            }
+
+            .navbar-brand-text {
+                font-size: 0.95rem;
+            }
+
+            .navbar-logo-img {
+                height: 36px;
+            }
+
+            .nav-link-auth {
+                padding: 7px 14px;
+                font-size: 0.85rem;
+            }
         }
 
         /* ===== LOGIN PAGE ===== */
@@ -354,8 +516,10 @@
                 <a href="login.html" class="nav-link-auth" id="auth-link">Login</a>
                 <a href="admin.html" style="display:none;" id="admin-link">Admin</a>
             </div>
-            <button class="hamburger-menu" id="hamburger-btn">
-                <span></span><span></span><span></span>
+            <button class="hamburger-menu" id="hamburger-btn" aria-label="Toggle menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
             </button>
         </div>
     </nav>
@@ -366,6 +530,9 @@
         <a href="dashboard.html" class="mobile-menu-link" id="mylistings-link-mobile" style="display:none;">My Listings</a>
         <a href="about.html" class="mobile-menu-link">About Us</a>
         <a href="contact.html" class="mobile-menu-link">Contact Us</a>
+        <div class="mobile-menu-divider"></div>
+        <a href="login.html" class="mobile-menu-link mobile-menu-auth" id="auth-link-mobile">Login</a>
+        <a href="admin.html" class="mobile-menu-link mobile-menu-admin" id="admin-link-mobile" style="display:none;">Admin</a>
         <a href="login.html" class="mobile-menu-link" id="auth-link-mobile">Login</a>
     </div>
 
@@ -527,6 +694,26 @@
             const token = localStorage.getItem('jwt_token');
             if (token) {
                 window.location.href = 'index.html';
+            }
+
+            // ===== HAMBURGER MENU FUNCTIONALITY =====
+            const hamburgerBtn = document.getElementById('hamburger-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            if (hamburgerBtn && mobileMenu) {
+                // Toggle hamburger menu on click
+                hamburgerBtn.addEventListener('click', () => {
+                    hamburgerBtn.classList.toggle('active');
+                    mobileMenu.classList.toggle('active');
+                });
+
+                // Close menu when link is clicked
+                mobileMenu.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        hamburgerBtn.classList.remove('active');
+                        mobileMenu.classList.remove('active');
+                    });
+                });
             }
         });
 

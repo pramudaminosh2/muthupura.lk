@@ -57,7 +57,11 @@
                 <span id="user-greeting" style="display:none;" class="user-greeting"></span>
                 <a id="auth-link" href="login.html" class="nav-auth-btn nav-login-btn">Login</a>
                 <a id="admin-link" href="admin.html" class="nav-auth-btn nav-admin-btn" style="display:none;">Admin</a>
-                <button class="navbar-hamburger" id="navbar-hamburger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+                <button class="hamburger-menu" id="hamburger-btn" aria-label="Toggle menu">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
             </div>
         </div>
     </nav>
@@ -67,9 +71,9 @@
         <a href="dashboard.html" class="mobile-menu-link" id="mylistings-link-mobile" style="display:none;">My Listings</a>
         <a href="about.html" class="mobile-menu-link">About Us</a>
         <a href="contact.html" class="mobile-menu-link">Contact Us</a>
-        <hr style="border: none; border-top: 1px solid rgba(220, 230, 255, 0.3); margin: 12px 0;">
-        <a id="auth-link-mobile" href="login.html" class="mobile-menu-link nav-login-btn">Login</a>
-        <a id="admin-link-mobile" href="admin.html" class="mobile-menu-link nav-admin-btn" style="display:none;">Admin</a>
+        <div class="mobile-menu-divider"></div>
+        <a id="auth-link-mobile" href="login.html" class="mobile-menu-link mobile-menu-auth">Login</a>
+        <a id="admin-link-mobile" href="admin.html" class="mobile-menu-link mobile-menu-admin" style="display:none;">Admin</a>
     </div>
     <section class="page-header">
         <div class="page-container"><div class="breadcrumb">Reach Millions</div><h1>Post a Vehicle</h1><p class="subtitle">List your vehicle and connect with potential buyers across Sri Lanka.</p></div>
@@ -330,7 +334,7 @@
             });
         }
         function setupHamburgerMenu() {
-            const hamburger = getEl('navbar-hamburger'), mobileMenu = getEl('mobile-menu');
+            const hamburger = getEl('hamburger-btn'), mobileMenu = getEl('mobile-menu');
             if (!hamburger || !mobileMenu) return;
             hamburger.addEventListener('click', () => {
                 hamburger.classList.toggle('active');
