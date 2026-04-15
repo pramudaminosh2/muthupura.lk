@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="shared.css">
+    <link rel="stylesheet" href="styles/navbar.css">
     <style>
         .page-header { margin-top: 90px; padding: 60px 20px; background: linear-gradient(135deg, rgba(79, 110, 247, 0.1) 0%, rgba(142, 82, 248, 0.08) 100%); text-align: center; border-bottom: 1px solid var(--border-light); }
         .page-header h1 { font-size: 3rem; font-weight: 800; color: var(--dark-bg); margin: 0 0 12px; letter-spacing: -0.02em; }
@@ -43,38 +44,8 @@
 </head>
 <body>
     <div class="bg-aurora" aria-hidden="true"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
-    <nav class="premium-navbar" id="navbar">
-        <div class="navbar-container">
-            <div class="navbar-left"><a href="index.html" class="navbar-brand"><img src="logo.PNG" alt="Muthupura.lk" class="navbar-logo"><span class="navbar-brand-text">Muthupura.lk</span></a></div>
-            <div class="navbar-center">
-                <a href="index.html" class="nav-link">Home</a>
-                <a href="post.html" class="nav-link active">Post Ad</a>
-                <a href="dashboard.html" class="nav-link" id="mylistings-link" style="display:none;">My Listings</a>
-                <a href="about.html" class="nav-link">About Us</a>
-                <a href="contact.html" class="nav-link">Contact Us</a>
-            </div>
-            <div class="navbar-right">
-                <span id="user-greeting" style="display:none;" class="user-greeting"></span>
-                <a id="auth-link" href="login.html" class="nav-auth-btn nav-login-btn">Login</a>
-                <a id="admin-link" href="admin.html" class="nav-auth-btn nav-admin-btn" style="display:none;">Admin</a>
-                <button class="hamburger-menu" id="hamburger-btn" aria-label="Toggle menu">
-                    <span class="hamburger-line"></span>
-                    <span class="hamburger-line"></span>
-                    <span class="hamburger-line"></span>
-                </button>
-            </div>
-        </div>
-    </nav>
-    <div class="mobile-menu-dropdown" id="mobile-menu">
-        <a href="index.html" class="mobile-menu-link">Home</a>
-        <a href="post.html" class="mobile-menu-link active">Post Ad</a>
-        <a href="dashboard.html" class="mobile-menu-link" id="mylistings-link-mobile" style="display:none;">My Listings</a>
-        <a href="about.html" class="mobile-menu-link">About Us</a>
-        <a href="contact.html" class="mobile-menu-link">Contact Us</a>
-        <div class="mobile-menu-divider"></div>
-        <a id="auth-link-mobile" href="login.html" class="mobile-menu-link mobile-menu-auth">Login</a>
-        <a id="admin-link-mobile" href="admin.html" class="mobile-menu-link mobile-menu-admin" style="display:none;">Admin</a>
-    </div>
+    <!-- Navbar Container (dynamically loaded by navbar.js) -->
+    <div id="navbar-container"></div>
     <section class="page-header">
         <div class="page-container"><div class="breadcrumb">Reach Millions</div><h1>Post a Vehicle</h1><p class="subtitle">List your vehicle and connect with potential buyers across Sri Lanka.</p></div>
     </section>
@@ -398,5 +369,8 @@
             getEl('postVehicleForm').addEventListener('submit', handleFormSubmit);
         });
     </script>
+    
+    <!-- Load navbar dynamically -->
+    <script src="js/navbar.js" defer></script>
 </body>
 </html>

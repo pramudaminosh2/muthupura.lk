@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles/navbar.css">
     <style>
         :root {
             --bg: #eef2f8;
@@ -743,42 +744,8 @@
     </style>
 </head>
 <body>
-    <!-- Fixed Navbar -->
-    <nav class="navbar" id="navbar">
-        <div class="nav-container">
-            <div class="nav-left">
-                <a class="nav-brand" href="index.html"><img src="logo.PNG" alt="Muthupura.lk"><span>Muthupura.lk</span></a>
-            </div>
-            <div class="nav-center">
-                <a href="index.html">Home</a>
-                <a href="post.html">Post Ad</a>
-                <a href="dashboard.html" id="mylistings-link" style="display:none;">My Listings</a>
-                <a href="about.html">About Us</a>
-                <a href="contact.html">Contact Us</a>
-            </div>
-            <div class="nav-right">
-                <span id="user-greeting" style="display:none;"></span>
-                <a id="auth-link" href="login.html">Login</a>
-                <a id="admin-link" href="admin.html" style="display:none;">Admin</a>
-                <button class="hamburger-menu" id="hamburger-btn" aria-label="Toggle menu">
-                    <span class="hamburger-line"></span>
-                    <span class="hamburger-line"></span>
-                    <span class="hamburger-line"></span>
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <div class="mobile-menu-dropdown" id="mobile-menu">
-        <a href="index.html" class="mobile-menu-link">Home</a>
-        <a href="post.html" class="mobile-menu-link">Post Ad</a>
-        <a href="dashboard.html" id="mylistings-link-mobile" class="mobile-menu-link" style="display:none;">My Listings</a>
-        <a href="about.html" class="mobile-menu-link">About Us</a>
-        <a href="contact.html" class="mobile-menu-link">Contact Us</a>
-        <div class="mobile-menu-divider"></div>
-        <a id="auth-link-mobile" href="login.html" class="mobile-menu-link mobile-menu-auth">Login</a>
-        <a id="admin-link-mobile" href="admin.html" class="mobile-menu-link mobile-menu-admin" style="display:none;">Admin</a>
-    </div>
+    <!-- Navbar Container (dynamically loaded by navbar.js) -->
+    <div id="navbar-container"></div>
 
     <div class="container">
         <div id="error-message" class="error-notice"></div>
@@ -1247,5 +1214,8 @@
 
     <!-- ✅ Auth UI Manager - Handles login state display -->
     <script src="auth-ui.js"></script>
+    
+    <!-- Load navbar dynamically -->
+    <script src="js/navbar.js" defer></script>
 </body>
 </html>

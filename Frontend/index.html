@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="preload" as="image" href="hero-bg.png">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles/navbar.css">
     <style>
         /* ===== GLOBAL STYLES ===== */
         * { box-sizing: border-box; }
@@ -2321,107 +2322,6 @@
     </style>
 
     <!-- Global Navbar Auth Update Function -->
-    <script>
-    /**
-     * Global function to update navbar auth state
-     * Reads from localStorage and updates navbar UI
-     * Called after login, on page load, and when auth state changes
-     */
-    window.updateNavbarAuthUI = function() {
-        // Try to get user data from localStorage
-        const userJson = localStorage.getItem("user");
-        const userName = localStorage.getItem("user_name");
-        const token = localStorage.getItem("token") || localStorage.getItem("jwt_token");
-        
-        console.log('🔍 updateNavbarAuthUI called -', { 
-            hasToken: !!token, 
-            hasUserJson: !!userJson,
-            hasUserName: !!userName 
-        });
-        
-        // Try to parse user object
-        let user = null;
-        if (userJson) {
-            try {
-                user = JSON.parse(userJson);
-                console.log('✅ Parsed user JSON:', user.name);
-            } catch (e) {
-                console.warn('⚠️  Could not parse user JSON:', e.message);
-            }
-        }
-        
-        // Determine display name
-        const displayName = user?.name || userName;
-        
-        if (!token || !displayName) {
-            console.log('❌ No auth data found, navbar showing login button');
-            return;
-        }
-        
-        // Find navbar elements (using correct IDs from premium navbar)
-        const loginBtn = document.getElementById("auth-link");
-        const logoutBtn = document.getElementById("logout-btn");
-        const userGreeting = document.getElementById("user-greeting");
-        const myListingsLink = document.getElementById("mylistings-link");
-        const myListingsLinkMobile = document.getElementById("mylistings-link-mobile");
-        const adminLink = document.getElementById("admin-link");
-        
-        // Hide login button and show logout button from desktop navbar
-        if (loginBtn) {
-            loginBtn.style.display = 'none';
-            console.log('✅ Hidden login button from navbar');
-        }
-        
-        if (logoutBtn) {
-            logoutBtn.style.display = 'inline-block';
-            console.log('✅ Showed desktop logout button');
-        }
-        
-        // Show user greeting (first name only)
-        if (userGreeting && displayName) {
-            const firstName = displayName.split(' ')[0];
-            userGreeting.textContent = `Hi, ${firstName}`;
-            userGreeting.style.display = "inline-block";
-            console.log('✅ Showed user greeting:', firstName);
-        }
-        
-        // Show mobile logout button in hamburger menu
-        const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
-        if (mobileLogoutBtn) {
-            mobileLogoutBtn.style.display = 'block';
-            console.log('✅ Showed mobile logout in updateNavbarAuthUI');
-        }
-        
-        // Show My Listings link if not visible
-        if (myListingsLink) {
-            myListingsLink.style.display = "block";
-            console.log('✅ Showed My Listings link');
-        }
-        
-        if (myListingsLinkMobile) {
-            myListingsLinkMobile.style.display = "block";
-            console.log('✅ Showed Mobile My Listings link');
-        }
-        
-        // Show admin link ONLY if user is admin
-        // Check both 'role' field and 'is_admin' field (backend might return either)
-        const userRole = user?.role;
-        const isAdminUser = user?.is_admin === true;  // only true if explicitly true
-        const userIsAdmin = userRole === 'admin' || isAdminUser;
-        
-        if (userIsAdmin) {
-            if (adminLink) {
-                adminLink.style.display = "inline-block";
-                console.log('✅ Showed Admin link (user is admin)');
-            }
-        } else {
-            if (adminLink) {
-                adminLink.style.display = "none";
-                console.log('✅ Hidden Admin link (non-admin user)');
-            }
-        }
-    };
-    </script>
 </head>
 <body>
     <div class="bg-aurora" aria-hidden="true">
@@ -2432,50 +2332,8 @@
 
     <div id="loader"></div>
 
-    <!-- Premium Navbar -->
-    <nav class="premium-navbar" id="navbar">
-        <div class="navbar-container">
-            <div class="navbar-left">
-                <a href="index.html" class="navbar-logo">
-                    <img src="logo.PNG" alt="Muthupura.lk" class="navbar-logo-img">
-                    <span class="navbar-brand-text">Muthupura.lk</span>
-                </a>
-            </div>
-
-            <div class="navbar-center" id="navbar-center">
-                <a href="index.html" class="nav-link" data-page="home">Home</a>
-                <a href="post.html" class="nav-link" data-page="post">Post Ad</a>
-                <a href="dashboard.html" class="nav-link" id="mylistings-link" data-page="dashboard" style="display:none;">My Listings</a>
-                <a href="about.html" class="nav-link" data-page="about">About Us</a>
-                <a href="contact.html" class="nav-link" data-page="contact">Contact Us</a>
-            </div>
-
-            <div class="navbar-right">
-                <span id="user-greeting" class="user-greeting" style="display:none;"></span>
-                <a href="login.html" class="nav-link-auth" id="auth-link">Login</a>
-                <button class="nav-link-auth logout-btn" id="logout-btn" style="display:none; background:none; border:none; padding:10px 22px; cursor:pointer;" onclick="window.performLogout()">🚪 Logout</button>
-                <a href="admin.html" class="nav-link-admin" id="admin-link" style="display:none;">Admin</a>
-            </div>
-
-            <button class="hamburger-menu" id="hamburger-btn" aria-label="Toggle menu">
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-            </button>
-        </div>
-    </nav>
-
-    <div class="mobile-menu-dropdown" id="mobile-menu">
-        <a href="index.html" class="mobile-menu-link" data-page="home">Home</a>
-        <a href="post.html" class="mobile-menu-link" data-page="post">Post Ad</a>
-        <a href="dashboard.html" class="mobile-menu-link" id="mylistings-link-mobile" data-page="dashboard" style="display:none;">My Listings</a>
-        <a href="about.html" class="mobile-menu-link" data-page="about">About Us</a>
-        <a href="contact.html" class="mobile-menu-link" data-page="contact">Contact Us</a>
-        <div class="mobile-menu-divider"></div>
-        <a href="login.html" class="mobile-menu-link mobile-menu-auth" id="auth-link-mobile">Login</a>
-        <a href="admin.html" class="mobile-menu-link mobile-menu-admin" id="admin-link-mobile" style="display:none;">Admin</a>
-        <button class="mobile-menu-link mobile-menu-logout" id="mobile-logout-btn" style="display:none; border:none; background:none; padding:14px 28px; text-align:left; width:100%; font-family:Poppins; font-size:15px; color:#d12845; cursor:pointer; font-weight:600;" onclick="window.performLogout()">🚪 Logout</button>
-    </div>
+    <!-- Navbar Container (dynamically loaded by navbar.js) -->
+    <div id="navbar-container"></div>
 
     <!-- Hero Section (PART A) -->
     <section class="hero-section">
@@ -3804,5 +3662,8 @@
             }
         });
     </script>
+    
+    <!-- Load navbar dynamically -->
+    <script src="js/navbar.js" defer></script>
 </body>
 </html>

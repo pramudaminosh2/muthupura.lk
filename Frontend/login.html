@@ -7,7 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="shared.css">
+    <link rel="stylesheet" href="styles/navbar.css">
     <style>
         /* ===== GLOBAL STYLES ===== */
         * { box-sizing: border-box; }
@@ -507,46 +508,8 @@
         <div class="auth-orb auth-orb-3"></div>
     </div>
 
-    <!-- Navbar -->
-    <nav class="premium-navbar" id="navbar">
-        <div class="navbar-container">
-            <div class="navbar-left">
-                <a href="index.html" class="navbar-logo">
-                    <img src="logo.PNG" alt="Muthupura.lk" class="navbar-logo-img">
-                    <span class="navbar-brand-text">Muthupura.lk</span>
-                </a>
-            </div>
-            <div class="navbar-center">
-                <a href="index.html" class="nav-link">Home</a>
-                <a href="post.html" class="nav-link">Post Ad</a>
-                <a href="dashboard.html" class="nav-link" id="mylistings-link" style="display:none;">My Listings</a>
-                <a href="about.html" class="nav-link">About Us</a>
-                <a href="contact.html" class="nav-link">Contact Us</a>
-            </div>
-            <div class="navbar-right">
-                <span id="user-greeting" class="user-greeting" style="display:none;"></span>
-                <a href="login.html" class="nav-link-auth" id="auth-link">Login</a>
-                <a href="admin.html" style="display:none;" id="admin-link">Admin</a>
-            </div>
-            <button class="hamburger-menu" id="hamburger-btn" aria-label="Toggle menu">
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-            </button>
-        </div>
-    </nav>
-
-    <div class="mobile-menu-dropdown" id="mobile-menu">
-        <a href="index.html" class="mobile-menu-link">Home</a>
-        <a href="post.html" class="mobile-menu-link">Post Ad</a>
-        <a href="dashboard.html" class="mobile-menu-link" id="mylistings-link-mobile" style="display:none;">My Listings</a>
-        <a href="about.html" class="mobile-menu-link">About Us</a>
-        <a href="contact.html" class="mobile-menu-link">Contact Us</a>
-        <div class="mobile-menu-divider"></div>
-        <a href="login.html" class="mobile-menu-link mobile-menu-auth" id="auth-link-mobile">Login</a>
-        <a href="admin.html" class="mobile-menu-link mobile-menu-admin" id="admin-link-mobile" style="display:none;">Admin</a>
-        <a href="login.html" class="mobile-menu-link" id="auth-link-mobile">Login</a>
-    </div>
+    <!-- Navbar Container - Loaded dynamically by navbar.js -->
+    <div id="navbar-container"></div>
 
     <!-- Login Container -->
     <div class="login-wrapper">
@@ -699,6 +662,7 @@
 
     <script src="config.js"></script>
     <script src="auth-ui.js"></script>
+    <script src="js/navbar.js" defer></script>
     <script>
         console.log('✅ Login page loaded');
 
@@ -706,26 +670,6 @@
             const token = localStorage.getItem('jwt_token');
             if (token) {
                 window.location.href = 'index.html';
-            }
-
-            // ===== HAMBURGER MENU FUNCTIONALITY =====
-            const hamburgerBtn = document.getElementById('hamburger-btn');
-            const mobileMenu = document.getElementById('mobile-menu');
-
-            if (hamburgerBtn && mobileMenu) {
-                // Toggle hamburger menu on click
-                hamburgerBtn.addEventListener('click', () => {
-                    hamburgerBtn.classList.toggle('active');
-                    mobileMenu.classList.toggle('active');
-                });
-
-                // Close menu when link is clicked
-                mobileMenu.querySelectorAll('a').forEach(link => {
-                    link.addEventListener('click', () => {
-                        hamburgerBtn.classList.remove('active');
-                        mobileMenu.classList.remove('active');
-                    });
-                });
             }
         });
 
@@ -1018,21 +962,6 @@
             const index = Array.from(inputs).indexOf(e.target);
             if (e.target.value.length > 1) e.target.value = e.target.value.slice(-1);
             if (e.target.value && index < inputs.length - 1) inputs[index + 1].focus();
-        });
-
-        // ===== HAMBURGER MENU =====
-        const hamburgerBtn = document.getElementById('hamburger-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        hamburgerBtn.addEventListener('click', () => {
-            hamburgerBtn.classList.toggle('active');
-            mobileMenu.classList.toggle('active');
-        });
-
-        document.querySelectorAll('.mobile-menu-link').forEach(link => {
-            link.addEventListener('click', () => {
-                hamburgerBtn.classList.remove('active');
-                mobileMenu.classList.remove('active');
-            });
         });
     </script>
 </body>
