@@ -700,6 +700,14 @@
     </footer>
 
     <script src="config.js"></script>
+    <script>
+        // Verify API configuration is loaded
+        if (!API_BASE_URL || typeof API_BASE_URL !== 'string') {
+            console.error('❌ CRITICAL: API_BASE_URL not properly loaded from config.js');
+        } else {
+            console.log('✅ API Configuration verified. Base URL:', API_BASE_URL);
+        }
+    </script>
     <script src="auth-ui.js"></script>
     <script src="js/navbar.js" defer></script>
     <script>
@@ -776,7 +784,20 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    const errorData = await response.json().catch(() => ({}));
+                    let errorMsg = `HTTP ${response.status}`;
+                    
+                    if (response.status === 404) {
+                        errorMsg = 'Server not found. Check your internet connection or try again later.';
+                        console.error('❌ 404: Endpoint not found - API_BASE_URL:', API_BASE_URL);
+                    } else if (response.status === 429) {
+                        errorMsg = 'Too many attempts. Please wait 15 minutes before trying again.';
+                        console.error('❌ 429: Rate limited - please wait');
+                    } else {
+                        errorMsg = errorData.message || response.statusText || 'Login failed';
+                    }
+                    
+                    throw new Error(errorMsg);
                 }
                 
                 const data = await response.json();
@@ -848,13 +869,25 @@
                 });
                 
                 if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-                    console.error('❌ Registration validation failed:', {
+                    const errorData = await response.json().catch(() => ({}));
+                    let errorMsg = `HTTP ${response.status}`;
+                    
+                    if (response.status === 404) {
+                        errorMsg = 'Server not found. Check your internet connection or try again later.';
+                        console.error('❌ 404: Endpoint not found - API_BASE_URL:', API_BASE_URL);
+                    } else if (response.status === 429) {
+                        errorMsg = 'Too many attempts. Please wait 15 minutes before trying again.';
+                        console.error('❌ 429: Rate limited - please wait');
+                    } else {
+                        errorMsg = errorData.message || response.statusText || 'Registration failed';
+                    }
+                    
+                    console.error('❌ Registration error:', {
                         status: response.status,
-                        message: errorData.message,
+                        message: errorMsg,
                         fullResponse: errorData
                     });
-                    throw new Error(`HTTP ${response.status}: ${errorData.message || response.statusText}`);
+                    throw new Error(errorMsg);
                 }
                 
                 const data = await response.json();
@@ -910,7 +943,20 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    const errorData = await response.json().catch(() => ({}));
+                    let errorMsg = `HTTP ${response.status}`;
+                    
+                    if (response.status === 404) {
+                        errorMsg = 'Server not found. Check your internet connection or try again later.';
+                        console.error('❌ 404: Endpoint not found - API_BASE_URL:', API_BASE_URL);
+                    } else if (response.status === 429) {
+                        errorMsg = 'Too many attempts. Please wait 15 minutes before trying again.';
+                        console.error('❌ 429: Rate limited - please wait');
+                    } else {
+                        errorMsg = errorData.message || response.statusText || 'Failed to send OTP';
+                    }
+                    
+                    throw new Error(errorMsg);
                 }
                 
                 const data = await response.json();
@@ -948,7 +994,20 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    const errorData = await response.json().catch(() => ({}));
+                    let errorMsg = `HTTP ${response.status}`;
+                    
+                    if (response.status === 404) {
+                        errorMsg = 'Server not found. Check your internet connection or try again later.';
+                        console.error('❌ 404: Endpoint not found - API_BASE_URL:', API_BASE_URL);
+                    } else if (response.status === 429) {
+                        errorMsg = 'Too many attempts. Please wait 15 minutes before trying again.';
+                        console.error('❌ 429: Rate limited - please wait');
+                    } else {
+                        errorMsg = errorData.message || response.statusText || 'OTP verification failed';
+                    }
+                    
+                    throw new Error(errorMsg);
                 }
                 
                 const data = await response.json();

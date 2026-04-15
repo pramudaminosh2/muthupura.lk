@@ -365,35 +365,43 @@
                 window.location.href = 'login.html';
                 return;
             }
-            const formData = {
-                make: getEl('make').value.trim(),
-                model: getEl('model').value.trim(),
-                year: parseInt(getEl('year').value),
-                mileage: parseInt(getEl('mileage').value),
-                transmission: getEl('transmission').value,
-                fueltype: getEl('fueltype').value,
-                description: getEl('description').value.trim(),
-                price: parseInt(getEl('price').value),
-                negotiable: getEl('negotiable').checked,
-                condition: getEl('condition').value,
-                phone: getEl('phone').value.trim(),
-                location: getEl('location').value.trim()
-            };
+            const formData = new FormData();
+            formData.append('make', getEl('make').value.trim());
+            formData.append('model', getEl('model').value.trim());
+            formData.append('year', parseInt(getEl('year').value));
+            formData.append('mileage', parseInt(getEl('mileage').value));
+            formData.append('transmission', getEl('transmission').value);
+            formData.append('fueltype', getEl('fueltype').value);
+            formData.append('description', getEl('description').value.trim());
+            formData.append('price', parseInt(getEl('price').value));
+            formData.append('negotiable', getEl('negotiable').checked);
+            formData.append('condition', getEl('condition').value);
+            formData.append('phone', getEl('phone').value.trim());
+            formData.append('location', getEl('location').value.trim());
+            
+            // Add images from file input
+            const photosInput = getEl('photos');
+            if (photosInput && photosInput.files.length > 0) {
+                for (let i = 0; i < photosInput.files.length; i++) {
+                    formData.append('images', photosInput.files[i]);
+                }
+            }
+            
             try {
-                const response = await fetch(`${API_URL}/vehicles`, {
+                const response = await fetch(`${API_URL}/add-vehicle`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     },
-                    body: JSON.stringify(formData)
+                    body: formData
                 });
                 if (response.ok) {
                     getEl('successMessage').classList.add('show');
                     getEl('postVehicleForm').reset();
                     setTimeout(() => { window.location.href = 'dashboard.html'; }, 2000);
                 } else {
-                    alert('Error posting vehicle. Please try again.');
+                    const errorData = await response.json();
+                    alert(`Error: ${errorData.message || 'Unable to post vehicle'}`);
                 }
             } catch (err) {
                 console.error('Error:', err);
