@@ -381,13 +381,14 @@
   .user-greeting {
     display: none !important;
     font-size: 0.75rem;
-    padding: 4px 8px;
-    max-width: 85px;
+    padding: 4px 6px;
+    max-width: 150px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     font-weight: 600;
     color: var(--accent);
+    margin-left: -4px;
   }
 
   .user-greeting.show {
