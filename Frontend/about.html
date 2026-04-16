@@ -567,6 +567,7 @@
           if (authLink) {
             authLink.textContent = 'Logout';
             authLink.classList.add('logout-btn');
+            authLink.classList.add('hide-on-mobile');
             authLink.href = '#';
             authLink.onclick = (e) => {
               e.preventDefault();
