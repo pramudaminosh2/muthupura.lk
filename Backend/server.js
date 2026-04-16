@@ -2480,6 +2480,7 @@ app.post('/test-url-parsing', (req, res) => {
 
 // Multer file upload error handler 2.0
 app.use((err, req, res, next) => {
+app.use((err, req, res, next) => {
     if (err && err.name === 'MulterError') {
         console.error('❌ Multer upload error:', err.code, err.field, err.message);
         if (err.code === 'LIMIT_FILE_SIZE') {
@@ -2499,7 +2500,6 @@ app.use((err, req, res, next) => {
 app.use((err, req, res, next) => {
     console.error('Unhandled error:', err);
     res.status(err.status || 500).json({ success: false, message: err.message || 'Internal server error' });
-});
 });
 
 // start server
