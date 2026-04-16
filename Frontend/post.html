@@ -7,39 +7,778 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="shared.css">
     <link rel="stylesheet" href="styles/navbar.css">
     <style>
-        .page-header { margin-top: 90px; padding: 60px 20px; background: linear-gradient(135deg, rgba(79, 110, 247, 0.1) 0%, rgba(142, 82, 248, 0.08) 100%); text-align: center; border-bottom: 1px solid var(--border-light); }
-        .page-header h1 { font-size: 3rem; font-weight: 800; color: var(--dark-bg); margin: 0 0 12px; letter-spacing: -0.02em; }
-        .page-header .breadcrumb { font-size: 0.95rem; color: var(--accent); margin-bottom: 16px; }
-        .page-header .subtitle { font-size: 1.1rem; color: var(--text-dark); opacity: 0.85; max-width: 600px; margin: 0 auto; }
-        .page-content { background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 247, 255, 0.95) 100%); padding: 60px 20px; min-height: auto; }
-        .page-container { max-width: 900px; margin: 0 auto; }
-        .form-card { background: rgba(255, 255, 255, 0.9); border: 1px solid var(--border-light); border-radius: 20px; padding: 40px; backdrop-filter: blur(8px); box-shadow: 0 8px 32px rgba(79, 110, 247, 0.08); margin-bottom: 30px; }
-        .form-section-title { font-size: 1.4rem; font-weight: 700; color: var(--dark-bg); margin: 0 0 28px; padding-bottom: 16px; border-bottom: 2px solid var(--accent); }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
-        .form-row.full { grid-template-columns: 1fr; }
-        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } }
-        .form-group { margin-bottom: 24px; }
-        .form-group label { display: block; font-size: 0.95rem; font-weight: 600; color: var(--text-dark); margin-bottom: 8px; padding-left: 4px; }
-        .form-input, .form-select { width: 100%; padding: 13px 16px; border: 1px solid var(--border-light); border-radius: 12px; background: rgba(255, 255, 255, 0.8); font-family: Poppins, sans-serif; font-size: 1rem; color: var(--text-dark); transition: all 0.2s ease; }
-        .form-input:focus, .form-select:focus { outline: none; border-color: var(--accent); background: rgba(255, 255, 255, 0.95); box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.1); }
-        textarea.form-input { resize: vertical; min-height: 120px; }
-        .checkbox-group { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-        .checkbox-group input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; accent-color: var(--accent); }
-        .checkbox-group label { margin: 0; cursor: pointer; }
-        .form-hint { font-size: 0.85rem; color: var(--text-dark); opacity: 0.7; margin-top: 6px; padding-left: 4px; }
-        .btn-submit { padding: 14px 32px; background: linear-gradient(135deg, var(--accent) 0%, #8e52f8 100%); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 24px rgba(79, 110, 247, 0.25); width: 100%; }
-        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(79, 110, 247, 0.35); }
-        .success-message { display: none; padding: 16px 20px; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 12px; color: #22c55e; font-weight: 500; margin-bottom: 24px; }
-        .success-message.show { display: block; }
-        .file-input-label { display: block; padding: 20px; border: 2px dashed var(--border-light); border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.2s ease; background: rgba(79, 110, 247, 0.03); }
-        .file-input-label:hover { border-color: var(--accent); background: rgba(79, 110, 247, 0.08); }
-        .file-input-label strong { color: var(--accent); }
-        .file-input { display: none; }
-        .auth-alert { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; padding: 16px; border-radius: 12px; margin-bottom: 24px; font-weight: 500; }
-        @media (max-width: 768px) { .page-header { margin-top: 80px; padding: 40px 16px; } .page-header h1 { font-size: 2rem; } .page-content { padding: 40px 16px; } .form-card { padding: 28px; } .form-input, .form-select { font-size: 16px; } }
+        /* ===== CSS VARIABLES ===== */
+        :root {
+            --accent: #4f6ef7;
+            --accent-rgb: 79, 110, 247;
+            --dark-bg: #0a0f2e;
+            --card-bg: rgba(255,255,255,0.85);
+            --text-dark: #1e2a4a;
+            --text-muted: #64748b;
+            --border-light: rgba(220,230,255,0.7);
+            --border-color: rgba(226,232,245,0.8);
+            --card-radius: 20px;
+            --navbar-height: 70px;
+        }
+
+        @media (max-width: 767px) {
+            :root {
+                --navbar-height: 60px;
+            }
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            margin-top: 90px;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, rgba(79, 110, 247, 0.1) 0%, rgba(142, 82, 248, 0.08) 100%);
+            text-align: center;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .page-header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--dark-bg);
+            margin: 0 0 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .page-header .breadcrumb {
+            font-size: 0.95rem;
+            color: var(--accent);
+            margin-bottom: 16px;
+        }
+
+        .page-header .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            opacity: 0.85;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ===== PAGE CONTENT ===== */
+        .page-content {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 247, 255, 0.95) 100%);
+            padding: 60px 20px;
+            min-height: auto;
+        }
+
+        .page-container {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+
+        /* ===== FORM CARD ===== */
+        .form-card {
+            background: rgba(255, 255, 255, 0.92);
+            border: 1.5px solid var(--border-light);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 8px 32px rgba(79, 110, 247, 0.08);
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .form-card:hover {
+            box-shadow: 0 12px 40px rgba(79, 110, 247, 0.12);
+            border-color: rgba(79, 110, 247, 0.3);
+        }
+
+        /* ===== SECTION TITLE ===== */
+        .form-section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-bg);
+            margin: 0 0 28px;
+            padding-bottom: 16px;
+            border-bottom: 2.5px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .form-section-title i {
+            font-size: 1.6rem;
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ===== FORM ROW & GROUP ===== */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+
+        .form-row.triple {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            padding-left: 4px;
+        }
+
+        .form-group label .required {
+            color: #ef4444;
+            font-weight: 700;
+            margin-left: 4px;
+        }
+
+        /* ===== INPUT & SELECT STYLING ===== */
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 13px 16px;
+            border: 1.5px solid var(--border-light);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            font-family: Poppins, sans-serif;
+            font-size: 1rem;
+            color: var(--text-dark);
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 0 0 4px rgba(79, 110, 247, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-select option {
+            background: #fff;
+            color: var(--text-dark);
+            padding: 10px;
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 140px;
+            font-size: 0.95rem;
+        }
+
+        /* ===== FORM HINT ===== */
+        .form-hint {
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            opacity: 0.65;
+            margin-top: 6px;
+            padding-left: 4px;
+        }
+
+        /* ===== CHECKBOX GROUP ===== */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            padding: 12px 14px;
+            background: rgba(79, 110, 247, 0.03);
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-group:hover {
+            background: rgba(79, 110, 247, 0.08);
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-dark);
+            flex: 1;
+        }
+
+        /* ===== PHOTO UPLOAD ===== */
+        .photo-upload-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 40px 20px;
+            border: 2.5px dashed var(--accent);
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: rgba(79, 110, 247, 0.05);
+        }
+
+        .file-input-label:hover {
+            border-color: #6366f1;
+            background: rgba(79, 110, 247, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .file-input-label i {
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .file-input-label strong {
+            display: block;
+            color: var(--dark-bg);
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .file-input-label p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* ===== IMAGE PREVIEW ===== */
+        .image-preview-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .image-preview-item {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid var(--border-light);
+            transition: all 0.2s ease;
+        }
+
+        .image-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-preview-item .remove-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .image-preview-item:hover .remove-btn {
+            opacity: 1;
+        }
+
+        .image-preview-item .main-badge {
+            position: absolute;
+            bottom: 6px;
+            right: 6px;
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: none;
+        }
+
+        .image-preview-item.main .main-badge {
+            display: block;
+        }
+
+        /* ===== BUTTON ===== */
+        .btn-submit {
+            padding: 16px 40px;
+            background: linear-gradient(135deg, var(--accent) 0%, #6366f1 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(79, 110, 247, 0.3);
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(79, 110, 247, 0.4);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-submit i {
+            font-size: 1.1rem;
+        }
+
+        /* ===== ALERT MESSAGES ===== */
+        .auth-alert {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1.5px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .auth-alert i {
+            font-size: 1.2rem;
+        }
+
+        .success-message {
+            display: none;
+            padding: 16px 20px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1.5px solid rgba(34, 197, 94, 0.3);
+            border-radius: 12px;
+            color: #22c55e;
+            font-weight: 500;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .success-message i {
+            font-size: 1.2rem;
+        }
+
+        .success-message.show {
+            display: flex;
+        }
+
+        /* ===== FOOTER ===== */
+        .premium-footer {
+            background: #1a1a2e;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 80px 0 0;
+            padding: 60px 40px 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .premium-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 50%, rgba(79, 110, 247, 0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(99, 110, 247, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .footer-col h3 {
+            margin: 0 0 18px 0;
+            color: #ffffff;
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .footer-col p {
+            margin: 0 0 12px 0;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .footer-col a {
+            display: block;
+            color: rgba(255, 255, 255, 0.75);
+            text-decoration: none;
+            margin: 10px 0;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            padding-left: 0;
+        }
+
+        .footer-col a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -2px;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), #6366f1);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .footer-col a:hover::before {
+            width: 100%;
+        }
+
+        .footer-col a:hover {
+            color: var(--accent);
+            transform: translateX(4px);
+        }
+
+        .footer-brand-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .footer-logo img {
+            height: 40px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        .footer-description {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            max-width: 280px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(79, 110, 247, 0.15);
+            color: var(--accent);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(79, 110, 247, 0.3);
+            font-size: 0.9rem;
+            margin: 0;
+            padding: 0;
+        }
+
+        .social-links a::before {
+            display: none;
+        }
+
+        .social-links a:hover {
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            color: #fff;
+            transform: translateY(-4px);
+            border-color: transparent;
+            box-shadow: 0 8px 20px rgba(79, 110, 247, 0.3);
+        }
+
+        .newsletter-section {
+            background: rgba(79, 110, 247, 0.12);
+            border: 1px solid rgba(79, 110, 247, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 40px;
+        }
+
+        .newsletter-section h4 {
+            margin: 0 0 12px 0;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .newsletter-section p {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: 8px;
+        }
+
+        .newsletter-form input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid rgba(79, 110, 247, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .newsletter-form input::placeholder {
+            color: #8a9ab8;
+        }
+
+        .newsletter-form input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.15);
+        }
+
+        .newsletter-form button {
+            padding: 10px 16px;
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(79, 110, 247, 0.2);
+        }
+
+        .newsletter-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(79, 110, 247, 0.3);
+        }
+
+        .footer-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            margin: 0 0 32px 0;
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        .footer-bottom a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            transition: color 0.2s ease;
+            margin: 0 12px;
+            padding: 0;
+        }
+
+        .footer-bottom a::before {
+            display: none;
+        }
+
+        .footer-bottom a:hover {
+            color: var(--accent);
+            transform: none;
+        }
+
+        .footer-bottom-links {
+            display: flex;
+            gap: 0;
+            flex-wrap: wrap;
+        }
+
+        .footer-bottom-links a {
+            margin: 0;
+        }
+
+        .footer-bottom-links a:not(:last-child)::after {
+            content: '|';
+            margin: 0 12px;
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 768px) {
+            .page-header {
+                margin-top: 80px;
+                padding: 40px 16px;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .page-content {
+                padding: 40px 16px;
+            }
+
+            .form-card {
+                padding: 24px;
+            }
+
+            .form-section-title {
+                font-size: 1.25rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+
+            .form-row.triple {
+                grid-template-columns: 1fr;
+            }
+
+            .form-input,
+            .form-select {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            .image-preview-container {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+
+            .file-input-label {
+                padding: 30px 16px;
+            }
+
+            .file-input-label i {
+                font-size: 2.5rem;
+            }
+
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 32px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .premium-footer {
+                margin: 60px 0 0;
+                padding: 40px 24px 30px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+
+            .footer-col h3 {
+                font-size: 1rem;
+                color: #ffffff;
+            }
+
+            .footer-col p {
+                font-size: 0.9rem;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+            }
+
+            .newsletter-form button {
+                width: 100%;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-bottom-links {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .footer-bottom-links a:not(:last-child)::after {
+                content: '';
+                margin: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -86,172 +825,325 @@
         <a href="admin.html" class="mobile-menu-link mobile-menu-admin" id="admin-link-mobile" style="display:none;">Admin</a>
     </div>
     <section class="page-header">
-        <div class="page-container"><div class="breadcrumb">Reach Millions</div><h1>Post a Vehicle</h1><p class="subtitle">List your vehicle and connect with potential buyers across Sri Lanka.</p></div>
+        <div class="page-container">
+            <div class="breadcrumb"><i class="fas fa-check-circle"></i> Post Your Vehicle</div>
+            <h1>List Your Vehicle</h1>
+            <p class="subtitle">Reach millions of buyers across Sri Lanka. Post your vehicle in minutes and connect with serious buyers.</p>
+        </div>
     </section>
+    <!-- PAGE CONTENT -->
     <section class="page-content">
         <div class="page-container">
-            <div id="auth-alert" class="auth-alert" style="display:none;">Please <a href="login.html" style="color: #ef4444; font-weight: bold;">login</a> to post a vehicle.</div>
-            <div class="success-message" id="successMessage">✓ Thank you! Your vehicle has been posted successfully. You can view it in My Listings.</div>
+            <!-- Auth Alert -->
+            <div id="auth-alert" class="auth-alert" style="display:none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>Please <a href="login.html" style="color: #ef4444; font-weight: bold;">login</a> to post a vehicle.</span>
+            </div>
+
+            <!-- Success Message -->
+            <div class="success-message" id="successMessage">
+                <i class="fas fa-check-circle"></i>
+                <span>Thank you! Your vehicle has been posted successfully. You can view it in My Listings.</span>
+            </div>
+
+            <!-- FORM -->
             <form id="postVehicleForm">
+                <!-- ===== SECTION 1: CONTACT INFO ===== -->
                 <div class="form-card">
-                    <div class="form-section-title">🚗 Vehicle Details</div>
+                    <div class="form-section-title">
+                        <i class="fas fa-phone-alt"></i>
+                        Contact Information
+                    </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="make">Make/Brand *</label>
-                            <input type="text" id="make" class="form-input" placeholder="e.g., Toyota, Honda" required>
+                            <label for="fullName">Full Name <span class="required">*</span></label>
+                            <input type="text" id="fullName" class="form-input" placeholder="Enter your full name" required>
+                            <div class="form-hint">How should buyers contact you?</div>
                         </div>
                         <div class="form-group">
-                            <label for="model">Model *</label>
-                            <input type="text" id="model" class="form-input" placeholder="e.g., Corolla, Civic" required>
+                            <label for="phone">Phone Number <span class="required">*</span></label>
+                            <input type="tel" id="phone" class="form-input" placeholder="+94 77 xxx xxxx" required>
+                            <div class="form-hint">Include country code (e.g., +94)</div>
+                        </div>
+                    </div>
+                    <div class="form-row full">
+                        <div class="form-group">
+                            <label for="city">City <span class="required">*</span></label>
+                            <input type="text" id="city" class="form-input" placeholder="e.g., Colombo, Kandy, Galle" required>
+                            <div class="form-hint">Where is the vehicle located?</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== SECTION 2: VEHICLE INFO ===== -->
+                <div class="form-card">
+                    <div class="form-section-title">
+                        <i class="fas fa-car"></i>
+                        Vehicle Information
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="vehicleType">Vehicle Type <span class="required">*</span></label>
+                            <select id="vehicleType" class="form-select" required>
+                                <option value="">Select vehicle type</option>
+                                <option value="car">Car</option>
+                                <option value="van">Van</option>
+                                <option value="bus">Bus</option>
+                                <option value="bike">Bike</option>
+                                <option value="tractor">Tractor</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="condition">Condition <span class="required">*</span></label>
+                            <select id="condition" class="form-select" required>
+                                <option value="">Select condition</option>
+                                <option value="antique">Antique</option>
+                                <option value="brand_new">Brand New</option>
+                                <option value="registered_used">Registered (Used)</option>
+                                <option value="unregistered_recondition">Unregistered (Recondition)</option>
+                                <option value="other">Other</option>
+                            </select>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="year">Year *</label>
+                            <label for="make">Make (Brand) <span class="required">*</span></label>
+                            <input type="text" id="make" class="form-input" placeholder="e.g., Toyota, Honda, BMW" list="makeSuggestions" required>
+                            <datalist id="makeSuggestions">
+                                <option value="Toyota">
+                                <option value="Honda">
+                                <option value="BMW">
+                                <option value="Mercedes-Benz">
+                                <option value="Audi">
+                                <option value="Hyundai">
+                                <option value="Kia">
+                                <option value="Ford">
+                                <option value="Suzuki">
+                                <option value="Volkswagen">
+                                <option value="Nissan">
+                                <option value="Mazda">
+                                <option value="Mitsubishi">
+                                <option value="Tata">
+                                <option value="MG">
+                            </datalist>
+                        </div>
+                        <div class="form-group">
+                            <label for="model">Model <span class="required">*</span></label>
+                            <input type="text" id="model" class="form-input" placeholder="e.g., Corolla, Civic, X5" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="year">Manufactured Year <span class="required">*</span></label>
                             <input type="number" id="year" class="form-input" placeholder="2020" min="1950" max="2030" required>
                         </div>
-                        <div class="form-group">
-                            <label for="mileage">Mileage (km) *</label>
-                            <input type="number" id="mileage" class="form-input" placeholder="50000" min="0" required>
-                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== SECTION 3: DETAILS ===== -->
+                <div class="form-card">
+                    <div class="form-section-title">
+                        <i class="fas fa-list"></i>
+                        Vehicle Details
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="transmission">Transmission *</label>
+                            <label for="price">Price (Rs.) <span class="required">*</span></label>
+                            <input type="number" id="price" class="form-input" placeholder="e.g., 2500000" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="transmission">Transmission <span class="required">*</span></label>
                             <select id="transmission" class="form-select" required>
                                 <option value="">Select transmission</option>
                                 <option value="manual">Manual</option>
                                 <option value="automatic">Automatic</option>
                             </select>
                         </div>
+                    </div>
+                    <div class="form-row">
                         <div class="form-group">
-                            <label for="fueltype">Fuel Type *</label>
-                            <select id="fueltype" class="form-select" required>
+                            <label for="fuelType">Fuel Type <span class="required">*</span></label>
+                            <select id="fuelType" class="form-select" required>
                                 <option value="">Select fuel type</option>
                                 <option value="petrol">Petrol</option>
                                 <option value="diesel">Diesel</option>
-                                <option value="hybrid">Hybrid</option>
                                 <option value="electric">Electric</option>
+                                <option value="hybrid">Hybrid</option>
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="engineCapacity">Engine Capacity (cc)</label>
+                            <input type="number" id="engineCapacity" class="form-input" placeholder="e.g., 1600" min="0">
+                            <div class="form-hint">Leave blank if not applicable</div>
                         </div>
                     </div>
                     <div class="form-row full">
                         <div class="form-group">
-                            <label for="description">Description *</label>
-                            <textarea id="description" class="form-input" placeholder="Describe your vehicle condition, features, and any notable details..." required></textarea>
-                            <div class="form-hint">Be detailed to attract more buyers</div>
+                            <label for="mileage">Mileage (km) <span class="required">*</span></label>
+                            <input type="number" id="mileage" class="form-input" placeholder="e.g., 45000" min="0" required>
                         </div>
                     </div>
                 </div>
+
+                <!-- ===== SECTION 4: FEATURES ===== -->
                 <div class="form-card">
-                    <div class="form-section-title">💰 Pricing</div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="price">Price (LKR) *</label>
-                            <input type="number" id="price" class="form-input" placeholder="e.g., 2,500,000" min="0" required>
-                        </div>
-                        <div class="form-group">
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="negotiable">
-                                <label for="negotiable">Price is negotiable</label>
-                            </div>
-                        </div>
+                    <div class="form-section-title">
+                        <i class="fas fa-star"></i>
+                        Features
                     </div>
-                </div>
-                <div class="form-card">
-                    <div class="form-section-title">✨ Features & Condition</div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="condition">Condition *</label>
-                            <select id="condition" class="form-select" required>
-                                <option value="">Select condition</option>
-                                <option value="excellent">Excellent</option>
-                                <option value="good">Good</option>
-                                <option value="fair">Fair</option>
-                                <option value="needs-repair">Needs Repair</option>
-                            </select>
-                        </div>
-                    </div>
+                    <p style="margin: 0 0 20px; color: var(--text-muted); font-size: 0.95rem;">Check all features that apply to your vehicle:</p>
                     <div class="form-row full">
                         <div class="form-group">
-                            <label>Features (Check all that apply)</label>
                             <div class="checkbox-group">
-                                <input type="checkbox" id="ac" value="AC">
+                                <input type="checkbox" id="ac" value="air_conditioning" name="features">
                                 <label for="ac">Air Conditioning</label>
                             </div>
                             <div class="checkbox-group">
-                                <input type="checkbox" id="power-steering" value="Power Steering">
-                                <label for="power-steering">Power Steering</label>
+                                <input type="checkbox" id="powerSteering" value="power_steering" name="features">
+                                <label for="powerSteering">Power Steering</label>
                             </div>
                             <div class="checkbox-group">
-                                <input type="checkbox" id="abs" value="ABS">
-                                <label for="abs">ABS</label>
+                                <input type="checkbox" id="powerMirror" value="power_mirror" name="features">
+                                <label for="powerMirror">Power Mirror</label>
                             </div>
                             <div class="checkbox-group">
-                                <input type="checkbox" id="airbags" value="Airbags">
-                                <label for="airbags">Airbags</label>
+                                <input type="checkbox" id="powerWindow" value="power_window" name="features">
+                                <label for="powerWindow">Power Window</label>
                             </div>
                             <div class="checkbox-group">
-                                <input type="checkbox" id="sunroof" value="Sunroof">
-                                <label for="sunroof">Sunroof</label>
+                                <input type="checkbox" id="selfParking" value="self_parking" name="features">
+                                <label for="selfParking">Self Parking</label>
                             </div>
                             <div class="checkbox-group">
-                                <input type="checkbox" id="leather" value="Leather Interior">
-                                <label for="leather">Leather Interior</label>
+                                <input type="checkbox" id="displayAudio" value="display_audio" name="features">
+                                <label for="displayAudio">Inbuilt Display + Audio</label>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- ===== SECTION 5: DESCRIPTION ===== -->
                 <div class="form-card">
-                    <div class="form-section-title">📸 Photos</div>
+                    <div class="form-section-title">
+                        <i class="fas fa-pen-fancy"></i>
+                        Description
+                    </div>
+                    <div class="form-row full">
+                        <div class="form-group">
+                            <label for="description">Additional Details</label>
+                            <textarea id="description" class="form-input" placeholder="Tell buyers more about your vehicle. Include any special features, maintenance history, or reasons for selling..."></textarea>
+                            <div class="form-hint">Be detailed to attract more buyers (optional but recommended)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== SECTION 6: PHOTOS ===== -->
+                <div class="form-card">
+                    <div class="form-section-title">
+                        <i class="fas fa-images"></i>
+                        Photos
+                    </div>
                     <div class="form-row full">
                         <div class="form-group">
                             <label class="file-input-label">
-                                <strong>📤 Upload Photos</strong>
-                                <p style="margin: 8px 0 0; font-size: 0.9rem; color: var(--text-dark);">Click to select or drag and drop</p>
-                                <input type="file" id="photos" class="file-input" multiple accept="image/*">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <strong>Upload Vehicle Photos</strong>
+                                <p>Click to browse or drag and drop images here</p>
+                                <input type="file" id="photos" class="file-input" multiple accept="image/*" required>
                             </label>
-                            <div class="form-hint">Upload up to 10 high-quality photos of your vehicle</div>
+                            <div class="form-hint">
+                                <i class="fas fa-info-circle"></i>
+                                You can upload up to 10 high-quality photos. The first image will be the main display image.
+                            </div>
+                            <div class="image-preview-container" id="imagePreviewContainer"></div>
                         </div>
                     </div>
                 </div>
+
+                <!-- SUBMIT BUTTON -->
                 <div class="form-card">
-                    <div class="form-section-title">📞 Your Contact Information</div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="phone">Phone Number *</label>
-                            <input type="tel" id="phone" class="form-input" placeholder="+94 77 123 4567" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="alt-phone">Alternate Phone (Optional)</label>
-                            <input type="tel" id="alt-phone" class="form-input" placeholder="+94 71 123 4567">
-                        </div>
-                    </div>
-                    <div class="form-row full">
-                        <div class="form-group">
-                            <label for="location">Location/City *</label>
-                            <input type="text" id="location" class="form-input" placeholder="e.g., Colombo, Kandy" required>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-card">
-                    <button type="submit" class="btn-submit">📤 Post My Vehicle</button>
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-upload"></i>
+                        Post Vehicle
+                    </button>
                 </div>
             </form>
         </div>
     </section>
+    <!-- FOOTER -->
     <footer class="premium-footer">
-        <div class="footer-content">
-            <div class="footer-column"><h4>Muthupura.lk</h4><p>Sri Lanka's premier online vehicle marketplace.</p><div class="social-links"><a href="#">f</a><a href="#">𝕏</a><a href="#">📷</a></div></div>
-            <div class="footer-column"><h4>Quick Links</h4><a href="index.html">Home</a><a href="about.html">About Us</a><a href="post.html">Post Vehicle</a><a href="contact.html">Contact</a></div>
-            <div class="footer-column"><h4>Support</h4><a href="#">FAQ</a><a href="#">Privacy Policy</a><a href="#">Terms & Conditions</a><a href="contact.html">Contact Support</a></div>
-            <div class="footer-column"><h4>Newsletter</h4><p style="font-size: 0.9rem; margin-bottom: 12px;">Get updates on new listings</p><form class="newsletter-form" onsubmit="event.preventDefault();"><input type="email" placeholder="Your email" required><button type="submit">Subscribe</button></form></div>
+        <div class="footer-container">
+            <div class="newsletter-section">
+                <h4>Subscribe to Our Newsletter</h4>
+                <p style="margin: 0 0 12px 0; color: rgba(255,255,255,0.7); font-size: 0.9rem;">Get the latest vehicles and exclusive deals delivered to your inbox</p>
+                <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Thank you for subscribing!');">
+                    <input type="email" placeholder="Enter your email address" required>
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+
+            <div class="footer-content">
+                <div class="footer-col footer-brand-section">
+                    <div class="footer-logo">
+                        <img src="logo.PNG" alt="Muthupura.lk">
+                        <span>Muthupura.lk</span>
+                    </div>
+                    <p class="footer-description">Your trusted marketplace to buy, sell and lease vehicles with complete transparency, speed, and security.</p>
+                    <div class="social-links">
+                        <a href="https://facebook.com" title="Facebook" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://twitter.com" title="Twitter" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="https://instagram.com" title="Instagram" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://linkedin.com" title="LinkedIn" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Quick Navigation</h3>
+                    <a href="index.html">Home</a>
+                    <a href="post.html">Post an Ad</a>
+                    <a href="dashboard.html">My Dashboard</a>
+                    <a href="about.html">About Us</a>
+                    <a href="contact.html">Contact Us</a>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Services</h3>
+                    <a href="#">Buy Vehicles</a>
+                    <a href="#">Sell Vehicles</a>
+                    <a href="#">Lease Vehicles</a>
+                    <a href="#">Vehicle Inspection</a>
+                    <a href="#">Financing</a>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Contact Us</h3>
+                    <p>📞 Phone: <a href="tel:+94777150660" style="color: var(--accent); font-weight: 600;">+94 777 150 660</a></p>
+                    <p>💬 WhatsApp: <a href="https://wa.me/94777150660" style="color: var(--accent); font-weight: 600;">Message Us</a></p>
+                    <p>📧 Email: <a href="mailto:info@muthupura.lk" style="color: var(--accent); font-weight: 600;">info@muthupura.lk</a></p>
+                </div>
+            </div>
+
+            <div class="footer-divider"></div>
+
+            <div class="footer-bottom">
+                <span>© 2026 Muthupura.lk – All rights reserved | Developed with ❤️</span>
+                <div class="footer-bottom-links">
+                    <a href="privacy-policy.html">Privacy Policy</a>
+                    <a href="terms-and-conditions.html">Terms of Service</a>
+                    <a href="cookie-policy.html">Cookie Policy</a>
+                </div>
+            </div>
         </div>
-        <div class="footer-bottom"><div class="footer-bottom-links"><a href="#">Privacy</a><span>•</span><a href="#">Terms</a><span>•</span><a href="contact.html">Contact</a></div><p>&copy; 2025 Muthupura.lk – All rights reserved</p></div>
     </footer>
     <script src="config.js"></script>
     <script>
-        // Global logout function
+        // ===== GLOBAL STATE =====
+        const API_URL = API_BASE_URL;
+        let selectedFiles = [];
+
+        // ===== UTILITY FUNCTIONS =====
+        const getEl = (id) => document.getElementById(id);
+
         window.performLogout = function() {
             console.log('🚪 Logout initiated');
             const keysToRemove = ['token', 'jwt_token', 'user_name', 'user_role', 'user', 'userName'];
@@ -263,9 +1155,7 @@
             });
             window.location.href = 'index.html';
         };
-        
-        const API_URL = API_BASE_URL;
-        const getEl = (id) => document.getElementById(id);
+
         function getTokenPayload() {
             const token = localStorage.getItem('token');
             if (!token) return null;
@@ -275,163 +1165,188 @@
                 return JSON.parse(atob(parts[1]));
             } catch (e) { return null; }
         }
+
+        // ===== AUTHENTICATION CHECK =====
         async function checkAuth() {
             const payload = getTokenPayload();
-            if (!payload) {
-                getEl('auth-alert').style.display = 'block';
+            if (!payload || (payload.exp && Date.now() >= payload.exp * 1000)) {
+                getEl('auth-alert').style.display = 'flex';
                 getEl('postVehicleForm').style.display = 'none';
+                localStorage.removeItem('token');
+                localStorage.removeItem('user_name');
             }
         }
+
+        // ===== NAVBAR UPDATE =====
         async function updateNavigation() {
             try {
                 let payload = getTokenPayload();
-                const authLink = getEl('auth-link'), adminLink = getEl('admin-link'), myListings = getEl('mylistings-link');
-                const userGreeting = getEl('user-greeting'), authLinkMobile = getEl('auth-link-mobile');
-                const adminLinkMobile = getEl('admin-link-mobile'), myListingsMobile = getEl('mylistings-link-mobile');
+                const authLink = getEl('auth-link');
+                const adminLink = getEl('admin-link');
+                const myListings = getEl('mylistings-link');
+                const userGreeting = getEl('user-greeting');
+
                 if (!payload || (payload.exp && Date.now() >= payload.exp * 1000)) {
-                    // Clear all auth keys on token expiry
                     ['token', 'jwt_token', 'user_name', 'user_role', 'user', 'userName'].forEach(key => {
                         localStorage.removeItem(key);
                     });
-                    if (userGreeting) userGreeting.style.display = 'none';
+                    userGreeting.style.display = 'none';
                     payload = null;
                 }
-                // Check both role field and is_admin field
+
                 const isUserAdmin = payload?.role === 'admin' || payload?.is_admin === true;
-                if (adminLink) adminLink.style.display = isUserAdmin ? 'inline-block' : 'none';
-                if (adminLinkMobile) adminLinkMobile.style.display = isUserAdmin ? 'block' : 'none';
-                if (payload) {
+                const userName = payload?.user_name || localStorage.getItem('user_name');
+
+                if (payload && userName) {
+                    authLink.textContent = 'Logout';
+                    authLink.href = '#';
+                    authLink.classList.add('logout-btn');
+                    authLink.onclick = (e) => {
+                        e.preventDefault();
+                        window.performLogout();
+                    };
+                    userGreeting.textContent = `Welcome, ${userName}!`;
+                    userGreeting.style.display = 'inline-block';
                     if (myListings) myListings.style.display = 'block';
-                    if (myListingsMobile) myListingsMobile.style.display = 'block';
-                    const displayName = payload.name || localStorage.getItem('userName') || payload.email || '';
-                    if (userGreeting) {
-                        // Show only first name to prevent overflow on mobile
-                        const firstName = displayName ? displayName.split(' ')[0] : 'User';
-                        userGreeting.textContent = `Hi, ${firstName}`;
-                        userGreeting.classList.add('show');
-                    }
-                    // Hide brand text on mobile when logged in
-                    const brandText = document.querySelector('.navbar-brand-text');
-                    if (brandText) {
-                        brandText.classList.add('hide-on-mobile-logged-in');
-                    }
-                    if (authLink) {
-                        authLink.textContent = 'Logout';
-                        authLink.classList.add('logout-btn');
-                        authLink.classList.add('hide-on-mobile');
-                        authLink.href = '#';
-                        authLink.onclick = (e) => {
-                            e.preventDefault();
-                            window.performLogout?.() || (localStorage.removeItem('token'), localStorage.removeItem('userName'), location.reload());
-                        };
-                    }
-                    if (authLinkMobile) {
-                        authLinkMobile.textContent = 'Logout';
-                        authLinkMobile.classList.remove('nav-login-btn');
-                        authLinkMobile.classList.add('nav-logout-btn');
-                        authLinkMobile.href = '#';
-                        authLinkMobile.onclick = (e) => {
-                            e.preventDefault();
-                            window.performLogout?.() || (localStorage.removeItem('token'), localStorage.removeItem('userName'), location.reload());
-                        };
-                    }
                 } else {
-                    if (myListings) myListings.style.display = 'none';
-                    if (myListingsMobile) myListingsMobile.style.display = 'none';
-                    if (userGreeting) userGreeting.classList.remove('show');
-                    // Show brand text on mobile when not logged in
-                    const brandText = document.querySelector('.navbar-brand-text');
-                    if (brandText) {
-                        brandText.classList.remove('hide-on-mobile-logged-in');
-                    }
-                    if (userGreeting) userGreeting.classList.remove('show');
-                    if (authLink) { authLink.textContent = 'Login'; authLink.classList.add('nav-login-btn'); authLink.classList.remove('nav-logout-btn'); authLink.href = 'login.html'; authLink.onclick = null; }
-                    if (authLinkMobile) { authLinkMobile.textContent = 'Login'; authLinkMobile.classList.add('nav-login-btn'); authLinkMobile.classList.remove('nav-logout-btn'); authLinkMobile.href = 'login.html'; authLinkMobile.onclick = null; }
+                    authLink.textContent = 'Login';
+                    authLink.href = 'login.html';
+                    authLink.classList.remove('logout-btn');
+                    authLink.onclick = null;
+                    userGreeting.style.display = 'none';
                 }
-            } catch (err) { console.error('Navigation update error:', err); }
+
+                if (isUserAdmin) {
+                    if (adminLink) adminLink.style.display = 'block';
+                }
+            } catch (e) {
+                console.error('Navigation update error:', e);
+            }
         }
-        function setupNavbarScroll() {
-            const navbar = getEl('navbar');
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 0) navbar.classList.add('scrolled');
-                else navbar.classList.remove('scrolled');
+
+        // ===== PHOTO UPLOAD HANDLING =====
+        const photosInput = getEl('photos');
+        const imagePreviewContainer = getEl('imagePreviewContainer');
+
+        photosInput.addEventListener('change', handlePhotoSelect);
+
+        function handlePhotoSelect(e) {
+            const files = Array.from(e.target.files).slice(0, 10); // Max 10 images
+            selectedFiles = files;
+            renderImagePreviews();
+        }
+
+        function renderImagePreviews() {
+            imagePreviewContainer.innerHTML = '';
+            selectedFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const div = document.createElement('div');
+                    div.className = `image-preview-item ${index === 0 ? 'main' : ''}`;
+                    div.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview ${index + 1}">
+                        <button type="button" class="remove-btn" onclick="removeImage(${index})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <div class="main-badge">Main</div>
+                    `;
+                    imagePreviewContainer.appendChild(div);
+                };
+                reader.readAsDataURL(file);
             });
         }
-        function setupHamburgerMenu() {
-            const hamburger = getEl('hamburger-btn'), mobileMenu = getEl('mobile-menu');
-            if (!hamburger || !mobileMenu) return;
-            hamburger.addEventListener('click', () => {
-                hamburger.classList.toggle('active');
-                mobileMenu.classList.toggle('active');
-            });
-            mobileMenu.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', () => {
-                    hamburger.classList.remove('active');
-                    mobileMenu.classList.remove('active');
-                });
-            });
-        }
-        async function handleFormSubmit(e) {
+
+        window.removeImage = function(index) {
+            selectedFiles.splice(index, 1);
+            // Update file input
+            const dataTransfer = new DataTransfer();
+            selectedFiles.forEach(file => dataTransfer.items.add(file));
+            photosInput.files = dataTransfer.files;
+            renderImagePreviews();
+        };
+
+        // ===== FORM SUBMISSION =====
+        getEl('postVehicleForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const payload = getTokenPayload();
-            if (!payload) {
-                alert('Please login to post a vehicle.');
-                window.location.href = 'login.html';
+
+            // Validate file selection
+            if (selectedFiles.length === 0) {
+                alert('Please upload at least one photo');
                 return;
             }
-            const formData = new FormData();
-            formData.append('make', getEl('make').value.trim());
-            formData.append('model', getEl('model').value.trim());
-            formData.append('year', parseInt(getEl('year').value));
-            formData.append('mileage', parseInt(getEl('mileage').value));
-            formData.append('transmission', getEl('transmission').value);
-            formData.append('fueltype', getEl('fueltype').value);
-            formData.append('description', getEl('description').value.trim());
-            formData.append('price', parseInt(getEl('price').value));
-            formData.append('negotiable', getEl('negotiable').checked);
-            formData.append('condition', getEl('condition').value);
-            formData.append('phone', getEl('phone').value.trim());
-            formData.append('location', getEl('location').value.trim());
-            
-            // Add images from file input
-            const photosInput = getEl('photos');
-            if (photosInput && photosInput.files.length > 0) {
-                for (let i = 0; i < photosInput.files.length; i++) {
-                    formData.append('images', photosInput.files[i]);
-                }
-            }
-            
+
+            const submitBtn = e.target.querySelector('.btn-submit');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
+
             try {
+                // Create FormData
+                const formData = new FormData();
+                formData.append('title', `${getEl('year').value} ${getEl('make').value} ${getEl('model').value}`);
+                formData.append('brand', getEl('make').value);
+                formData.append('model', getEl('model').value);
+                formData.append('year', getEl('year').value);
+                formData.append('price', getEl('price').value);
+                formData.append('fuelType', getEl('fuelType').value);
+                formData.append('vehicle_type', getEl('vehicleType').value);
+                formData.append('condition', getEl('condition').value);
+                formData.append('transmission', getEl('transmission').value);
+                formData.append('engine_capacity', getEl('engineCapacity').value || null);
+                formData.append('mileage', getEl('mileage').value);
+                formData.append('phone', getEl('phone').value);
+                formData.append('location', getEl('city').value);
+                formData.append('description', getEl('description').value);
+                
+                // Collect features
+                const features = Array.from(document.querySelectorAll('input[name="features"]:checked'))
+                    .map(cb => cb.value)
+                    .join(', ');
+                formData.append('features', features);
+
+                // Add images (first image is main)
+                selectedFiles.forEach(file => {
+                    formData.append('images', file);
+                });
+
+                // Send to backend
+                const token = localStorage.getItem('token');
                 const response = await fetch(`${API_URL}/add-vehicle`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${token}`
                     },
                     body: formData
                 });
-                if (response.ok) {
+
+                const result = await response.json();
+
+                if (result.success) {
                     getEl('successMessage').classList.add('show');
                     getEl('postVehicleForm').reset();
-                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 2000);
+                    selectedFiles = [];
+                    imagePreviewContainer.innerHTML = '';
+                    
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 2000);
                 } else {
-                    const errorData = await response.json();
-                    alert(`Error: ${errorData.message || 'Unable to post vehicle'}`);
+                    alert(`Error: ${result.message}`);
                 }
-            } catch (err) {
-                console.error('Error:', err);
-                alert('Error posting vehicle. Please check your connection.');
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert('An error occurred while uploading. Please try again.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-upload"></i> Post Vehicle';
             }
-        }
+        });
+
+        // ===== INITIALIZE =====
         document.addEventListener('DOMContentLoaded', () => {
-            updateNavigation();
             checkAuth();
-            setupNavbarScroll();
-            setupHamburgerMenu();
-            getEl('postVehicleForm').addEventListener('submit', handleFormSubmit);
+            updateNavigation();
         });
     </script>
-    
-    <!-- Load navbar dynamically -->
-    <script src="js/navbar.js" defer></script>
+
 </body>
 </html>

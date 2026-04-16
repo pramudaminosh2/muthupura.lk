@@ -1748,7 +1748,7 @@ app.post('/add-vehicle', authenticateToken, postLimiter, upload.array('images', 
     console.log("FILES RECEIVED:", req.files?.length || 0);
     
     try {
-        // Extract form data - including ALL new fields
+        // Extract form data - including ALL new fields from redesigned post.html
         const { 
             title, brand, model, year, price, 
             fuelType, location, phone, description,
@@ -1776,9 +1776,13 @@ app.post('/add-vehicle', authenticateToken, postLimiter, upload.array('images', 
         if (!validatePrice(price)) {
             return res.status(400).json({ success: false, message: 'Invalid price (must be 0-999999999)' });
         }
-        if (!fuelType || !['Petrol', 'Diesel', 'Electric', 'Hybrid'].includes(fuelType)) {
+        
+        // ✅ FIXED: FuelType validation - accept both lowercase and capitalize
+        const fuelTypeCapitalized = fuelType ? fuelType.charAt(0).toUpperCase() + fuelType.slice(1).toLowerCase() : '';
+        if (!fuelTypeCapitalized || !['Petrol', 'Diesel', 'Electric', 'Hybrid'].includes(fuelTypeCapitalized)) {
             return res.status(400).json({ success: false, message: 'Invalid fuel type' });
         }
+        
         if (!locationSanitized) {
             return res.status(400).json({ success: false, message: 'Location is required' });
         }
@@ -1810,7 +1814,7 @@ app.post('/add-vehicle', authenticateToken, postLimiter, upload.array('images', 
             }
         }
         
-        const image_url = imageUrls[0]; // Use first image as primary
+        const image_url = imageUrls[0]; // Use first image as primary (main image)
         
         console.log('📝 Vehicle form data:', {
             title,
@@ -1818,17 +1822,18 @@ app.post('/add-vehicle', authenticateToken, postLimiter, upload.array('images', 
             model,
             year: parseInt(year),
             price: parseFloat(price),
-            fuelType,
+            fuelType: fuelTypeCapitalized,
             vehicle_type,
             condition,
             transmission,
             location,
             phone,
             description: description || null,
+            features: features || null,
             image_url: image_url.substring(0, 80) + '...'
         });
         
-        // Insert into database - with ALL new columns
+        // Insert into database - with ALL new columns from redesigned form
         const sql = `
             INSERT INTO vehicles 
             (title, brand, model, year, price, phone, 
@@ -1841,32 +1846,29 @@ app.post('/add-vehicle', authenticateToken, postLimiter, upload.array('images', 
         `;
         
         const values = [
-            titleSanitized,                          // 1. title
+            titleSanitized,                          // 1. title (auto-generated: year make model)
             brandSanitized,                          // 2. brand
             modelSanitized || null,                  // 3. model
             parseInt(year),                          // 4. year
             parseFloat(price),                       // 5. price
             phoneSanitized,                          // 6. phone
-            image_url,                               // 7. image
-            JSON.stringify(imageUrls),               // 8. images (JSON array)
-            fuelType,                                // 9. fuelType
-            sanitizeString(vehicle_type, 64) || null,// 10. vehicle_type
-            sanitizeString(condition, 50) || null,   // 11. condition
-            sanitizeString(transmission, 32) || null,// 12. transmission
-            engine_capacity ? parseInt(engine_capacity) : null,  // 13. engine_capacity
-            mileage ? parseInt(mileage) : null,      // 14. mileage
-            sanitizeString(features, 500) || null,   // 15. features
-            listing_type || 'sale',                  // 16. listing_type
-            req.user.id,                             // 17. ✅ FIXED: ownerId now assigned from authenticated user
-            locationSanitized,                       // 18. location
-            sanitizeString(description, 2000) || null,// 19. description
-            0,                                       // 20. isFeatured
-            location,                                // 18. location
-            description || null,                     // 19. description
-            0,                                       // 20. isFeatured
-            0,                                       // 21. is_approved (pending admin approval)
-            0,                                       // 22. views
-            null                                     // 23. featuredUntil
+            image_url,                               // 7. image (first image = main)
+            JSON.stringify(imageUrls),               // 8. images (JSON array of all image URLs)
+            fuelTypeCapitalized,                     // 9. fuelType
+            sanitizeString(vehicle_type, 64) || null,// 10. vehicle_type (car, van, bus, bike, tractor)
+            sanitizeString(condition, 50) || null,   // 11. condition (antique, brand_new, registered_used, unregistered_recondition, other)
+            sanitizeString(transmission, 32) || null,// 12. transmission (manual or automatic)
+            engine_capacity ? parseInt(engine_capacity) : null,  // 13. engine_capacity (cc, optional)
+            mileage ? parseInt(mileage) : null,      // 14. mileage (km, required)
+            sanitizeString(features, 500) || null,   // 15. features (comma-separated: air_conditioning, power_steering, power_mirror, power_window, self_parking, display_audio)
+            listing_type || 'sale',                  // 16. listing_type (sale/lease/rent)
+            req.user.id,                             // 17. ownerId (from authenticated user token)
+            locationSanitized,                       // 18. location (city)
+            sanitizeString(description, 2000) || null,// 19. description (additional details, optional)
+            0,                                       // 20. isFeatured (false by default)
+            0,                                       // 21. is_approved (0 = pending, requires admin approval)
+            0,                                       // 22. views (starts at 0)
+            null                                     // 23. featuredUntil (null by default)
         ];
         
         db.query(sql, values, (err, result) => {
