@@ -827,7 +827,7 @@
     <section class="page-header">
         <div class="page-container">
             <div class="breadcrumb"><i class="fas fa-check-circle"></i> Post Your Vehicle</div>
-            <h1>List Your Vehicle</h1>
+            <h1 style="background: linear-gradient(135deg, var(--accent) 0%, #6366f1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">List Your Vehicle</h1>
             <p class="subtitle">Reach millions of buyers across Sri Lanka. Post your vehicle in minutes and connect with serious buyers.</p>
         </div>
     </section>
@@ -841,7 +841,7 @@
             </div>
 
             <!-- Success Message -->
-            <div class="success-message" id="successMessage">
+            <div class="success-message" id="successMessage" style="display:none;">
                 <i class="fas fa-check-circle"></i>
                 <span>Thank you! Your vehicle has been posted successfully. You can view it in My Listings.</span>
             </div>
@@ -1170,10 +1170,11 @@
         async function checkAuth() {
             const payload = getTokenPayload();
             if (!payload || (payload.exp && Date.now() >= payload.exp * 1000)) {
-                getEl('auth-alert').style.display = 'flex';
-                getEl('postVehicleForm').style.display = 'none';
+                // Redirect to login page instead of showing alert
                 localStorage.removeItem('token');
                 localStorage.removeItem('user_name');
+                window.location.href = 'login.html';
+                return;
             }
         }
 
@@ -1280,21 +1281,21 @@
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
 
             try {
-                // Create FormData
+                // Create FormData - map to database column names
                 const formData = new FormData();
-                formData.append('title', `${getEl('year').value} ${getEl('make').value} ${getEl('model').value}`);
-                formData.append('brand', getEl('make').value);
+                formData.append('seller_name', getEl('fullName').value);
+                formData.append('phone', getEl('phone').value);
+                formData.append('city', getEl('city').value);
+                formData.append('vehicle_type', getEl('vehicleType').value);
+                formData.append('condition', getEl('condition').value);
+                formData.append('make', getEl('make').value);
                 formData.append('model', getEl('model').value);
                 formData.append('year', getEl('year').value);
                 formData.append('price', getEl('price').value);
-                formData.append('fuelType', getEl('fuelType').value);
-                formData.append('vehicle_type', getEl('vehicleType').value);
-                formData.append('condition', getEl('condition').value);
                 formData.append('transmission', getEl('transmission').value);
+                formData.append('fuel_type', getEl('fuelType').value);
                 formData.append('engine_capacity', getEl('engineCapacity').value || null);
                 formData.append('mileage', getEl('mileage').value);
-                formData.append('phone', getEl('phone').value);
-                formData.append('location', getEl('city').value);
                 formData.append('description', getEl('description').value);
                 
                 // Collect features
@@ -1321,7 +1322,7 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    getEl('successMessage').classList.add('show');
+                    getEl('successMessage').style.display = 'flex';
                     getEl('postVehicleForm').reset();
                     selectedFiles = [];
                     imagePreviewContainer.innerHTML = '';

@@ -1748,46 +1748,49 @@ app.post('/add-vehicle', authenticateToken, postLimiter, upload.array('images', 
     console.log("FILES RECEIVED:", req.files?.length || 0);
     
     try {
-        // Extract form data - including ALL new fields from redesigned post.html
+        // Extract form data - map to database column names
         const { 
-            title, brand, model, year, price, 
-            fuelType, location, phone, description,
-            vehicle_type, condition, transmission,
-            engine_capacity, mileage, features,
-            listing_type
+            seller_name, phone, city, vehicle_type, condition,
+            make, model, year, price, transmission, fuel_type,
+            engine_capacity, mileage, features, description
         } = req.body;
         
-        // ✅ FIXED: Input validation for all required fields
-        const titleSanitized = sanitizeString(title, 255);
-        const brandSanitized = sanitizeString(brand, 100);
-        const modelSanitized = sanitizeString(model, 100);
-        const locationSanitized = sanitizeString(location, 128);
-        const phoneSanitized = sanitizeString(phone, 32);
-        
-        if (!titleSanitized) {
-            return res.status(400).json({ success: false, message: 'Title is required' });
+        // ✅ Input validation for all required fields
+        if (!seller_name || !seller_name.trim()) {
+            return res.status(400).json({ success: false, message: 'Seller name is required' });
         }
-        if (!brandSanitized) {
-            return res.status(400).json({ success: false, message: 'Brand is required' });
+        if (!phone || !phone.trim()) {
+            return res.status(400).json({ success: false, message: 'Phone is required' });
         }
-        if (!validateYear(year)) {
-            return res.status(400).json({ success: false, message: 'Invalid year (must be 1900-current)' });
+        if (!city || !city.trim()) {
+            return res.status(400).json({ success: false, message: 'City is required' });
         }
-        if (!validatePrice(price)) {
-            return res.status(400).json({ success: false, message: 'Invalid price (must be 0-999999999)' });
+        if (!vehicle_type || !vehicle_type.trim()) {
+            return res.status(400).json({ success: false, message: 'Vehicle type is required' });
         }
-        
-        // ✅ FIXED: FuelType validation - accept both lowercase and capitalize
-        const fuelTypeCapitalized = fuelType ? fuelType.charAt(0).toUpperCase() + fuelType.slice(1).toLowerCase() : '';
-        if (!fuelTypeCapitalized || !['Petrol', 'Diesel', 'Electric', 'Hybrid'].includes(fuelTypeCapitalized)) {
-            return res.status(400).json({ success: false, message: 'Invalid fuel type' });
+        if (!condition || !condition.trim()) {
+            return res.status(400).json({ success: false, message: 'Condition is required' });
         }
-        
-        if (!locationSanitized) {
-            return res.status(400).json({ success: false, message: 'Location is required' });
+        if (!make || !make.trim()) {
+            return res.status(400).json({ success: false, message: 'Make is required' });
         }
-        if (!validatePhone(phoneSanitized)) {
-            return res.status(400).json({ success: false, message: 'Invalid phone number (7-15 digits)' });
+        if (!model || !model.trim()) {
+            return res.status(400).json({ success: false, message: 'Model is required' });
+        }
+        if (!year) {
+            return res.status(400).json({ success: false, message: 'Year is required' });
+        }
+        if (!price) {
+            return res.status(400).json({ success: false, message: 'Price is required' });
+        }
+        if (!transmission || !transmission.trim()) {
+            return res.status(400).json({ success: false, message: 'Transmission is required' });
+        }
+        if (!fuel_type || !fuel_type.trim()) {
+            return res.status(400).json({ success: false, message: 'Fuel type is required' });
+        }
+        if (!mileage && mileage !== 0) {
+            return res.status(400).json({ success: false, message: 'Mileage is required' });
         }
         
         // Ensure at least one image was uploaded
@@ -1814,66 +1817,64 @@ app.post('/add-vehicle', authenticateToken, postLimiter, upload.array('images', 
             }
         }
         
-        const image_url = imageUrls[0]; // Use first image as primary (main image)
-        
         console.log('📝 Vehicle form data:', {
-            title,
-            brand,
-            model,
-            year: parseInt(year),
-            price: parseFloat(price),
-            fuelType: fuelTypeCapitalized,
+            seller_name,
+            phone,
+            city,
             vehicle_type,
             condition,
+            make,
+            model,
+            year: parseInt(year),
+            price: parseInt(price),
             transmission,
-            location,
-            phone,
-            description: description || null,
+            fuel_type,
+            engine_capacity: engine_capacity ? parseInt(engine_capacity) : null,
+            mileage: parseInt(mileage),
             features: features || null,
-            image_url: image_url.substring(0, 80) + '...'
+            images_count: imageUrls.length
         });
         
-        // Insert into database - with ALL new columns from redesigned form
+        // Insert into database - matching exact column names from vehicles table
         const sql = `
             INSERT INTO vehicles 
-            (title, brand, model, year, price, phone, 
-             image, images, fuelType, vehicle_type, condition,
-             transmission, engine_capacity, mileage, features,
-             listing_type, ownerId, location, description,
-             isFeatured, is_approved, views, featuredUntil, createdAt)
+            (user_id, seller_name, phone, city, vehicle_type, condition,
+             make, model, year, price, transmission, fuel_type,
+             engine_capacity, mileage, features, description, images,
+             listing_type, is_featured, is_approved, views, created_at)
             VALUES 
-            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
         `;
         
         const values = [
-            titleSanitized,                          // 1. title (auto-generated: year make model)
-            brandSanitized,                          // 2. brand
-            modelSanitized || null,                  // 3. model
-            parseInt(year),                          // 4. year
-            parseFloat(price),                       // 5. price
-            phoneSanitized,                          // 6. phone
-            image_url,                               // 7. image (first image = main)
-            JSON.stringify(imageUrls),               // 8. images (JSON array of all image URLs)
-            fuelTypeCapitalized,                     // 9. fuelType
-            sanitizeString(vehicle_type, 64) || null,// 10. vehicle_type (car, van, bus, bike, tractor)
-            sanitizeString(condition, 50) || null,   // 11. condition (antique, brand_new, registered_used, unregistered_recondition, other)
-            sanitizeString(transmission, 32) || null,// 12. transmission (manual or automatic)
-            engine_capacity ? parseInt(engine_capacity) : null,  // 13. engine_capacity (cc, optional)
-            mileage ? parseInt(mileage) : null,      // 14. mileage (km, required)
-            sanitizeString(features, 500) || null,   // 15. features (comma-separated: air_conditioning, power_steering, power_mirror, power_window, self_parking, display_audio)
-            listing_type || 'sale',                  // 16. listing_type (sale/lease/rent)
-            req.user.id,                             // 17. ownerId (from authenticated user token)
-            locationSanitized,                       // 18. location (city)
-            sanitizeString(description, 2000) || null,// 19. description (additional details, optional)
-            0,                                       // 20. isFeatured (false by default)
-            0,                                       // 21. is_approved (0 = pending, requires admin approval)
-            0,                                       // 22. views (starts at 0)
-            null                                     // 23. featuredUntil (null by default)
+            req.user.id,                             // user_id from authenticated token
+            seller_name.trim(),                      // seller_name
+            phone.trim(),                            // phone
+            city.trim(),                             // city
+            vehicle_type.trim(),                     // vehicle_type (car, van, bus, bike, tractor)
+            condition.trim(),                        // condition (antique, brand_new, registered_used, unregistered_recondition, other)
+            make.trim(),                             // make
+            model.trim(),                            // model
+            parseInt(year),                          // year
+            parseInt(price),                         // price
+            transmission.trim(),                     // transmission (manual or automatic)
+            fuel_type.trim(),                        // fuel_type (Petrol, Diesel, Electric, Hybrid)
+            engine_capacity ? parseInt(engine_capacity) : null,  // engine_capacity (optional)
+            parseInt(mileage),                       // mileage
+            features && features.trim() ? features.trim() : null,  // features (comma-separated)
+            description && description.trim() ? description.trim() : null,  // description (optional)
+            JSON.stringify(imageUrls),               // images (JSON array of all image URLs)
+            'sale',                                  // listing_type (sale/lease/rent)
+            0,                                       // is_featured (false by default)
+            0,                                       // is_approved (pending admin approval)
+            0                                        // views (starts at 0)
         ];
         
         db.query(sql, values, (err, result) => {
             if (err) {
                 console.error('❌ Database error:', err.message);
+                console.error('❌ SQL:', sql);
+                console.error('❌ Values:', values);
                 return res.status(500).json({ 
                     success: false, 
                     message: 'Failed to save vehicle',
@@ -1887,7 +1888,7 @@ app.post('/add-vehicle', authenticateToken, postLimiter, upload.array('images', 
                 success: true, 
                 message: 'Vehicle posted successfully', 
                 vehicleId: result.insertId,
-                image_url: image_url
+                image_url: imageUrls[0]
             });
         });
         
