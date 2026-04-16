@@ -1744,8 +1744,10 @@ app.get('/api/debug/vehicles-sample', (req, res) => {
 
 // 🟢 Add Vehicle - Production Route
 app.post('/add-vehicle', authenticateToken, postLimiter, upload.array('images', 10), async (req, res) => {
-    console.log("🔥 POST /add-vehicle hit from user:", req.user.id);
-    console.log("FILES RECEIVED:", req.files?.length || 0);
+    console.log("\n🔥 ================== POST /add-vehicle ==================");
+    console.log("👤 User ID:", req.user.id);
+    console.log("📦 Request body keys:", Object.keys(req.body));
+    console.log("📸 Files received:", req.files?.length || 0);
     
     try {
         // Extract form data - map to database column names
@@ -1755,85 +1757,96 @@ app.post('/add-vehicle', authenticateToken, postLimiter, upload.array('images', 
             engine_capacity, mileage, features, description
         } = req.body;
         
+        console.log("📋 Extracted fields:", {
+            seller_name, phone, city, vehicle_type, condition,
+            make, model, year, price, transmission, fuel_type,
+            engine_capacity, mileage, features: features ? features.substring(0, 50) : null, 
+            description: description ? description.substring(0, 50) : null
+        });
+        
         // ✅ Input validation for all required fields
-        if (!seller_name || !seller_name.trim()) {
+        if (!seller_name || !seller_name.toString().trim()) {
+            console.warn('⚠️ Validation failed: seller_name is empty');
             return res.status(400).json({ success: false, message: 'Seller name is required' });
         }
-        if (!phone || !phone.trim()) {
+        if (!phone || !phone.toString().trim()) {
+            console.warn('⚠️ Validation failed: phone is empty');
             return res.status(400).json({ success: false, message: 'Phone is required' });
         }
-        if (!city || !city.trim()) {
+        if (!city || !city.toString().trim()) {
+            console.warn('⚠️ Validation failed: city is empty');
             return res.status(400).json({ success: false, message: 'City is required' });
         }
-        if (!vehicle_type || !vehicle_type.trim()) {
+        if (!vehicle_type || !vehicle_type.toString().trim()) {
+            console.warn('⚠️ Validation failed: vehicle_type is empty');
             return res.status(400).json({ success: false, message: 'Vehicle type is required' });
         }
-        if (!condition || !condition.trim()) {
+        if (!condition || !condition.toString().trim()) {
+            console.warn('⚠️ Validation failed: condition is empty');
             return res.status(400).json({ success: false, message: 'Condition is required' });
         }
-        if (!make || !make.trim()) {
+        if (!make || !make.toString().trim()) {
+            console.warn('⚠️ Validation failed: make is empty');
             return res.status(400).json({ success: false, message: 'Make is required' });
         }
-        if (!model || !model.trim()) {
+        if (!model || !model.toString().trim()) {
+            console.warn('⚠️ Validation failed: model is empty');
             return res.status(400).json({ success: false, message: 'Model is required' });
         }
-        if (!year) {
+        if (!year || year === '') {
+            console.warn('⚠️ Validation failed: year is empty');
             return res.status(400).json({ success: false, message: 'Year is required' });
         }
-        if (!price) {
+        if (!price || price === '') {
+            console.warn('⚠️ Validation failed: price is empty');
             return res.status(400).json({ success: false, message: 'Price is required' });
         }
-        if (!transmission || !transmission.trim()) {
+        if (!transmission || !transmission.toString().trim()) {
+            console.warn('⚠️ Validation failed: transmission is empty');
             return res.status(400).json({ success: false, message: 'Transmission is required' });
         }
-        if (!fuel_type || !fuel_type.trim()) {
+        if (!fuel_type || !fuel_type.toString().trim()) {
+            console.warn('⚠️ Validation failed: fuel_type is empty');
             return res.status(400).json({ success: false, message: 'Fuel type is required' });
         }
-        if (!mileage && mileage !== 0) {
+        if (!mileage && mileage !== 0 && mileage !== '0') {
+            console.warn('⚠️ Validation failed: mileage is empty');
             return res.status(400).json({ success: false, message: 'Mileage is required' });
         }
         
+        console.log('✅ All field validations passed');
+        
         // Ensure at least one image was uploaded
         if (!Array.isArray(req.files) || !req.files.length) {
+            console.warn('⚠️ No images uploaded');
             return res.status(400).json({ 
                 success: false, 
                 message: 'At least one image file is required' 
             });
         }
         
+        console.log(`📸 Starting to upload ${req.files.length} images to Firebase Storage...`);
+        
         // Upload images to Firebase Storage
         const imageUrls = [];
-        for (const file of req.files) {
+        for (let i = 0; i < req.files.length; i++) {
+            const file = req.files[i];
             try {
+                console.log(`  ⏳ Uploading image ${i + 1}/${req.files.length}: ${file.originalname} (${file.size} bytes)`);
                 const url = await uploadToFirebase(file);
                 imageUrls.push(url);
-                console.log('✅ Uploaded image:', url);
+                console.log(`  ✅ Image ${i + 1} uploaded: ${url.substring(0, 80)}...`);
             } catch (uploadError) {
-                console.error('❌ Failed to upload image:', uploadError);
+                console.error(`  ❌ Failed to upload image ${i + 1}:`, uploadError.message);
                 return res.status(500).json({ 
                     success: false, 
-                    message: 'Failed to upload image to storage' 
+                    message: `Failed to upload image ${i + 1} to storage`,
+                    error: uploadError.message
                 });
             }
         }
         
-        console.log('📝 Vehicle form data:', {
-            seller_name,
-            phone,
-            city,
-            vehicle_type,
-            condition,
-            make,
-            model,
-            year: parseInt(year),
-            price: parseInt(price),
-            transmission,
-            fuel_type,
-            engine_capacity: engine_capacity ? parseInt(engine_capacity) : null,
-            mileage: parseInt(mileage),
-            features: features || null,
-            images_count: imageUrls.length
-        });
+        console.log(`✅ All ${imageUrls.length} images uploaded successfully`);
         
         // Insert into database - matching exact column names from vehicles table
         const sql = `
@@ -1848,21 +1861,21 @@ app.post('/add-vehicle', authenticateToken, postLimiter, upload.array('images', 
         
         const values = [
             req.user.id,                             // user_id from authenticated token
-            seller_name.trim(),                      // seller_name
-            phone.trim(),                            // phone
-            city.trim(),                             // city
-            vehicle_type.trim(),                     // vehicle_type (car, van, bus, bike, tractor)
-            condition.trim(),                        // condition (antique, brand_new, registered_used, unregistered_recondition, other)
-            make.trim(),                             // make
-            model.trim(),                            // model
+            seller_name.toString().trim(),           // seller_name
+            phone.toString().trim(),                 // phone
+            city.toString().trim(),                  // city
+            vehicle_type.toString().trim(),          // vehicle_type (car, van, bus, bike, tractor)
+            condition.toString().trim(),             // condition (antique, brand_new, registered_used, unregistered_recondition, other)
+            make.toString().trim(),                  // make
+            model.toString().trim(),                 // model
             parseInt(year),                          // year
             parseInt(price),                         // price
-            transmission.trim(),                     // transmission (manual or automatic)
-            fuel_type.trim(),                        // fuel_type (Petrol, Diesel, Electric, Hybrid)
+            transmission.toString().trim(),          // transmission (manual or automatic)
+            fuel_type.toString().trim(),             // fuel_type (Petrol, Diesel, Electric, Hybrid)
             engine_capacity ? parseInt(engine_capacity) : null,  // engine_capacity (optional)
             parseInt(mileage),                       // mileage
-            features && features.trim() ? features.trim() : null,  // features (comma-separated)
-            description && description.trim() ? description.trim() : null,  // description (optional)
+            features && features.toString().trim() ? features.toString().trim() : null,  // features (comma-separated)
+            description && description.toString().trim() ? description.toString().trim() : null,  // description (optional)
             JSON.stringify(imageUrls),               // images (JSON array of all image URLs)
             'sale',                                  // listing_type (sale/lease/rent)
             0,                                       // is_featured (false by default)
@@ -1870,19 +1883,38 @@ app.post('/add-vehicle', authenticateToken, postLimiter, upload.array('images', 
             0                                        // views (starts at 0)
         ];
         
+        console.log('💾 Database insert details:');
+        console.log('   SQL columns: user_id, seller_name, phone, city, vehicle_type, condition, make, model, year, price, transmission, fuel_type, engine_capacity, mileage, features, description, images, listing_type, is_featured, is_approved, views, created_at');
+        console.log('   Values count:', values.length);
+        console.log('   Sample values:', [
+            values[0], // user_id
+            values[1], // seller_name
+            values[2], // phone
+            values[3], // city
+            values[8], // year
+            values[9], // price
+            values[16].substring(0, 80) // images
+        ]);
+        
         db.query(sql, values, (err, result) => {
             if (err) {
                 console.error('❌ Database error:', err.message);
-                console.error('❌ SQL:', sql);
-                console.error('❌ Values:', values);
+                console.error('   Error code:', err.code);
+                console.error('   SQL:', sql);
                 return res.status(500).json({ 
                     success: false, 
-                    message: 'Failed to save vehicle',
+                    message: 'Failed to save vehicle to database',
                     error: process.env.NODE_ENV === 'development' ? err.message : null
                 });
             }
             
-            console.log(`✅ Vehicle saved with ID: ${result.insertId}`);
+            console.log(`✅ Vehicle saved successfully!`);
+            console.log(`   Vehicle ID: ${result.insertId}`);
+            console.log(`   User ID: ${req.user.id}`);
+            console.log(`   Seller: ${seller_name} (${phone})`);
+            console.log(`   Vehicle: ${year} ${make} ${model}`);
+            console.log(`   Price: ${price}`);
+            console.log("🔥 ================== SUCCESS ==================\n");
             
             res.status(201).json({ 
                 success: true, 
@@ -1894,9 +1926,11 @@ app.post('/add-vehicle', authenticateToken, postLimiter, upload.array('images', 
         
     } catch (err) {
         console.error('❌ Unexpected error in /add-vehicle:', err.message);
+        console.error('   Stack trace:', err.stack);
+        console.error("🔥 ================== ERROR ==================\n");
         res.status(500).json({ 
             success: false, 
-            message: 'Server error',
+            message: 'Server error: ' + err.message,
             error: process.env.NODE_ENV === 'development' ? err.message : null
         });
     }

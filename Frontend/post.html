@@ -1269,48 +1269,84 @@
         // ===== FORM SUBMISSION =====
         getEl('postVehicleForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            console.log('📝 Form submission started');
 
             // Validate file selection
             if (selectedFiles.length === 0) {
+                console.error('❌ No files selected');
                 alert('Please upload at least one photo');
                 return;
             }
+            console.log(`✅ Files selected: ${selectedFiles.length}`);
 
             const submitBtn = e.target.querySelector('.btn-submit');
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
 
             try {
+                // Validate token
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    console.error('❌ No token found');
+                    alert('Authentication token missing. Please login again.');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                console.log('✅ Token found:', token.substring(0, 20) + '...');
+
                 // Create FormData - map to database column names
                 const formData = new FormData();
-                formData.append('seller_name', getEl('fullName').value);
-                formData.append('phone', getEl('phone').value);
-                formData.append('city', getEl('city').value);
-                formData.append('vehicle_type', getEl('vehicleType').value);
-                formData.append('condition', getEl('condition').value);
-                formData.append('make', getEl('make').value);
-                formData.append('model', getEl('model').value);
-                formData.append('year', getEl('year').value);
-                formData.append('price', getEl('price').value);
-                formData.append('transmission', getEl('transmission').value);
-                formData.append('fuel_type', getEl('fuelType').value);
-                formData.append('engine_capacity', getEl('engineCapacity').value || null);
-                formData.append('mileage', getEl('mileage').value);
-                formData.append('description', getEl('description').value);
+                
+                const formValues = {
+                    seller_name: getEl('fullName').value,
+                    phone: getEl('phone').value,
+                    city: getEl('city').value,
+                    vehicle_type: getEl('vehicleType').value,
+                    condition: getEl('condition').value,
+                    make: getEl('make').value,
+                    model: getEl('model').value,
+                    year: getEl('year').value,
+                    price: getEl('price').value,
+                    transmission: getEl('transmission').value,
+                    fuel_type: getEl('fuelType').value,
+                    engine_capacity: getEl('engineCapacity').value || '',
+                    mileage: getEl('mileage').value,
+                    description: getEl('description').value || ''
+                };
+
+                console.log('📋 Form values:', formValues);
+
+                // Validate required fields
+                if (!formValues.seller_name || !formValues.phone || !formValues.city || !formValues.vehicle_type || 
+                    !formValues.condition || !formValues.make || !formValues.model || !formValues.year || 
+                    !formValues.price || !formValues.transmission || !formValues.fuel_type || !formValues.mileage) {
+                    console.error('❌ Missing required fields:', formValues);
+                    alert('Please fill in all required fields');
+                    return;
+                }
+                console.log('✅ All required fields filled');
+
+                // Add form values to FormData
+                Object.keys(formValues).forEach(key => {
+                    formData.append(key, formValues[key]);
+                });
                 
                 // Collect features
                 const features = Array.from(document.querySelectorAll('input[name="features"]:checked'))
                     .map(cb => cb.value)
                     .join(', ');
                 formData.append('features', features);
+                console.log('✅ Features collected:', features || 'None');
 
                 // Add images (first image is main)
-                selectedFiles.forEach(file => {
+                console.log(`📸 Adding ${selectedFiles.length} images to FormData`);
+                selectedFiles.forEach((file, index) => {
+                    console.log(`  - Image ${index + 1}: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
                     formData.append('images', file);
                 });
 
                 // Send to backend
-                const token = localStorage.getItem('token');
+                console.log(`🚀 Sending POST request to ${API_URL}/add-vehicle`);
                 const response = await fetch(`${API_URL}/add-vehicle`, {
                     method: 'POST',
                     headers: {
@@ -1319,9 +1355,22 @@
                     body: formData
                 });
 
+                console.log(`📡 Response status: ${response.status} ${response.statusText}`);
+                
+                // Check if response is JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const responseText = await response.text();
+                    console.error('❌ Non-JSON response received:', responseText.substring(0, 200));
+                    alert('Server returned invalid response. Check console for details.');
+                    return;
+                }
+
                 const result = await response.json();
+                console.log('✅ Response received:', result);
 
                 if (result.success) {
+                    console.log(`✅ Vehicle posted successfully! ID: ${result.vehicleId}`);
                     getEl('successMessage').style.display = 'flex';
                     getEl('postVehicleForm').reset();
                     selectedFiles = [];
@@ -1331,11 +1380,13 @@
                         window.location.href = 'dashboard.html';
                     }, 2000);
                 } else {
+                    console.error('❌ API returned error:', result.message);
                     alert(`Error: ${result.message}`);
                 }
             } catch (error) {
-                console.error('Upload error:', error);
-                alert('An error occurred while uploading. Please try again.');
+                console.error('❌ Upload error:', error);
+                console.error('   Stack:', error.stack);
+                alert('An error occurred while uploading. Check console for details:\n\n' + error.message);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-upload"></i> Post Vehicle';
@@ -1346,7 +1397,46 @@
         document.addEventListener('DOMContentLoaded', () => {
             checkAuth();
             updateNavigation();
+            initializeNavbarScroll();
+            initializeMobileMenu();
         });
+
+        // ===== NAVBAR SCROLL EFFECT (Glassmorphism) =====
+        function initializeNavbarScroll() {
+            const navbar = document.getElementById('navbar');
+            const scrollThreshold = 50;
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > scrollThreshold) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+        }
+
+        // ===== MOBILE MENU TOGGLE =====
+        function initializeMobileMenu() {
+            const hamburgerBtn = document.getElementById('hamburger-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            if (hamburgerBtn) {
+                hamburgerBtn.addEventListener('click', () => {
+                    const isOpen = mobileMenu.style.display === 'block';
+                    mobileMenu.style.display = isOpen ? 'none' : 'block';
+                    hamburgerBtn.classList.toggle('active');
+                });
+            }
+
+            // Close mobile menu when a link is clicked
+            const mobileLinks = document.querySelectorAll('.mobile-menu-link');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.style.display = 'none';
+                    if (hamburgerBtn) hamburgerBtn.classList.remove('active');
+                });
+            });
+        }
     </script>
 
 </body>
