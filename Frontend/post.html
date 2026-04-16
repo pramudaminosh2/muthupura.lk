@@ -317,13 +317,12 @@
                     }
                     if (authLink) {
                         authLink.textContent = 'Logout';
-                        authLink.classList.remove('nav-login-btn');
-                        authLink.classList.add('nav-logout-btn');
+                        authLink.classList.add('logout-btn');
                         authLink.classList.add('hide-on-mobile');
                         authLink.href = '#';
                         authLink.onclick = (e) => {
                             e.preventDefault();
-                            window.performLogout();
+                            window.performLogout?.() || (localStorage.removeItem('token'), localStorage.removeItem('userName'), location.reload());
                         };
                     }
                     if (authLinkMobile) {
@@ -333,12 +332,18 @@
                         authLinkMobile.href = '#';
                         authLinkMobile.onclick = (e) => {
                             e.preventDefault();
-                            window.performLogout();
+                            window.performLogout?.() || (localStorage.removeItem('token'), localStorage.removeItem('userName'), location.reload());
                         };
                     }
                 } else {
                     if (myListings) myListings.style.display = 'none';
                     if (myListingsMobile) myListingsMobile.style.display = 'none';
+                    if (userGreeting) userGreeting.classList.remove('show');
+                    // Show brand text on mobile when not logged in
+                    const brandText = document.querySelector('.navbar-brand-text');
+                    if (brandText) {
+                        brandText.classList.remove('hide-on-mobile-logged-in');
+                    }
                     if (userGreeting) userGreeting.classList.remove('show');
                     if (authLink) { authLink.textContent = 'Login'; authLink.classList.add('nav-login-btn'); authLink.classList.remove('nav-logout-btn'); authLink.href = 'login.html'; authLink.onclick = null; }
                     if (authLinkMobile) { authLinkMobile.textContent = 'Login'; authLinkMobile.classList.add('nav-login-btn'); authLinkMobile.classList.remove('nav-logout-btn'); authLinkMobile.href = 'login.html'; authLinkMobile.onclick = null; }

@@ -3176,16 +3176,16 @@
             try {
                 let payload = getTokenPayload();
                 const authLink = getEl('auth-link');
-                const authLinkMobile = getEl('auth-link-mobile');
                 const adminLink = getEl('admin-link');
                 const myListings = getEl('mylistings-link');
                 const userGreeting = getEl('user-greeting');
+                const authLinkMobile = getEl('auth-link-mobile');
+                const adminLinkMobile = getEl('admin-link-mobile');
+                const myListingsMobile = getEl('mylistings-link-mobile');
 
                 if (!payload || (payload.exp && Date.now() >= payload.exp * 1000)) {
-                    // Clear all auth keys on token expiry
-                    ['token', 'jwt_token', 'user_name', 'user_role', 'user', 'userName', 'user_id'].forEach(key => {
-                        localStorage.removeItem(key);
-                    });
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('userName');
                     if (userGreeting) userGreeting.classList.remove('show');
                     payload = null;
                 }
@@ -3214,18 +3214,19 @@
                 }
 
                 if (adminLink) {
-                    // Check both role field and is_admin field
-                    const isAdmin = payload?.role === 'admin' || payload?.is_admin === true;
-                    adminLink.style.display = isAdmin ? 'inline-block' : 'none';
-                    console.log(`👤 Admin link ${isAdmin ? 'shown' : 'hidden'} for user`);
+                    adminLink.style.display = payload?.role === 'admin' ? 'inline-block' : 'none';
+                }
+                if (adminLinkMobile) {
+                    adminLinkMobile.style.display = payload?.role === 'admin' ? 'block' : 'none';
                 }
 
                 if (payload) {
                     if (myListings) myListings.style.display = 'inline-block';
+                    if (myListingsMobile) myListingsMobile.style.display = 'block';
                     const displayName = payload.name || localStorage.getItem('userName') || payload.email || '';
-                    if (userGreeting && displayName) {
-                        // Show only first name
-                        const firstName = displayName.split(' ')[0];
+                    if (userGreeting) {
+                        // Show only first name to prevent overflow on mobile
+                        const firstName = displayName ? displayName.split(' ')[0] : 'User';
                         userGreeting.textContent = `Hi, ${firstName}`;
                         userGreeting.classList.add('show');
                     }
@@ -3234,17 +3235,14 @@
                     if (brandText) {
                         brandText.classList.add('hide-on-mobile-logged-in');
                     }
-                    // Show logout button in navbar
                     if (authLink) {
                         authLink.textContent = 'Logout';
-                        authLink.style.display = 'inline-block';
-                        authLink.classList.remove('nav-login-btn');
-                        authLink.classList.add('nav-logout-btn');
+                        authLink.classList.add('logout-btn');
                         authLink.classList.add('hide-on-mobile');
                         authLink.href = '#';
                         authLink.onclick = (e) => {
                             e.preventDefault();
-                            window.performLogout();
+                            window.performLogout?.() || (localStorage.removeItem('token'), localStorage.removeItem('userName'), location.reload());
                         };
                     }
                     if (authLinkMobile) {
@@ -3254,30 +3252,33 @@
                         authLinkMobile.href = '#';
                         authLinkMobile.onclick = (e) => {
                             e.preventDefault();
-                            window.performLogout();
+                            window.performLogout?.() || (localStorage.removeItem('token'), localStorage.removeItem('userName'), location.reload());
                         };
                     }
                 } else {
                     if (myListings) myListings.style.display = 'none';
-                    if (userGreeting) {
-                        userGreeting.classList.remove('show');
-                    }
+                    if (myListingsMobile) myListingsMobile.style.display = 'none';
+                    if (userGreeting) userGreeting.classList.remove('show');
                     // Show brand text on mobile when not logged in
                     const brandText = document.querySelector('.navbar-brand-text');
                     if (brandText) {
                         brandText.classList.remove('hide-on-mobile-logged-in');
                     }
+                    if (userGreeting) userGreeting.classList.remove('show');
                     if (authLink) {
-                        authLink.style.display = 'inline-block';
                         authLink.textContent = 'Login';
-                        authLink.classList.add('nav-login-btn');
-                        authLink.classList.remove('nav-logout-btn');
+                        authLink.classList.remove('logout-btn');
                         authLink.href = 'login.html';
                         authLink.onclick = null;
                     }
                     if (authLinkMobile) {
                         authLinkMobile.textContent = 'Login';
                         authLinkMobile.classList.add('nav-login-btn');
+                        authLinkMobile.classList.remove('nav-logout-btn');
+                        authLinkMobile.href = 'login.html';
+                        authLinkMobile.onclick = null;
+                    }
+                }
                         authLinkMobile.classList.remove('nav-logout-btn');
                         authLinkMobile.href = 'login.html';
                         authLinkMobile.onclick = null;
