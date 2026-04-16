@@ -520,7 +520,7 @@
         if (!payload || (payload.exp && Date.now() >= payload.exp * 1000)) {
           localStorage.removeItem('token');
           localStorage.removeItem('userName');
-          if (userGreeting) userGreeting.style.display = 'none';
+          if (userGreeting) userGreeting.classList.remove('show');
           payload = null;
         }
 
@@ -562,7 +562,7 @@
             // Show only first name to prevent overflow on mobile
             const firstName = displayName ? displayName.split(' ')[0] : 'User';
             userGreeting.textContent = `Hi, ${firstName}`;
-            userGreeting.style.display = 'inline-block';
+            userGreeting.classList.add('show');
           }
           // Hide brand text on mobile when logged in
           const brandText = document.querySelector('.navbar-brand-text');
@@ -592,13 +592,13 @@
         } else {
           if (myListings) myListings.style.display = 'none';
           if (myListingsMobile) myListingsMobile.style.display = 'none';
-          if (userGreeting) userGreeting.style.display = 'none';
+          if (userGreeting) userGreeting.classList.remove('show');
           // Show brand text on mobile when not logged in
           const brandText = document.querySelector('.navbar-brand-text');
           if (brandText) {
             brandText.classList.remove('hide-on-mobile-logged-in');
           }
-          if (userGreeting) userGreeting.style.display = 'none';
+          if (userGreeting) userGreeting.classList.remove('show');
           if (authLink) {
             authLink.textContent = 'Login';
             authLink.classList.remove('logout-btn');

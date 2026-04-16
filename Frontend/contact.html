@@ -548,7 +548,7 @@
                     ['token', 'jwt_token', 'user_name', 'user_role', 'user', 'userName'].forEach(key => {
                         localStorage.removeItem(key);
                     });
-                    if (userGreeting) userGreeting.style.display = 'none';
+                    if (userGreeting) userGreeting.classList.remove('show');
                     payload = null;
                 }
 
@@ -565,7 +565,7 @@
                         // Show only first name to prevent overflow on mobile
                         const firstName = displayName ? displayName.split(' ')[0] : 'User';
                         userGreeting.textContent = `Hi, ${firstName}`;
-                        userGreeting.style.display = 'inline-block';
+                        userGreeting.classList.add('show');
                     }
                     // Hide brand text on mobile when logged in
                     const brandText = document.querySelector('.navbar-brand-text');
