@@ -485,14 +485,14 @@
             }
 
             .navbar-brand-text {
-                display: none;
+                display: inline;
             }
 
             .user-greeting {
                 max-width: 70px;
                 font-size: 0.7rem;
                 padding: 3px 6px;
-                display: inline-block !important;
+                display: none !important;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -3253,6 +3253,7 @@
                     }
                 } else {
                     if (myListings) myListings.style.display = 'none';
+                    if (userGreeting) userGreeting.style.display = 'none';
                     if (authLink) {
                         authLink.style.display = 'inline-block';
                         authLink.textContent = 'Login';
