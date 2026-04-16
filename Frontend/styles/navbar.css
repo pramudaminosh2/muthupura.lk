@@ -374,6 +374,10 @@
     display: inline;
   }
 
+  .navbar-brand-text.hide-on-mobile-logged-in {
+    display: none !important;
+  }
+
   .user-greeting {
     display: none !important;
     font-size: 0.75rem;

@@ -961,6 +961,11 @@
                     if (myListings) myListings.style.display = 'none';
                     if (myListingsMobile) myListingsMobile.style.display = 'none';
                     if (userGreeting) userGreeting.style.display = 'none';
+                    // Show brand text on mobile when not logged in
+                    const brandText = document.querySelector('.navbar-brand-text');
+                    if (brandText) {
+                        brandText.classList.remove('hide-on-mobile-logged-in');
+                    }
                     if (authLink) {
                         authLink.textContent = 'Login';
                         authLink.classList.remove('logout-btn');

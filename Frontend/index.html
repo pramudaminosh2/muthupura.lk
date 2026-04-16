@@ -3229,6 +3229,11 @@
                         userGreeting.textContent = `Hi, ${firstName}`;
                         userGreeting.style.display = 'inline-block';
                     }
+                    // Hide brand text on mobile when logged in
+                    const brandText = document.querySelector('.navbar-brand-text');
+                    if (brandText) {
+                        brandText.classList.add('hide-on-mobile-logged-in');
+                    }
                     // Show logout button in navbar
                     if (authLink) {
                         authLink.textContent = 'Logout';
@@ -3255,6 +3260,11 @@
                 } else {
                     if (myListings) myListings.style.display = 'none';
                     if (userGreeting) userGreeting.style.display = 'none';
+                    // Show brand text on mobile when not logged in
+                    const brandText = document.querySelector('.navbar-brand-text');
+                    if (brandText) {
+                        brandText.classList.remove('hide-on-mobile-logged-in');
+                    }
                     if (authLink) {
                         authLink.style.display = 'inline-block';
                         authLink.textContent = 'Login';

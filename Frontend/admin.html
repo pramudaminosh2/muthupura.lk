@@ -188,6 +188,11 @@
                         userGreeting.textContent = `Hi, ${firstName}`;
                         userGreeting.style.display = 'inline-block';
                     }
+                    // Hide brand text on mobile when logged in
+                    const brandText = document.querySelector('.navbar-brand-text');
+                    if (brandText) {
+                        brandText.classList.add('hide-on-mobile-logged-in');
+                    }
                     if (authLink) {
                         authLink.textContent = 'Logout';
                         authLink.classList.remove('nav-login-btn');

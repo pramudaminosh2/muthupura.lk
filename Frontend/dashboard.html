@@ -593,6 +593,11 @@
                     userGreeting.textContent = `Hi, ${firstName}`;
                     userGreeting.style.display = 'inline-block';
                 }
+                // Hide brand text on mobile when logged in
+                const brandText = document.querySelector('.navbar-brand-text');
+                if (brandText) {
+                    brandText.classList.add('hide-on-mobile-logged-in');
+                }
 
                 if (authLink) {
                     authLink.textContent = 'Logout';
@@ -1398,6 +1403,11 @@
                         userGreeting.textContent = `Hi, ${firstName}`;
                         userGreeting.style.display = 'inline-block';
                     }
+                    // Hide brand text on mobile when logged in
+                    const brandText = document.querySelector('.navbar-brand-text');
+                    if (brandText) {
+                        brandText.classList.add('hide-on-mobile-logged-in');
+                    }
                     if (authLink) {
                         authLink.textContent = 'Logout';
                         authLink.classList.add('logout-btn');
@@ -1411,6 +1421,11 @@
                 } else {
                     if (myListings) myListings.style.display = 'none';
                     if (userGreeting) userGreeting.style.display = 'none';
+                    // Show brand text on mobile when not logged in
+                    const brandText = document.querySelector('.navbar-brand-text');
+                    if (brandText) {
+                        brandText.classList.remove('hide-on-mobile-logged-in');
+                    }
                     if (userGreeting) userGreeting.style.display = 'none';
                     if (authLink) {
                         authLink.textContent = 'Login';
