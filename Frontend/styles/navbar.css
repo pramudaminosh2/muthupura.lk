@@ -185,14 +185,24 @@
 }
 
 .nav-link-auth.logout-btn {
-  color: #d12845;
-  border-color: #d12845;
+  color: #d12845 !important;
+  border: 2.2px solid #d12845 !important;
+  background: transparent !important;
+  text-decoration: none;
+  padding: 10px 22px;
+  border-radius: 10px;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .nav-link-auth.logout-btn:hover {
-  background: #d12845;
-  color: #ffffff;
+  background: #d12845 !important;
+  color: #ffffff !important;
   box-shadow: 0 8px 24px rgba(209, 40, 69, 0.35);
+  transform: translateY(-3px);
+}
+
+.nav-link-auth.logout-btn:active {
+  transform: translateY(-1px);
 }
 
 .nav-link-admin {

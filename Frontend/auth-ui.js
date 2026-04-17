@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // A. Show user greeting with smooth fade-in (first name only)
         if (userGreeting) {
             const firstName = name.split(' ')[0];
-            userGreeting.textContent = firstName;
+            userGreeting.textContent = `Hi, ${firstName}`;
             userGreeting.style.display = 'inline-block';
             userGreeting.style.opacity = '0';
             userGreeting.style.transition = 'opacity 0.3s ease-in-out';
@@ -76,7 +76,6 @@ document.addEventListener('DOMContentLoaded', function() {
             authLink.href = '#';
             authLink.classList.add('logout-btn');
             authLink.style.opacity = '0';
-            authLink.style.transition = 'opacity 0.3s ease-in-out, background 0.3s ease-in-out';
             
             authLink.addEventListener('click', (e) => {
                 e.preventDefault();
