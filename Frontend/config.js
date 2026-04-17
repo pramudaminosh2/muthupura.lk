@@ -4,7 +4,7 @@
  * Change only this file to update API endpoints across the entire frontend
  */
 
-const API_BASE_URL = 'https://muthupura-lk.onrender.com';
+const API_BASE_URL = 'https://api-soez2bw2ma-uc.a.run.app';
 
 // Validation check
 if (!API_BASE_URL || typeof API_BASE_URL !== 'string') {
@@ -12,3 +12,4 @@ if (!API_BASE_URL || typeof API_BASE_URL !== 'string') {
 }
 
 console.log('✅ API Configuration loaded. Base URL:', API_BASE_URL);
+

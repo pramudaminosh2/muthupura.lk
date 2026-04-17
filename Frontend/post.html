@@ -877,9 +877,9 @@
         <a href="dashboard.html" class="mobile-menu-link" id="mylistings-link-mobile" data-page="dashboard" style="display:none;">My Listings</a>
         <a href="about.html" class="mobile-menu-link" data-page="about">About Us</a>
         <a href="contact.html" class="mobile-menu-link" data-page="contact">Contact Us</a>
+        <a href="admin.html" class="mobile-menu-link mobile-menu-admin" id="admin-link-mobile" style="display:none;">Admin</a>
         <div class="mobile-menu-divider"></div>
         <a href="login.html" class="mobile-menu-link mobile-menu-auth" id="auth-link-mobile">Login</a>
-        <a href="admin.html" class="mobile-menu-link mobile-menu-admin" id="admin-link-mobile" style="display:none;">Admin</a>
     </div>
     <section class="page-header">
         <div class="page-header-content">
@@ -1403,8 +1403,8 @@
                 });
 
                 // Send to backend
-                console.log(`🚀 Sending POST request to ${API_URL}/add-vehicle`);
-                const response = await fetch(`${API_URL}/add-vehicle`, {
+                console.log(`🚀 Sending POST request to ${API_URL}/api/vehicles/add`);
+                const response = await fetch(`${API_URL}/api/vehicles/add`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -1427,7 +1427,7 @@
                     
                     if (response.status === 404) {
                         alert(`❌ API Endpoint Not Found (404)\n\n` +
-                              `Endpoint: ${API_URL}/add-vehicle\n` +
+                              `Endpoint: ${API_URL}/api/vehicles/add\n` +
                               `Status: ${response.status}\n\n` +
                               `This usually means the backend server is not running or hasn't been deployed.\n` +
                               `Check if the backend at ${API_URL} is online.`);

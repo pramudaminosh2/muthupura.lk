@@ -322,15 +322,22 @@
 
         .nav-link-admin {
             font-family: 'Poppins', sans-serif;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             font-weight: 600;
-            color: rgba(30, 42, 74, 0.6);
+            color: #d12845;
+            border: 1.5px solid #d12845;
             text-decoration: none;
-            padding: 6px 12px;
-            border-radius: 6px;
+            padding: 8px 16px;
+            border-radius: 8px;
             transition: all 0.3s ease;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        .nav-link-admin:hover {
+            background: #d12845;
+            color: #ffffff;
+            box-shadow: 0 8px 24px rgba(209, 40, 69, 0.35);
+            transform: translateY(-3px);
         }
 
         .mobile-menu-logout:hover {
@@ -443,15 +450,18 @@
         }
 
         .mobile-menu-admin {
-            font-size: 0.85rem;
-            color: rgba(30, 42, 74, 0.6);
-            padding: 10px 24px;
+            font-size: 0.95rem;
+            color: #d12845;
+            padding: 12px 24px;
+            font-weight: 600;
+            border-left: 3px solid #d12845;
         }
 
         .mobile-menu-admin:hover {
-            background: rgba(79, 110, 247, 0.08);
-            color: var(--accent);
-            border-left-color: transparent;
+            background: rgba(209, 40, 69, 0.1);
+            color: #d12845;
+            border-left-color: #d12845;
+            padding-left: 30px;
         }
 
         @keyframes slideInDown {
@@ -2377,9 +2387,9 @@
         <a href="dashboard.html" class="mobile-menu-link" id="mylistings-link-mobile" data-page="dashboard" style="display:none;">My Listings</a>
         <a href="about.html" class="mobile-menu-link" data-page="about">About Us</a>
         <a href="contact.html" class="mobile-menu-link" data-page="contact">Contact Us</a>
+        <a href="admin.html" class="mobile-menu-link mobile-menu-admin" id="admin-link-mobile" style="display:none;">Admin</a>
         <div class="mobile-menu-divider"></div>
         <a href="login.html" class="mobile-menu-link mobile-menu-auth" id="auth-link-mobile">Login</a>
-        <a href="admin.html" class="mobile-menu-link mobile-menu-admin" id="admin-link-mobile" style="display:none;">Admin</a>
     </div>
 
     <!-- Hero Section (PART A) -->
@@ -3192,7 +3202,7 @@
 
                 if (payload && !payload.name) {
                     try {
-                        const url = `${API_URL}/profile`;
+                        const url = `${API_URL}/api/profile/me`;
                         console.log('📡 Fetching profile from:', url);
                         const res = await fetch(url, {
                             headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }

@@ -406,9 +406,9 @@
         <a href="dashboard.html" class="mobile-menu-link active">My Listings</a>
         <a href="about.html" class="mobile-menu-link">About Us</a>
         <a href="contact.html" class="mobile-menu-link">Contact Us</a>
+        <a id="admin-link-mobile" href="admin.html" class="mobile-menu-link mobile-menu-admin" style="display:none;">Admin</a>
         <div class="mobile-menu-divider"></div>
         <a id="auth-link-mobile" href="login.html" class="mobile-menu-link mobile-menu-auth">Login</a>
-        <a id="admin-link-mobile" href="admin.html" class="mobile-menu-link mobile-menu-admin" style="display:none;">Admin</a>
     </div>
 
     <!-- ===== PAGE HEADER ===== -->
@@ -567,7 +567,7 @@
 
                 if (payload && !payload.name) {
                     try {
-                        const res = await fetch(`${API_URL}/profile`, {
+                        const res = await fetch(`${API_URL}/api/profile/me`, {
                             headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                         });
                         if (res.ok) {
@@ -1373,7 +1373,7 @@
 
                 if (payload && !payload.name) {
                     try {
-                        const res = await fetch(`${API_URL}/profile`, {
+                        const res = await fetch(`${API_URL}/api/profile/me`, {
                             headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                         });
                         if (res.ok) {
@@ -1561,7 +1561,7 @@
 
             try {
                 console.log('Calling API:', API_BASE_URL);
-                const res = await fetch(`${API_URL}/my-vehicles`, {
+                const res = await fetch(`${API_URL}/api/vehicles/user/${userId}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 if (!res.ok) throw new Error('Failed to retrieve your vehicles');
@@ -1598,7 +1598,7 @@
             if (!confirm('Delete this vehicle?')) return;
             const token = localStorage.getItem('token');
             try {
-                const url = `${API_URL}/delete-vehicle/${id}`;
+                const url = `${API_URL}/api/vehicles/${id}`;
                 console.log('📡 Calling delete API:', url);
                 
                 const res = await fetch(url, { 
@@ -1638,7 +1638,7 @@
 
             const token = localStorage.getItem('token');
             try {
-                const url = `${API_URL}/update-vehicle/${id}`;
+                const url = `${API_URL}/api/vehicles/${id}`;
                 console.log('📡 Calling update API:', url, data);
                 
                 const res = await fetch(url, {

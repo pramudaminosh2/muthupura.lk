@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Connection Test</title>
+    <style>
+        body { font-family: Arial; margin: 20px; background: #f5f5f5; }
+        .test { background: white; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .pass { border-left: 4px solid green; }
+        .fail { border-left: 4px solid red; }
+        .result { margin-top: 10px; padding: 10px; background: #f0f0f0; border-radius: 3px; font-family: monospace; overflow-x: auto; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 3px; }
+        h1 { color: #333; }
+        .running { color: orange; }
+    </style>
+</head>
+<body>
+    <h1>🧪 API Connection Test</h1>
+    <p>Testing: <strong>https://api-soez2bw2ma-uc.a.run.app</strong></p>
+    
+    <button onclick="testAll()">Run All Tests</button>
+    <button onclick="testHealth()">Test Health</button>
+    <button onclick="testVehicles()">Test Vehicles</button>
+    <button onclick="testLogin()">Test Login</button>
+    
+    <div id="results"></div>
+
+    <script>
+        const API = 'https://api-soez2bw2ma-uc.a.run.app';
+        
+        function addResult(name, status, data) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = 'test ' + (status ? 'pass' : 'fail');
+            div.innerHTML = `
+                <strong>${status ? '✅' : '❌'} ${name}</strong>
+                <div class="result">${typeof data === 'string' ? data : JSON.stringify(data, null, 2)}</div>
+            `;
+            results.appendChild(div);
+        }
+        
+        async function testHealth() {
+            try {
+                const res = await fetch(`${API}/api/health`);
+                const data = await res.text();
+                addResult('Health Check', res.ok, `Status: ${res.status}\n${data}`);
+            } catch (e) {
+                addResult('Health Check', false, `Error: ${e.message}`);
+            }
+        }
+        
+        async function testVehicles() {
+            try {
+                const res = await fetch(`${API}/api/vehicles/all`);
+                const data = await res.json();
+                addResult('Get All Vehicles', res.ok, data);
+            } catch (e) {
+                addResult('Get All Vehicles', false, `Error: ${e.message}`);
+            }
+        }
+        
+        async function testLogin() {
+            try {
+                const res = await fetch(`${API}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: 'test@test.com', password: 'test123' })
+                });
+                const data = await res.json();
+                addResult('Login Endpoint', false, `Status: ${res.status}\n${JSON.stringify(data, null, 2)}`);
+            } catch (e) {
+                addResult('Login Endpoint', false, `Error: ${e.message}`);
+            }
+        }
+        
+        async function testAll() {
+            document.getElementById('results').innerHTML = '<div class="running">⏳ Running tests...</div>';
+            setTimeout(() => {
+                document.getElementById('results').innerHTML = '';
+                testHealth();
+                setTimeout(() => testVehicles(), 500);
+                setTimeout(() => testLogin(), 1000);
+            }, 100);
+        }
+    </script>
+</body>
+</html>
+

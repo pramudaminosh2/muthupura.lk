@@ -1,6 +1,6 @@
 (function() {
   // ── CONFIG ──────────────────────────────
-  const API_BASE = 'https://muthupura-lk.onrender.com';
+  const API_BASE = 'https://api-soez2bw2ma-uc.a.run.app';
 
   // ── NAV LINKS ───────────────────────────
   const navLinks = [
@@ -48,7 +48,7 @@
             <a href="login.html" class="nav-login-btn" 
                id="nav-login-btn">Login</a>
           </div>
-          <a href="admin.html" class="nav-admin-link">Admin</a>
+          <a href="admin.html" class="nav-admin-btn" id="nav-admin-btn" style="display:none;">Admin</a>
         </div>
 
         <!-- Hamburger -->
@@ -69,6 +69,7 @@
             ${link.label}
           </a>
         `).join('')}
+        <a href="admin.html" class="mobile-nav-link" id="mobile-admin-link" style="display:none;">Admin</a>
         <div class="mobile-auth-area" id="mobile-auth-area">
           <a href="login.html" class="mobile-login-btn">Login</a>
         </div>
@@ -240,18 +241,24 @@
       border-color: rgba(255,255,255,0.75);
     }
 
-    .nav-admin-link {
+    .nav-admin-btn {
       font-family: Poppins, sans-serif;
-      font-size: 12px;
-      font-weight: 500;
-      color: rgba(255,255,255,0.50);
+      font-size: 14px;
+      font-weight: 600;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: #ffffff;
       text-decoration: none;
-      transition: color 0.2s;
+      padding: 8px 20px;
+      border: 1.5px solid #dc2626;
+      border-radius: 10px;
+      transition: all 0.22s ease;
       white-space: nowrap;
     }
 
-    .nav-admin-link:hover {
-      color: rgba(255,255,255,0.80);
+    .nav-admin-btn:hover {
+      box-shadow: 0 8px 24px rgba(220, 38, 38, 0.35);
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      border-color: #b91c1c;
     }
 
     /* Hamburger */
@@ -326,6 +333,20 @@
       border-left-color: var(--accent);
       background: rgba(255,255,255,0.05);
       color: white;
+      padding-left: 34px;
+    }
+
+    #mobile-admin-link {
+      border-left-color: #ef4444 !important;
+      color: #ef4444 !important;
+      font-weight: 600 !important;
+      background: rgba(239,68,68,0.08) !important;
+    }
+
+    #mobile-admin-link:hover {
+      border-left-color: #ef4444 !important;
+      background: rgba(239,68,68,0.18) !important;
+      color: #ff5555 !important;
       padding-left: 34px;
     }
 
@@ -511,6 +532,14 @@
       document.body.classList.remove('nav-open');
     });
   });
+
+  // Close menu when mobile admin link is clicked
+  const mobileAdminLink = document.getElementById('mobile-admin-link');
+  if (mobileAdminLink) {
+    mobileAdminLink.addEventListener('click', () => {
+      document.body.classList.remove('nav-open');
+    });
+  }
 
   // Close on outside click
   document.addEventListener('click', e => {
@@ -715,3 +744,4 @@
   document.body.style.paddingTop = '0';
 
 })();
+

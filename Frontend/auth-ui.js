@@ -33,6 +33,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const adminLinkMobile = document.getElementById('admin-link-mobile');
     const myListingsLinkMobile = document.getElementById('mylistings-link-mobile');
 
+    // Navbar admin button (from navbar.js)
+    const navAdminBtn = document.getElementById('nav-admin-btn');
+    const mobileAdminLink = document.getElementById('mobile-admin-link');
+
     // ============================================
     // 3. HELPER FUNCTION: LOGOUT
     // ============================================
@@ -140,11 +144,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 100);
             }
 
+            // Show navbar admin button
+            if (navAdminBtn) {
+                navAdminBtn.style.display = 'inline-block';
+                navAdminBtn.style.opacity = '0';
+                navAdminBtn.style.transition = 'opacity 0.3s ease-in-out';
+                
+                setTimeout(() => {
+                    navAdminBtn.style.opacity = '1';
+                }, 100);
+            }
+
+            // Show mobile admin link
+            if (mobileAdminLink) {
+                mobileAdminLink.style.display = 'block';
+                mobileAdminLink.style.opacity = '0';
+                mobileAdminLink.style.transition = 'opacity 0.3s ease-in-out';
+                
+                setTimeout(() => {
+                    mobileAdminLink.style.opacity = '1';
+                }, 100);
+            }
+
             console.log('👑 Admin mode enabled');
         } else {
             // Hide admin links for non-admins
             if (adminLink) adminLink.style.display = 'none';
             if (adminLinkMobile) adminLinkMobile.style.display = 'none';
+            if (navAdminBtn) navAdminBtn.style.display = 'none';
+            if (mobileAdminLink) mobileAdminLink.style.display = 'none';
         }
 
     } else {
@@ -165,7 +193,13 @@ document.addEventListener('DOMContentLoaded', function() {
             authLinkMobile.classList.remove('mobile-menu-logout');
         }
 
-        // C. Hide user greeting
+        // C. Hide admin buttons
+        if (navAdminBtn) navAdminBtn.style.display = 'none';
+        if (mobileAdminLink) mobileAdminLink.style.display = 'none';
+        if (adminLink) adminLink.style.display = 'none';
+        if (adminLinkMobile) adminLinkMobile.style.display = 'none';
+
+        // D. Hide user greeting
         if (userGreeting) {
             userGreeting.style.display = 'none';
         }
@@ -300,3 +334,4 @@ document.addEventListener('DOMContentLoaded', function() {
  * 
  * 3. Logout is handled automatically by clicking "Logout" button
  */
+
