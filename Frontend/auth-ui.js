@@ -56,9 +56,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (isLoggedIn) {
         // ===== USER IS LOGGED IN =====
         
-        // A. Show user greeting with smooth fade-in
+        // A. Show user greeting with smooth fade-in (first name only)
         if (userGreeting) {
-            userGreeting.textContent = `👤 ${name}`;
+            const firstName = name.split(' ')[0];
+            userGreeting.textContent = firstName;
             userGreeting.style.display = 'inline-block';
             userGreeting.style.opacity = '0';
             userGreeting.style.transition = 'opacity 0.3s ease-in-out';
@@ -71,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // B. Replace Login button with Logout button
         if (authLink) {
-            authLink.textContent = '🚪 Logout';
+            authLink.textContent = 'Logout';
             authLink.href = '#';
             authLink.classList.add('logout-btn');
             authLink.style.opacity = '0';
@@ -90,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // C. Mobile logout button
         if (authLinkMobile) {
-            authLinkMobile.textContent = '🚪 Logout';
+            authLinkMobile.textContent = 'Logout';
             authLinkMobile.href = '#';
             authLinkMobile.classList.add('mobile-menu-logout');
             
@@ -180,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // A. Ensure login button is visible
         if (authLink) {
-            authLink.textContent = '🔐 Login';
+            authLink.textContent = 'Login';
             authLink.href = 'login.html';
             authLink.classList.remove('logout-btn');
             authLink.style.opacity = '1';
@@ -188,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // B. Mobile login button
         if (authLinkMobile) {
-            authLinkMobile.textContent = '🔐 Login';
+            authLinkMobile.textContent = 'Login';
             authLinkMobile.href = 'login.html';
             authLinkMobile.classList.remove('mobile-menu-logout');
         }
