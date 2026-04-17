@@ -152,9 +152,8 @@
   white-space: nowrap;
   font-weight: 600;
   letter-spacing: 0.5px;
-  max-width: 150px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  flex-shrink: 0;  /* CRITICAL: Don't shrink so greeting displays fully */
+  overflow: visible;  /* Let text flow naturally, no truncation */
 }
 
 .nav-link-auth {
@@ -392,20 +391,17 @@
   }
 
   .user-greeting {
-    display: none;
-    font-size: 0.75rem;
+    display: none !important;  /* Hidden by default on mobile */
+    font-size: 0.8rem;
     padding: 4px 6px;
-    max-width: 70px;
+    margin: 0 4px 0 0;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-weight: 600;
-    color: var(--accent);
-    margin-left: -4px;
+    flex-shrink: 0;  /* CRITICAL: Don't shrink so greeting displays fully */
+    overflow: visible;  /* Let text flow naturally, no truncation */
   }
 
-  .user-greeting[style*="inline-block"] {
-    display: inline-block !important;
+  .user-greeting.show {
+    display: inline-block !important;  /* Show when logged in */
   }
 
   .nav-link-auth {

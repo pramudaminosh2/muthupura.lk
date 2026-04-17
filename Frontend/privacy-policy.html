@@ -251,7 +251,7 @@
             </div>
 
             <div class="navbar-right">
-                <span id="user-greeting" class="user-greeting" style="display:none;"></span>
+                <span id="user-greeting" class="user-greeting"></span>
                 <a href="login.html" class="nav-link-auth" id="auth-link">Login</a>
                 <a href="admin.html" class="nav-link-admin" id="admin-link" style="display:none;">Admin</a>
             </div>
@@ -584,7 +584,7 @@
                 if (!payload || (payload.exp && Date.now() >= payload.exp * 1000)) {
                     localStorage.removeItem('token');
                     localStorage.removeItem('userName');
-                    if (userGreeting) userGreeting.style.display = 'none';
+                    if (userGreeting) userGreeting.classList.remove('show');
                     payload = null;
                 }
 
@@ -596,13 +596,17 @@
                     if (myListingsMobile) myListingsMobile.style.display = 'block';
                     const displayName = payload.name || localStorage.getItem('userName') || payload.email || '';
                     if (userGreeting) {
-                        userGreeting.textContent = displayName ? `Hi, ${displayName}` : 'Hi';
-                        userGreeting.style.display = 'inline-block';
+                        const firstName = displayName ? displayName.split(' ')[0] : 'User';
+                        userGreeting.textContent = `Hi, ${firstName}`;
+                        userGreeting.classList.add('show');
+                    }
+                    const brandText = document.querySelector('.navbar-brand-text');
+                    if (brandText) {
+                        brandText.classList.add('hide-on-mobile-logged-in');
                     }
                     if (authLink) {
                         authLink.textContent = 'Logout';
-                        authLink.classList.remove('nav-login-btn');
-                        authLink.classList.add('nav-logout-btn');
+                        authLink.classList.add('logout-btn');
                         authLink.href = '#';
                         authLink.onclick = (e) => {
                             e.preventDefault();
@@ -613,7 +617,6 @@
                     }
                     if (authLinkMobile) {
                         authLinkMobile.textContent = 'Logout';
-                        authLinkMobile.classList.remove('nav-login-btn');
                         authLinkMobile.classList.add('nav-logout-btn');
                         authLinkMobile.href = '#';
                         authLinkMobile.onclick = (e) => {
@@ -626,8 +629,13 @@
                 } else {
                     if (myListings) myListings.style.display = 'none';
                     if (myListingsMobile) myListingsMobile.style.display = 'none';
-                    if (authLink) { authLink.textContent = 'Login'; authLink.classList.add('nav-login-btn'); authLink.classList.remove('nav-logout-btn'); authLink.href = 'login.html'; authLink.onclick = null; }
-                    if (authLinkMobile) { authLinkMobile.textContent = 'Login'; authLinkMobile.classList.add('nav-login-btn'); authLinkMobile.classList.remove('nav-logout-btn'); authLinkMobile.href = 'login.html'; authLinkMobile.onclick = null; }
+                    if (userGreeting) userGreeting.classList.remove('show');
+                    const brandText = document.querySelector('.navbar-brand-text');
+                    if (brandText) {
+                        brandText.classList.remove('hide-on-mobile-logged-in');
+                    }
+                    if (authLink) { authLink.textContent = 'Login'; authLink.classList.remove('logout-btn'); authLink.href = 'login.html'; authLink.onclick = null; }
+                    if (authLinkMobile) { authLinkMobile.textContent = 'Login'; authLinkMobile.classList.remove('nav-logout-btn'); authLinkMobile.href = 'login.html'; authLinkMobile.onclick = null; }
                 }
             } catch (err) { console.error('Navigation update error:', err); }
         }

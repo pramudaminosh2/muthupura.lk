@@ -68,7 +68,12 @@ async function updateNavigation() {
                 // Show only first name to prevent overflow on mobile
                 const firstName = displayName ? displayName.split(' ')[0] : 'User';
                 userGreeting.textContent = `Hi, ${firstName}`;
-                userGreeting.style.display = 'inline-block';
+                userGreeting.classList.add('show');
+            }
+            // Hide brand text on mobile when logged in
+            const brandText = document.querySelector('.navbar-brand-text');
+            if (brandText) {
+                brandText.classList.add('hide-on-mobile-logged-in');
             }
             if (authLink) {
                 authLink.textContent = 'Logout';
@@ -93,7 +98,12 @@ async function updateNavigation() {
         } else {
             if (myListings) myListings.style.display = 'none';
             if (myListingsMobile) myListingsMobile.style.display = 'none';
-            if (userGreeting) userGreeting.style.display = 'none';
+            if (userGreeting) userGreeting.classList.remove('show');
+            // Show brand text on mobile when not logged in
+            const brandText = document.querySelector('.navbar-brand-text');
+            if (brandText) {
+                brandText.classList.remove('hide-on-mobile-logged-in');
+            }
             if (authLink) { authLink.textContent = 'Login'; authLink.classList.add('nav-login-btn'); authLink.classList.remove('nav-logout-btn'); authLink.href = 'login.html'; authLink.onclick = null; }
             if (authLinkMobile) { authLinkMobile.textContent = 'Login'; authLinkMobile.classList.add('nav-login-btn'); authLinkMobile.classList.remove('nav-logout-btn'); authLinkMobile.href = 'login.html'; authLinkMobile.onclick = null; }
         }
@@ -118,17 +128,37 @@ function setupNavbarScroll() {
  */
 function setupHamburgerMenu() {
     const hamburger = getEl('hamburger-btn'), mobileMenu = getEl('mobile-menu');
-    if (!hamburger || !mobileMenu) return;
-    hamburger.addEventListener('click', () => {
+    if (!hamburger || !mobileMenu) {
+        console.warn('⚠️ Hamburger or mobile menu not found');
+        return;
+    }
+    
+    // Click handler for hamburger button
+    hamburger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        console.log('🍔 Hamburger clicked, toggling menu');
         hamburger.classList.toggle('active');
         mobileMenu.classList.toggle('active');
     });
+    
+    // Close menu when a link is clicked
     mobileMenu.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', () => {
+            console.log('📎 Menu link clicked, closing menu');
             hamburger.classList.remove('active');
             mobileMenu.classList.remove('active');
         });
     });
+    
+    // Close menu when clicking outside (on mobile)
+    document.addEventListener('click', (e) => {
+        if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+            hamburger.classList.remove('active');
+            mobileMenu.classList.remove('active');
+        }
+    });
+    
+    console.log('✅ Hamburger menu setup complete');
 }
 
 

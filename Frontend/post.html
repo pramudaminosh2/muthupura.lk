@@ -858,7 +858,7 @@
             </div>
 
             <div class="navbar-right">
-                <span id="user-greeting" class="user-greeting" style="display:none;"></span>
+                <span id="user-greeting" class="user-greeting"></span>
                 <a href="login.html" class="nav-link-auth" id="auth-link">Login</a>
                 <a href="admin.html" class="nav-link-admin" id="admin-link" style="display:none;">Admin</a>
             </div>
@@ -1372,39 +1372,66 @@
                 const adminLink = getEl('admin-link');
                 const myListings = getEl('mylistings-link');
                 const userGreeting = getEl('user-greeting');
+                const authLinkMobile = getEl('auth-link-mobile');
+                const adminLinkMobile = getEl('admin-link-mobile');
+                const myListingsMobile = getEl('mylistings-link-mobile');
 
                 if (!payload || (payload.exp && Date.now() >= payload.exp * 1000)) {
                     ['token', 'jwt_token', 'user_name', 'user_role', 'user', 'userName'].forEach(key => {
                         localStorage.removeItem(key);
                     });
-                    userGreeting.style.display = 'none';
+                    if (userGreeting) userGreeting.classList.remove('show');
                     payload = null;
                 }
 
                 const isUserAdmin = payload?.role === 'admin' || payload?.is_admin === true;
-                const userName = payload?.user_name || localStorage.getItem('user_name');
+                if (adminLink) adminLink.style.display = isUserAdmin ? 'inline-block' : 'none';
+                if (adminLinkMobile) adminLinkMobile.style.display = isUserAdmin ? 'block' : 'none';
 
-                if (payload && userName) {
-                    authLink.textContent = 'Logout';
-                    authLink.href = '#';
-                    authLink.classList.add('logout-btn');
-                    authLink.onclick = (e) => {
-                        e.preventDefault();
-                        window.performLogout();
-                    };
-                    userGreeting.textContent = `Welcome, ${userName}!`;
-                    userGreeting.style.display = 'inline-block';
+                if (payload) {
                     if (myListings) myListings.style.display = 'block';
+                    if (myListingsMobile) myListingsMobile.style.display = 'block';
+                    const displayName = payload.name || localStorage.getItem('userName') || payload.email || '';
+                    if (userGreeting) {
+                        // Show only first name to prevent overflow on mobile
+                        const firstName = displayName ? displayName.split(' ')[0] : 'User';
+                        userGreeting.textContent = `Hi, ${firstName}`;
+                        userGreeting.classList.add('show');
+                    }
+                    if (authLink) {
+                        authLink.textContent = 'Logout';
+                        authLink.classList.add('logout-btn');
+                        authLink.href = '#';
+                        authLink.onclick = (e) => {
+                            e.preventDefault();
+                            window.performLogout?.() || (localStorage.removeItem('token'), localStorage.removeItem('userName'), location.reload());
+                        };
+                    }
+                    if (authLinkMobile) {
+                        authLinkMobile.textContent = 'Logout';
+                        authLinkMobile.classList.add('nav-logout-btn');
+                        authLinkMobile.href = '#';
+                        authLinkMobile.onclick = (e) => {
+                            e.preventDefault();
+                            window.performLogout?.() || (localStorage.removeItem('token'), localStorage.removeItem('userName'), location.reload());
+                        };
+                    }
                 } else {
-                    authLink.textContent = 'Login';
-                    authLink.href = 'login.html';
-                    authLink.classList.remove('logout-btn');
-                    authLink.onclick = null;
-                    userGreeting.style.display = 'none';
-                }
-
-                if (isUserAdmin) {
-                    if (adminLink) adminLink.style.display = 'block';
+                    if (myListings) myListings.style.display = 'none';
+                    if (myListingsMobile) myListingsMobile.style.display = 'none';
+                    if (userGreeting) userGreeting.classList.remove('show');
+                    if (authLink) {
+                        authLink.textContent = 'Login';
+                        authLink.classList.remove('logout-btn');
+                        authLink.href = 'login.html';
+                        authLink.onclick = null;
+                    }
+                    if (authLinkMobile) {
+                        authLinkMobile.textContent = 'Login';
+                        authLinkMobile.classList.remove('nav-logout-btn');
+                        authLinkMobile.href = 'login.html';
+                        authLinkMobile.onclick = null;
+                    }
                 }
             } catch (e) {
                 console.error('Navigation update error:', e);
@@ -1623,22 +1650,29 @@
             const hamburgerBtn = document.getElementById('hamburger-btn');
             const mobileMenu = document.getElementById('mobile-menu');
 
-            if (hamburgerBtn) {
-                hamburgerBtn.addEventListener('click', () => {
-                    const isOpen = mobileMenu.style.display === 'block';
-                    mobileMenu.style.display = isOpen ? 'none' : 'block';
+            if (hamburgerBtn && mobileMenu) {
+                hamburgerBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     hamburgerBtn.classList.toggle('active');
+                    mobileMenu.classList.toggle('active');
+                });
+
+                // Close mobile menu when a link is clicked
+                mobileMenu.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        hamburgerBtn.classList.remove('active');
+                        mobileMenu.classList.remove('active');
+                    });
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!hamburgerBtn.contains(e.target) && !mobileMenu.contains(e.target)) {
+                        hamburgerBtn.classList.remove('active');
+                        mobileMenu.classList.remove('active');
+                    }
                 });
             }
-
-            // Close mobile menu when a link is clicked
-            const mobileLinks = document.querySelectorAll('.mobile-menu-link');
-            mobileLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    mobileMenu.style.display = 'none';
-                    if (hamburgerBtn) hamburgerBtn.classList.remove('active');
-                });
-            });
         }
     </script>
     <script src="auth-ui.js"></script>

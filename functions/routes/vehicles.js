@@ -14,7 +14,10 @@ const getDb = () => {
   }
 };
 
-const bucket = admin.storage().bucket();
+// ✅ Lazy-load storage bucket to avoid initialization timeout
+const getBucket = () => {
+  return admin.storage().bucket();
+};
 
 // Wrapper to handle multer errors gracefully
 const handleMulterError = (middleware) => {
@@ -119,6 +122,7 @@ module.exports = (upload) => {
 
       if (req.files && req.files.length > 0) {
         console.log(`📸 Uploading ${req.files.length} images to Firebase Storage`);
+        const bucket = getBucket();
         console.log(`🪣 Bucket name: ${bucket.name}`);
 
         for (let i = 0; i < req.files.length; i++) {
@@ -362,7 +366,7 @@ module.exports = (upload) => {
       for (const imageUrl of images) {
         const filePath = extractFilePathFromUrl(imageUrl);
         if (filePath) {
-          await bucket.file(filePath).delete().catch(() => {
+          await getBucket().file(filePath).delete().catch(() => {
             console.log(`Failed to delete ${filePath}`);
           });
         }

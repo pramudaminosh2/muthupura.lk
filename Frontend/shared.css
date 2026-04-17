@@ -204,6 +204,16 @@ html {
   transition: all 0.3s ease;
 }
 
+.navbar-brand-text.hide-on-mobile-logged-in {
+  display: none;
+}
+
+@media (min-width: 769px) {
+  .navbar-brand-text.hide-on-mobile-logged-in {
+    display: inline;
+  }
+}
+
 .navbar-logo:hover .navbar-brand-text {
   color: var(--accent);
 }
@@ -286,6 +296,8 @@ html {
   white-space: nowrap;
   font-weight: 600;
   letter-spacing: 0.5px;
+  display: none;  /* Hidden by default on desktop */
+  flex-shrink: 0;  /* CRITICAL: Don't shrink the greeting element */
 }
 
 .nav-link-auth {
@@ -459,6 +471,19 @@ html {
   color: #ffffff;
 }
 
+/* Override logout button styling for mobile menu - keep accent color instead of red */
+.mobile-menu-auth.nav-logout-btn {
+  border: 2px solid var(--accent) !important;
+  color: var(--accent) !important;
+  background: transparent !important;
+}
+
+.mobile-menu-auth.nav-logout-btn:hover {
+  background: var(--accent) !important;
+  color: #ffffff !important;
+  border-color: var(--accent) !important;
+}
+
 @keyframes slideInDown {
   from {
     opacity: 0;
@@ -476,24 +501,38 @@ html {
   }
 
   .hamburger-menu {
-    display: flex;
+    display: flex !important;
+    z-index: 9999;
   }
 
   .navbar-right {
-    gap: 12px;
+    gap: 4px;  /* Reduced from 10px to 4px to give more space to greeting */
+    border-left: none;
+    padding-left: 0;
+    margin-left: auto;
+    align-items: center;
+    flex-shrink: 0;  /* CHANGED: Don't shrink so greeting has full space */
+    min-width: fit-content;
   }
 
   .user-greeting {
-    display: none;
+    display: none !important;  /* Hidden by default on mobile */
+    font-size: 0.8rem;
+    padding: 4px 6px;  /* REDUCED: from 6px 10px to save horizontal space */
+    margin: 0 4px 0 0;  /* REDUCED: from 0 6px 0 0 */
+    white-space: nowrap;
+    flex-shrink: 0;  /* CRITICAL: Don't shrink so greeting displays fully */
+    overflow: visible;  /* Let text flow naturally, no truncation */
   }
 
-  .user-greeting[style*="inline-block"] {
-    display: inline-block !important;
+  .user-greeting.show {
+    display: inline-block !important;  /* Show when logged in */
   }
 
   .nav-link-auth {
     padding: 8px 16px;
     font-size: 0.9rem;
+    flex-shrink: 0;
   }
 
   .nav-link-admin {
@@ -502,7 +541,8 @@ html {
 
   .navbar-container {
     padding: 0 16px;
-    gap: 16px;
+    gap: 12px;
+    overflow: visible;
   }
 }
 
@@ -522,6 +562,13 @@ html {
   .nav-link-auth {
     padding: 7px 14px;
     font-size: 0.85rem;
+  }
+
+  .user-greeting {
+    font-size: 0.75rem;  /* Slightly smaller on small phones */
+    padding: 3px 5px;  /* Even tighter padding */
+    flex-shrink: 0;  /* CRITICAL: Don't shrink */
+    overflow: visible;  /* Let text flow naturally */
   }
 }
 
