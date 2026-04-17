@@ -152,6 +152,9 @@
   white-space: nowrap;
   font-weight: 600;
   letter-spacing: 0.5px;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .nav-link-auth {
@@ -379,10 +382,10 @@
   }
 
   .user-greeting {
-    display: none !important;
+    display: none;
     font-size: 0.75rem;
     padding: 4px 6px;
-    max-width: 150px;
+    max-width: 70px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -391,7 +394,7 @@
     margin-left: -4px;
   }
 
-  .user-greeting.show {
+  .user-greeting[style*="inline-block"] {
     display: inline-block !important;
   }
 

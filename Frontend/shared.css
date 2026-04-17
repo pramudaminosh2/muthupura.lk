@@ -477,6 +477,10 @@ html {
     display: none;
   }
 
+  .user-greeting[style*="inline-block"] {
+    display: inline-block !important;
+  }
+
   .nav-link-auth {
     padding: 8px 16px;
     font-size: 0.9rem;
