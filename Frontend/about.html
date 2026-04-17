@@ -428,58 +428,81 @@
   <!-- Premium Footer -->
   <footer class="premium-footer">
     <div class="footer-container">
+      <!-- Newsletter Section -->
       <div class="newsletter-section">
-        <h4>Subscribe to Our Newsletter</h4>
-        <p style="margin: 0 0 12px 0; color: rgba(255,255,255,0.7); font-size: 0.9rem;">Get the latest vehicles and exclusive deals delivered to your inbox</p>
-        <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Thank you for subscribing!');">
+        <h4>✉️ Subscribe to Our Newsletter</h4>
+        <p>Get the latest vehicles, exclusive deals, and marketplace updates delivered to your inbox</p>
+        <form class="newsletter-form" onsubmit="event.preventDefault(); handleNewsletterSubmit(event);">
           <input type="email" placeholder="Enter your email address" required>
           <button type="submit">Subscribe</button>
         </form>
       </div>
 
+      <!-- Main Footer Content -->
       <div class="footer-content">
-        <div class="footer-col footer-brand-section">
+        <!-- Brand Section -->
+        <div class="footer-col footer-brand-section" id="footer-brand">
           <div class="footer-logo">
             <img src="logo.PNG" alt="Muthupura.lk">
             <span>Muthupura.lk</span>
           </div>
-          <p class="footer-description">Your trusted marketplace to buy, sell and lease vehicles with complete transparency, speed, and security.</p>
+          <p class="footer-description">Your trusted marketplace to buy, sell and lease vehicles with complete transparency, speed, and security. Sri Lanka's #1 vehicle marketplace.</p>
           <div class="social-links">
-            <a href="https://facebook.com" title="Facebook" aria-label="Facebook">f</a>
-            <a href="https://twitter.com" title="Twitter" aria-label="Twitter">𝕏</a>
-            <a href="https://instagram.com" title="Instagram" aria-label="Instagram">📷</a>
-            <a href="https://linkedin.com" title="LinkedIn" aria-label="LinkedIn">in</a>
+            <a href="https://facebook.com" title="Facebook" aria-label="Facebook" class="social-icon">f</a>
+            <a href="https://twitter.com" title="Twitter" aria-label="Twitter" class="social-icon">𝕏</a>
+            <a href="https://instagram.com" title="Instagram" aria-label="Instagram" class="social-icon">📷</a>
+            <a href="https://linkedin.com" title="LinkedIn" aria-label="LinkedIn" class="social-icon">in</a>
           </div>
         </div>
 
-        <div class="footer-col">
-          <h3>Quick Navigation</h3>
-          <a href="index.html">Home</a>
-          <a href="post.html">Post an Ad</a>
-          <a href="dashboard.html">My Dashboard</a>
-          <a href="about.html">About Us</a>
-          <a href="contact.html">Contact Us</a>
+        <!-- Quick Navigation -->
+        <div class="footer-col" id="footer-navigation">
+          <button class="footer-col-header" data-mobile-toggle="footer-navigation">
+            <h3>🏠 Quick Navigation</h3>
+            <span class="toggle-icon">+</span>
+          </button>
+          <div class="footer-col-content">
+            <a href="index.html">Home</a>
+            <a href="post.html">Post an Ad</a>
+            <a href="dashboard.html">My Dashboard</a>
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact Us</a>
+          </div>
         </div>
 
-        <div class="footer-col">
-          <h3>Services</h3>
-          <a href="#">Buy Vehicles</a>
-          <a href="#">Sell Vehicles</a>
-          <a href="#">Lease Vehicles</a>
-          <a href="#">Vehicle Inspection</a>
-          <a href="#">Financing</a>
+        <!-- Services -->
+        <div class="footer-col" id="footer-services">
+          <button class="footer-col-header" data-mobile-toggle="footer-services">
+            <h3>🚗 Services</h3>
+            <span class="toggle-icon">+</span>
+          </button>
+          <div class="footer-col-content">
+            <a href="#">Buy Vehicles</a>
+            <a href="#">Sell Vehicles</a>
+            <a href="#">Lease Vehicles</a>
+            <a href="#">Vehicle Inspection</a>
+            <a href="#">Financing Options</a>
+          </div>
         </div>
 
-        <div class="footer-col">
-          <h3>Contact Us</h3>
-          <p>📞 Phone: <a href="tel:+94777150660" style="color: var(--accent); font-weight: 600;">+94 777 150 660</a></p>
-          <p>💬 WhatsApp: <a href="https://wa.me/94777150660" style="color: var(--accent); font-weight: 600;">Message Us</a></p>
-          <p>📧 Email: <a href="mailto:info@muthupura.lk" style="color: var(--accent); font-weight: 600;">info@muthupura.lk</a></p>
+        <!-- Support & Info -->
+        <div class="footer-col" id="footer-support">
+          <button class="footer-col-header" data-mobile-toggle="footer-support">
+            <h3>📞 Contact & Support</h3>
+            <span class="toggle-icon">+</span>
+          </button>
+          <div class="footer-col-content">
+            <p><strong>Phone:</strong><br><a href="tel:+94777150660">+94 777 150 660</a></p>
+            <p><strong>WhatsApp:</strong><br><a href="https://wa.me/94777150660">Message Us</a></p>
+            <p><strong>Email:</strong><br><a href="mailto:info@muthupura.lk">info@muthupura.lk</a></p>
+          </div>
         </div>
       </div>
 
+      <!-- Divider -->
       <div class="footer-divider"></div>
 
+      <!-- Footer Bottom -->
       <div class="footer-bottom">
         <span>© 2026 Muthupura.lk – All rights reserved | Developed with ❤️</span>
         <div class="footer-bottom-links">
@@ -490,6 +513,111 @@
       </div>
     </div>
   </footer>
+
+  <script>
+        // Footer Mobile Collapsible Functionality
+        function initFooterCollapsibles() {
+            const isMobile = window.innerWidth <= 640;
+            const toggles = document.querySelectorAll('[data-mobile-toggle]');
+            
+            toggles.forEach(btn => {
+                // Remove old listener if it exists by cloning
+                const clone = btn.cloneNode(true);
+                btn.replaceWith(clone);
+                
+                // Add fresh listener
+                clone.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const targetId = this.dataset.mobileToggle;
+                    const target = document.getElementById(targetId);
+                    if (!target) return;
+                    
+                    const content = target.querySelector('.footer-col-content');
+                    const icon = this.querySelector('.toggle-icon');
+                    if (!content || !icon) return;
+                    
+                    content.classList.toggle('active');
+                    icon.textContent = content.classList.contains('active') ? '−' : '+';
+                });
+            });
+            
+            // Initialize state based on screen size
+            document.querySelectorAll('[data-mobile-toggle]').forEach(btn => {
+                const targetId = btn.dataset.mobileToggle;
+                const target = document.getElementById(targetId);
+                if (!target) return;
+                const content = target.querySelector('.footer-col-content');
+                const icon = btn.querySelector('.toggle-icon');
+                if (!content || !icon) return;
+                
+                if (isMobile) {
+                    // On mobile: close all by default
+                    content.classList.remove('active');
+                    icon.textContent = '+';
+                } else {
+                    // On desktop: open all
+                    content.classList.add('active');
+                    icon.textContent = '−';
+                }
+            });
+        }
+    // Newsletter Submission Handler
+    function handleNewsletterSubmit(event) {
+        const email = event.target.querySelector('input[type="email"]').value;
+        showFooterNotification('Thank you for subscribing! 📧', 'success');
+        event.target.reset();
+    }
+
+    // Footer Notification Toast
+    function showFooterNotification(message, type = 'info') {
+        let notification = document.getElementById('footer-notification');
+        if (!notification) {
+            notification = document.createElement('div');
+            notification.id = 'footer-notification';
+            notification.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                max-width: 300px;
+                padding: 14px 18px;
+                border-radius: 10px;
+                font-weight: 600;
+                z-index: 9999;
+                animation: slideInRight 0.4s ease;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+                font-family: 'Poppins', sans-serif;
+                font-size: 0.9rem;
+            `;
+            document.body.appendChild(notification);
+        }
+
+        notification.textContent = message;
+        notification.style.backgroundColor = type === 'success' ? '#22c55e' : (type === 'error' ? '#ef4444' : '#3b82f6');
+        notification.style.color = 'white';
+        notification.style.display = 'block';
+
+        clearTimeout(notification.timeout);
+        notification.timeout = setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.4s ease';
+            setTimeout(() => {
+                notification.style.display = 'none';
+                notification.style.animation = 'slideInRight 0.4s ease';
+            }, 400);
+        }, 3000);
+    }
+
+    // Initialize on DOM ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initFooterCollapsibles);
+    } else {
+        initFooterCollapsibles();
+    }
+
+    // Re-initialize on window resize to handle responsive changes
+    window.addEventListener('resize', initFooterCollapsibles);
+  </script>
 
   <script src="config.js"></script>
   <script>
