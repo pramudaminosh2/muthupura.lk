@@ -13,7 +13,7 @@ console.log("   Service account path:", serviceAccountPath);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccountPath),
-  storageBucket: "muthupuralk.appspot.com",
+  storageBucket: "muthupuralk.firebasestorage.app",
 });
 
 /**

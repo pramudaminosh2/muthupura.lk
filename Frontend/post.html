@@ -1322,8 +1322,27 @@
         // Re-initialize on window resize to handle responsive changes
         window.addEventListener('resize', initFooterCollapsibles);
     </script>
+    <!-- Firebase SDK for Storage (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
     <script src="config.js"></script>
     <script>
+        // ===== FIREBASE INITIALIZATION =====
+        if (!window.firebase) {
+            console.error('❌ Firebase SDK not loaded. Ensure scripts are loaded correctly.');
+        } else {
+            firebase.initializeApp(FIREBASE_CONFIG);
+            console.log('✅ Firebase initialized for project:', FIREBASE_CONFIG.projectId);
+        }
+        
+        const storage = firebase.storage ? firebase.storage() : null;
+        if (storage) {
+            console.log('✅ Firebase Storage initialized');
+        } else {
+            console.error('❌ Firebase Storage initialization failed');
+        }
+
         // ===== GLOBAL STATE =====
         const API_URL = API_BASE_URL;
         let selectedFiles = [];
@@ -1480,10 +1499,144 @@
             renderImagePreviews();
         };
 
+        // ===== FIREBASE STORAGE UPLOAD FUNCTION =====
+        async function uploadImagesToFirebaseStorage(files, userId) {
+            console.log(`📸 Starting Firebase Storage upload for ${files.length} images...`);
+            console.log(`🔥 Storage info:`, {
+                storageExists: !!storage,
+                bucket: storage ? storage.app.options.storageBucket : 'N/A',
+                projectId: FIREBASE_CONFIG.projectId
+            });
+            
+            if (!storage) {
+                throw new Error('Firebase Storage not initialized. Please refresh the page.');
+            }
+            
+            const imageUrls = [];
+            let uploadedCount = 0;
+            let failedCount = 0;
+            const UPLOAD_TIMEOUT = 60000; // 60 seconds timeout per image
+
+            for (let i = 0; i < files.length; i++) {
+                try {
+                    const file = files[i];
+                    const timestamp = Date.now();
+                    // Remove spaces from filename to avoid issues
+                    const safeName = file.name.replace(/\s+/g, '_');
+                    const fileName = `vehicles/${userId}/${timestamp}-${i}-${safeName}`;
+                    
+                    console.log(`\n📤 IMAGE ${i + 1}/${files.length}`);
+                    console.log(`   Name: ${file.name}`);
+                    console.log(`   Size: ${(file.size / 1024 / 1024).toFixed(2)} MB`);
+                    console.log(`   Type: ${file.type}`);
+                    console.log(`   Path: ${fileName}`);
+                    
+                    // Create storage reference using pre-initialized storage object
+                    const storageRef = storage.ref().child(fileName);
+                    console.log(`📍 Storage reference created`);
+                    
+                    // Upload file with timeout protection
+                    const uploadPromise = new Promise((resolve, reject) => {
+                        const startTime = Date.now();
+                        const uploadTask = storageRef.put(file, {
+                            contentType: file.type,
+                            customMetadata: {
+                                uploadedAt: new Date().toISOString(),
+                                uploadedBy: userId
+                            }
+                        });
+                        
+                        let lastProgressTime = Date.now();
+                        let lastProgress = 0;
+                        
+                        // Track upload progress
+                        uploadTask.on(
+                            'state_changed',
+                            (snapshot) => {
+                                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                                const state = snapshot.state;
+                                lastProgressTime = Date.now();
+                                
+                                // Log every 20% or state change
+                                if (Math.abs(progress - lastProgress) >= 20 || state !== 'running') {
+                                    console.log(`   🔄 State: ${state}, Progress: ${progress.toFixed(1)}%`);
+                                    lastProgress = progress;
+                                }
+                            },
+                            (error) => {
+                                const elapsed = Date.now() - startTime;
+                                console.error(`❌ UPLOAD ERROR after ${elapsed}ms:`);
+                                console.error(`   Code: ${error.code}`);
+                                console.error(`   Message: ${error.message}`);
+                                console.error(`   Full error:`, error);
+                                reject(error);
+                            },
+                            () => {
+                                const elapsed = Date.now() - startTime;
+                                console.log(`✅ Upload completed in ${elapsed}ms`);
+                                resolve();
+                            }
+                        );
+                        
+                        // Timeout protection
+                        setTimeout(() => {
+                            if (uploadTask.snapshot?.state !== 'success') {
+                                console.warn(`⏱️ UPLOAD TIMEOUT - cancelling after ${UPLOAD_TIMEOUT}ms`);
+                                uploadTask.cancel();
+                                reject(new Error(`Upload timeout after ${UPLOAD_TIMEOUT}ms`));
+                            }
+                        }, UPLOAD_TIMEOUT);
+                    });
+                    
+                    await uploadPromise;
+                    
+                    console.log(`🔗 Getting download URL...`);
+                    
+                    // Get download URL
+                    const downloadURL = await storageRef.getDownloadURL();
+                    console.log(`✅ Download URL: ${downloadURL.substring(0, 60)}...`);
+                    imageUrls.push(downloadURL);
+                    uploadedCount++;
+                    
+                    console.log(`✅ Image ${i + 1}/${files.length} completed`);
+                    
+                } catch (uploadErr) {
+                    console.error(`\n❌ IMAGE ${i + 1} FAILED:`);
+                    console.error(`   Error code: ${uploadErr.code}`);
+                    console.error(`   Error message: ${uploadErr.message}`);
+                    console.error(`   Full error:`, uploadErr);
+                    failedCount++;
+                }
+            }
+
+            console.log(`\n📊 UPLOAD SUMMARY:`);
+            console.log(`   ✅ Succeeded: ${uploadedCount}`);
+            console.log(`   ❌ Failed: ${failedCount}`);
+            console.log(`   🔗 URLs ready: ${imageUrls.length}`);
+            
+            if (uploadedCount === 0) {
+                throw new Error(`All image uploads failed.\n\n📌 TROUBLESHOOTING:\n1. Check Firebase Storage Rules in Console\n2. Ensure rules allow public write\n3. Check browser console for error codes\n4. Verify Firebase Storage bucket exists`);
+            }
+            
+            if (failedCount > 0) {
+                console.warn(`⚠️ ${failedCount} image(s) failed, but ${uploadedCount} succeeded`);
+            }
+            
+            return imageUrls;
+        }
+
         // ===== FORM SUBMISSION =====
         getEl('postVehicleForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             console.log('📝 Form submission started');
+
+            // Validate Firebase initialization
+            if (!window.firebase || !storage) {
+                console.error('❌ Firebase Storage not initialized');
+                alert('⚠️ Firebase not loaded. Please refresh the page and try again.');
+                return;
+            }
+            console.log('✅ Firebase Storage ready');
 
             // Validate file selection
             if (selectedFiles.length === 0) {
@@ -1493,57 +1646,42 @@
             }
             console.log(`✅ Files selected: ${selectedFiles.length}`);
 
-            // Validate files before submission
-            let totalFileSize = 0;
-            const fileValidations = [];
-            for (let i = 0; i < selectedFiles.length; i++) {
-                const file = selectedFiles[i];
-                totalFileSize += file.size;
-                fileValidations.push({
-                    index: i,
-                    name: file.name,
-                    size: file.size,
-                    type: file.type,
-                    lastModified: file.lastModified,
-                    valid: file.size > 0 && file.type.startsWith('image/')
-                });
-            }
-            
-            console.log('📋 File validation results:');
-            fileValidations.forEach(fv => {
-                if (fv.valid) {
-                    console.log(`  ✅ File ${fv.index}: ${fv.name} (${(fv.size / 1024 / 1024).toFixed(2)} MB)`);
-                } else {
-                    console.error(`  ❌ File ${fv.index}: INVALID - ${fv.name}`);
-                }
-            });
-            
-            console.log(`📊 Total file size: ${(totalFileSize / 1024 / 1024).toFixed(2)} MB`);
-            
-            if (totalFileSize > 100 * 1024 * 1024) {
-                console.error('❌ Total file size exceeds 100MB');
-                alert('Total file size exceeds 100MB. Please reduce the number or size of images.');
+            // Validate authentication
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.error('❌ No token found');
+                alert('Authentication token missing. Please login again.');
+                window.location.href = 'login.html';
                 return;
             }
+            
+            // Get user ID from token payload
+            const payload = getTokenPayload();
+            if (!payload || !payload.uid) {
+                console.error('❌ Cannot extract user ID from token');
+                console.error('   Payload:', payload);
+                alert('Invalid authentication token. Please login again.');
+                window.location.href = 'login.html';
+                return;
+            }
+            const userId = payload.uid;
+            console.log('✅ User ID (uid):', userId);
+            console.log('✅ User email:', payload.email);
+            console.log('✅ User name:', payload.name);
 
             const submitBtn = e.target.querySelector('.btn-submit');
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
 
             try {
-                // Validate token
-                const token = localStorage.getItem('token');
-                if (!token) {
-                    console.error('❌ No token found');
-                    alert('Authentication token missing. Please login again.');
-                    window.location.href = 'login.html';
-                    return;
-                }
-                console.log('✅ Token found:', token.substring(0, 20) + '...');
-
-                // Create FormData - map to database column names
-                const formData = new FormData();
+                // STEP 1: Upload images to Firebase Storage
+                console.log('🚀 STEP 1: Upload images to Firebase Storage...');
+                submitBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Uploading images...';
                 
+                const imageUrls = await uploadImagesToFirebaseStorage(selectedFiles, userId);
+                console.log(`✅ Firebase Storage upload complete: ${imageUrls.length} URLs obtained`);
+
+                // STEP 2: Prepare vehicle data
+                console.log('🚀 STEP 2: Preparing vehicle data...');
                 const formValues = {
                     seller_name: getEl('fullName').value,
                     phone: getEl('phone').value,
@@ -1558,10 +1696,26 @@
                     fuel_type: getEl('fuelType').value,
                     engine_capacity: getEl('engineCapacity').value || '',
                     mileage: getEl('mileage').value,
-                    description: getEl('description').value || ''
+                    description: getEl('description').value || '',
+                    images: imageUrls
                 };
 
-                console.log('📋 Form values:', formValues);
+                console.log('📋 FORM VALUES COLLECTED:');
+                console.log('   seller_name:', formValues.seller_name);
+                console.log('   phone:', formValues.phone);
+                console.log('   city:', formValues.city);
+                console.log('   vehicle_type:', formValues.vehicle_type);
+                console.log('   condition:', formValues.condition);
+                console.log('   make:', formValues.make);
+                console.log('   model:', formValues.model);
+                console.log('   year:', formValues.year);
+                console.log('   price:', formValues.price);
+                console.log('   transmission:', formValues.transmission);
+                console.log('   fuel_type:', formValues.fuel_type);
+                console.log('   engine_capacity:', formValues.engine_capacity);
+                console.log('   mileage:', formValues.mileage);
+                console.log('   description:', formValues.description);
+                console.log('   images:', formValues.images.length)
 
                 // Validate required fields
                 if (!formValues.seller_name || !formValues.phone || !formValues.city || !formValues.vehicle_type || 
@@ -1573,90 +1727,27 @@
                 }
                 console.log('✅ All required fields filled');
 
-                // Add form values to FormData
-                Object.keys(formValues).forEach(key => {
-                    formData.append(key, formValues[key]);
-                });
-                
                 // Collect features
                 const features = Array.from(document.querySelectorAll('input[name="features"]:checked'))
                     .map(cb => cb.value)
                     .join(', ');
-                formData.append('features', features);
+                formValues.features = features;
                 console.log('✅ Features collected:', features || 'None');
 
-                // Add images (first image is main)
-                console.log(`📸 Adding ${selectedFiles.length} images to FormData`);
-                selectedFiles.forEach((file, index) => {
-                    console.log(`  - Image ${index + 1}: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
-                    formData.append('images', file);
+                // STEP 3: Send JSON to backend
+                console.log('🚀 STEP 3: Send vehicle data to backend...');
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating listing...';
+                
+                const response = await fetch(`${API_URL}/api/vehicles/add`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(formValues)
                 });
 
-                // Send to backend with retry logic
-                console.log(`🚀 Sending POST request to ${API_URL}/api/vehicles/add`);
-                console.log(`📦 FormData details: ${selectedFiles.length} images, ${Object.keys(formValues).length} fields`);
-                
-                // Validate FormData before sending
-                console.log('🔍 FormData contents:');
-                for (let pair of formData.entries()) {
-                    if (pair[0] === 'images') {
-                        console.log(`  - ${pair[0]}: File (${pair[1].name})`);
-                    } else {
-                        console.log(`  - ${pair[0]}: ${String(pair[1]).substring(0, 50)}`);
-                    }
-                }
-
-                // Send with retry logic for multipart errors
-                let response = null;
-                let retryCount = 0;
-                const maxRetries = 2;
-                
-                while (retryCount <= maxRetries) {
-                    try {
-                        if (retryCount > 0) {
-                            console.log(`⏳ Retry attempt ${retryCount} of ${maxRetries}...`);
-                            // Add small delay before retry
-                            await new Promise(r => setTimeout(r, 1000 * retryCount));
-                            
-                            // Rebuild FormData for retry
-                            const retryFormData = new FormData();
-                            Object.keys(formValues).forEach(key => {
-                                retryFormData.append(key, formValues[key]);
-                            });
-                            retryFormData.append('features', features);
-                            selectedFiles.forEach((file) => {
-                                retryFormData.append('images', file);
-                            });
-                            
-                            response = await fetch(`${API_URL}/api/vehicles/add`, {
-                                method: 'POST',
-                                headers: {
-                                    'Authorization': `Bearer ${token}`
-                                },
-                                body: retryFormData
-                            });
-                        } else {
-                            response = await fetch(`${API_URL}/api/vehicles/add`, {
-                                method: 'POST',
-                                headers: {
-                                    'Authorization': `Bearer ${token}`
-                                },
-                                body: formData
-                            });
-                        }
-
-                        console.log(`📡 Response status: ${response.status} ${response.statusText}`);
-                        break; // Success, exit retry loop
-                        
-                    } catch (fetchError) {
-                        console.error(`❌ Fetch attempt ${retryCount} failed:`, fetchError.message);
-                        retryCount++;
-                        
-                        if (retryCount > maxRetries) {
-                            throw fetchError;
-                        }
-                    }
-                }
+                console.log(`📡 Response status: ${response.status} ${response.statusText}`);
 
                 // Check if response is JSON
                 const contentType = response.headers.get('content-type');
@@ -1672,36 +1763,43 @@
                     if (response.status === 404) {
                         alert(`❌ API Endpoint Not Found (404)\n\n` +
                               `Endpoint: ${API_URL}/api/vehicles/add\n` +
-                              `Status: ${response.status}\n\n` +
-                              `This usually means the backend server is not running or hasn't been deployed.\n` +
-                              `Check if the backend at ${API_URL} is online.`);
+                              `Status: ${response.status}`);
                     } else {
                         alert(`❌ Server returned invalid response\n\n` +
                               `Status: ${response.status}\n` +
-                              `Content-Type: ${contentType}\n\n` +
-                              `Check console for full response.`);
+                              `Content-Type: ${contentType}`);
                     }
                     return;
                 }
 
                 const result = await response.json();
                 console.log('✅ Response received:', result);
+                console.log('   Status OK:', response.ok);
+                console.log('   Success:', result.success);
+                console.log('   Errors:', result.errors);
+                console.log('   Message:', result.message);
 
-                // Handle 400 errors specifically
-                if (response.status === 400) {
-                    console.error('❌ Bad Request (400):', result);
+                // Handle errors
+                if (!response.ok) {
+                    console.error('❌ API error response:');
+                    console.error('   Status:', response.status);
+                    console.error('   Full result:', result);
                     
-                    if (result.code === 'INCOMPLETE_MULTIPART') {
-                        console.error('🔴 Multipart form parsing failed');
-                        console.error('   This usually means: network issue, timeout, or file too large');
-                        alert(`❌ Upload Failed - Multipart Error\n\n` +
-                              `${result.message}\n\n` +
-                              `Try uploading fewer or smaller images.\n` +
-                              `If the problem persists, check your internet connection.`);
+                    // Build error message from various sources
+                    let errorMsg = '';
+                    
+                    if (result.errors && Array.isArray(result.errors)) {
+                        errorMsg = result.errors.map((e, i) => `${i + 1}. ${e}`).join('\n');
+                    } else if (result.message) {
+                        errorMsg = result.message;
+                    } else if (result.error) {
+                        errorMsg = result.error;
                     } else {
-                        console.error('Error details:', result);
-                        alert(`Error: ${result.message || result.error}`);
+                        errorMsg = `Server error (Status: ${response.status})`;
                     }
+                    
+                    console.error('❌ Error message:', errorMsg);
+                    alert(`❌ Cannot post vehicle:\n\n${errorMsg}`);
                     return;
                 }
 
@@ -1720,10 +1818,10 @@
                     alert(`Error: ${result.message}`);
                 }
             } catch (error) {
-                console.error('❌ Upload error:', error);
+                console.error('❌ Error during vehicle posting:', error);
                 console.error('   Stack:', error.stack);
                 console.error('   Message:', error.message);
-                alert('An error occurred while uploading. Check console for details:\n\n' + error.message);
+                alert('An error occurred: ' + error.message);
 
             } finally {
                 submitBtn.disabled = false;

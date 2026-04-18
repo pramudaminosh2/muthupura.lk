@@ -15,7 +15,7 @@ admin.initializeApp({
     path.join(__dirname, "functions", "service-account.json")
   ),
   databaseId: "muthupuralk",
-  storageBucket: "muthupuralk.appspot.com",
+  storageBucket: "muthupuralk.firebasestorage.app",
 });
 
 const db = admin.firestore();

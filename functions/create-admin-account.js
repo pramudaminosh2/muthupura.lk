@@ -13,7 +13,7 @@ admin.initializeApp({
   credential: admin.credential.cert(
     path.resolve(__dirname, "..", "Backend", "service-account.json")
   ),
-  storageBucket: "muthupuralk.appspot.com",
+  storageBucket: "muthupuralk.firebasestorage.app",
 });
 
 // ✅ Access Firestore with specific database ID

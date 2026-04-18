@@ -45,6 +45,32 @@ function extractFilePathFromUrl(imageUrl) {
 function validateVehicleData(data) {
   const errors = [];
 
+  // Allowed values for dropdowns
+  const allowedConditions = [
+    "antique",
+    "brand_new",
+    "registered_used",
+    "unregistered_recondition",
+    "other"
+  ];
+  const allowedVehicleTypes = [
+    "car",
+    "van",
+    "bus",
+    "bike",
+    "tractor"
+  ];
+  const allowedTransmissions = [
+    "manual",
+    "automatic"
+  ];
+  const allowedFuelTypes = [
+    "petrol",
+    "diesel",
+    "electric",
+    "hybrid"
+  ];
+
   if (!data.title || data.title.trim().length === 0) {
     errors.push("Title is required");
   }
@@ -65,8 +91,20 @@ function validateVehicleData(data) {
     errors.push("Valid year is required");
   }
 
-  if (!data.condition || !["new", "used"].includes(data.condition)) {
-    errors.push("Condition must be 'new' or 'used'");
+  if (!data.condition || !allowedConditions.includes(data.condition)) {
+    errors.push(`Condition must be one of: ${allowedConditions.join(", ")}`);
+  }
+
+  if (!data.vehicleType || !allowedVehicleTypes.includes(data.vehicleType)) {
+    errors.push(`Vehicle type must be one of: ${allowedVehicleTypes.join(", ")}`);
+  }
+
+  if (!data.transmission || !allowedTransmissions.includes(data.transmission)) {
+    errors.push(`Transmission must be one of: ${allowedTransmissions.join(", ")}`);
+  }
+
+  if (!data.fuelType || !allowedFuelTypes.includes(data.fuelType)) {
+    errors.push(`Fuel type must be one of: ${allowedFuelTypes.join(", ")}`);
   }
 
   return errors;

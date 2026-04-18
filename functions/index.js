@@ -3,11 +3,8 @@ const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 const admin = require("firebase-admin");
-const multer = require("multer");
 
 // ✅ Initialize Firebase Admin SDK
-// Note: Storage bucket is NOT initialized here to avoid deployment timeouts
-// It will be lazily loaded only when needed via admin.storage().bucket()
 admin.initializeApp();
 
 // Set global options for Cloud Functions
@@ -23,47 +20,8 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
-// ✅ Middleware to log multipart requests (before any body parsing)
-app.use((req, res, next) => {
-  const contentType = req.get("content-type") || "";
-  if (contentType.includes("multipart/form-data")) {
-    console.log("📦 Multipart request detected on:", req.path);
-    console.log("   Content-Type:", contentType);
-    console.log("   Content-Length:", req.get("content-length"), "bytes");
-
-    // Extract boundary if present
-    const boundaryMatch = contentType.match(/boundary=([^;]+)/);
-    if (boundaryMatch) {
-      const boundary = boundaryMatch[1];
-      console.log("   Boundary:", boundary);
-    }
-
-    // Set longer timeout for multipart uploads
-    res.setTimeout(600000); // 10 minutes
-  }
-  next();
-});
-
-// ✅ CRITICAL: Do NOT use global body parsing middleware
-// This prevents interference with multer's multipart handling
-// Instead, express.json() will be applied selectively to routes that need it
-
-// Configure multer for file uploads (memory storage)
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 50 * 1024 * 1024, // 50MB per file
-    files: 10, // Max 10 files
-  },
-  fileFilter: (req, file, cb) => {
-    console.log(`📁 Multer file: ${file.fieldname} - ${file.originalname} (${file.size} bytes)`);
-    if (file.mimetype.startsWith("image/")) {
-      cb(null, true);
-    } else {
-      cb(new Error("Only image files are allowed"));
-    }
-  },
-});
+// ✅ Parse JSON requests (images now come from Firebase Storage)
+app.use(express.json({limit: "50mb"})); // Allow up to 50MB JSON payloads for image URLs
 
 // Import routes
 const authRoutes = require("./routes/auth");
@@ -73,7 +31,7 @@ const adminRoutes = require("./routes/admin");
 
 // Use routes
 app.use("/api/auth", authRoutes);
-app.use("/api/vehicles", vehicleRoutes(upload));
+app.use("/api/vehicles", vehicleRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/admin", adminRoutes);
 
@@ -86,36 +44,10 @@ app.get("/api/health", (req, res) => {
 app.use((err, req, res, next) => {
   console.error("🔴 Error:", err);
 
-  // Multer errors
-  if (err.name === "MulterError") {
-    console.error("📤 Multer error:", err.code, err.message);
-    if (err.code === "FILE_TOO_LARGE") {
-      return res.status(413).json({error: "File too large"});
-    }
-    if (err.code === "LIMIT_FILE_COUNT") {
-      return res.status(413).json({error: "Too many files"});
-    }
-    return res.status(400).json({error: `File upload error: ${err.message}`});
-  }
-
-  // Multipart parsing errors
-  if (err.message && err.message.includes("Unexpected end of form")) {
-    console.error("⚠️  Multipart parsing error - malformed form data received");
-    console.error("   This usually means: missing final boundary, incomplete upload, or connection issue");
-    console.error("   Error:", err.message);
-    return res.status(400).json({
-      error: "Multipart form parsing failed",
-      details: "The form data appears incomplete. Try uploading fewer or smaller files.",
-    });
-  }
-
-  // Handle other multipart errors
-  if (err.message && (err.message.includes("boundary") || err.message.includes("multipart"))) {
-    console.error("⚠️  Multipart error:", err.message);
-    return res.status(400).json({
-      error: "Form data error",
-      details: err.message,
-    });
+  // JSON parsing errors
+  if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
+    console.error("📝 JSON parsing error:", err.message);
+    return res.status(400).json({error: "Invalid JSON in request body"});
   }
 
   // Generic error
