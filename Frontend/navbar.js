@@ -463,8 +463,20 @@
 
     @media (max-width: 768px) {
       .nav-links  { display: none; }
-      .nav-right  { display: none; }
+      .nav-admin-btn  { display: none !important; }
       .hamburger  { display: flex; }
+      
+      /* Show nav-right with login button on mobile */
+      .nav-right {
+        display: flex !important;
+        gap: 8px;
+      }
+      
+      /* Style login button for mobile */
+      .nav-login-btn {
+        font-size: 13px;
+        padding: 7px 16px;
+      }
     }
     </style>
   `;
@@ -521,10 +533,12 @@
   const hamburger = document.getElementById('hamburger');
   const mobileMenu = document.getElementById('mobile-menu');
 
-  if (hamburger) {
+  if (hamburger && mobileMenu) {
     hamburger.addEventListener('click', () => {
       document.body.classList.toggle('nav-open');
     });
+  } else if (hamburger) {
+    console.log('ℹ️ Mobile menu element not found - navbar.js only handles generic navbar');
   }
 
   document.querySelectorAll('.mobile-nav-link').forEach(link => {
@@ -557,6 +571,7 @@
     
     const token = localStorage.getItem('jwt_token') || localStorage.getItem('token');
     const userName = localStorage.getItem('user_name');
+    const userRole = localStorage.getItem('user_role');
     const userDataStr = localStorage.getItem('user');
     let user = null;
 
@@ -564,6 +579,7 @@
       jwt_token: localStorage.getItem('jwt_token'),
       token: localStorage.getItem('token'),
       user_name: userName,
+      user_role: userRole,
       user_raw: userDataStr
     });
 
@@ -582,17 +598,51 @@
     console.log('🔐 Navbar Auth Update:', { 
       hasToken: !!token, 
       displayName,
+      userRole,
+      isAdmin: userRole === 'admin',
       source: userName ? 'jwt_token/user_name' : (user ? 'user JSON' : 'none')
     });
 
     const authArea = document.getElementById('nav-auth-area');
     const mobileAuthArea = document.getElementById('mobile-auth-area');
+    const navAdminBtn = document.getElementById('nav-admin-btn');
+    const mobileAdminLink = document.getElementById('mobile-admin-link');
 
     console.log('🔍 DOM Elements found:', {
       navAuthArea: !!authArea,
       mobileAuthArea: !!mobileAuthArea,
-      navAuthAreaId: authArea?.id
+      navAdminBtn: !!navAdminBtn,
+      mobileAdminLink: !!mobileAdminLink
     });
+
+    // ── ADMIN LINK VISIBILITY ──
+    // Show admin link only if user is logged in AND is an admin
+    if (userRole === 'admin' && token) {
+      console.log('👑 Admin user detected - showing admin links');
+      if (navAdminBtn) {
+        navAdminBtn.style.display = 'inline-block';
+        navAdminBtn.style.opacity = '0';
+        navAdminBtn.style.transition = 'opacity 0.3s ease-in-out';
+        setTimeout(() => { navAdminBtn.style.opacity = '1'; }, 5);
+      }
+      if (mobileAdminLink) {
+        mobileAdminLink.style.display = 'block';
+        mobileAdminLink.style.opacity = '0';
+        mobileAdminLink.style.transition = 'opacity 0.3s ease-in-out';
+        setTimeout(() => { mobileAdminLink.style.opacity = '1'; }, 5);
+      }
+    } else {
+      // Hide admin links for non-admins or non-logged-in users
+      console.log('🚫 Non-admin user or not logged in - hiding admin links');
+      if (navAdminBtn) {
+        navAdminBtn.style.display = 'none';
+        navAdminBtn.style.opacity = '0';
+      }
+      if (mobileAdminLink) {
+        mobileAdminLink.style.display = 'none';
+        mobileAdminLink.style.opacity = '0';
+      }
+    }
 
     if (!token || !displayName || !authArea) {
       console.log('⚠️  No auth found or missing elements:', {
@@ -718,7 +768,7 @@
 
   // Listen for storage changes (e.g., login in another tab or from login.html)
   window.addEventListener('storage', (e) => {
-    if (e.key === 'jwt_token' || e.key === 'user_name' || e.key === 'token' || e.key === 'user') {
+    if (e.key === 'jwt_token' || e.key === 'user_name' || e.key === 'user_role' || e.key === 'token' || e.key === 'user') {
       console.log('📢 Storage changed (' + e.key + '), updating navbar...');
       updateNavbarAuth();
     }

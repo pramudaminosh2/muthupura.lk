@@ -751,28 +751,13 @@
             });
         }
 
-        function setupHamburgerMenu() {
-            const hamburger = getEl('hamburger-btn'), mobileMenu = getEl('mobile-menu');
-            if (!hamburger || !mobileMenu) return;
-            hamburger.addEventListener('click', () => {
-                hamburger.classList.toggle('active');
-                mobileMenu.classList.toggle('active');
-            });
-            mobileMenu.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', () => {
-                    hamburger.classList.remove('active');
-                    mobileMenu.classList.remove('active');
-                });
-            });
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
             updateNavigation();
             setupNavbarScroll();
-            setupHamburgerMenu();
             getEl('contactForm').addEventListener('submit', handleContactSubmit);
         });
     </script>
     <script src="auth-ui.js"></script>
+    <script src="js/navbar.js" defer></script>
 </body>
 </html>

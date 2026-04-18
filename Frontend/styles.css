@@ -233,63 +233,23 @@ img {
     transform: rotate(-45deg) translate(6px, -6px);
 }
 
-/* Mobile Menu Drawer */
+/* Mobile Menu Drawer - DEPRECATED (Use navbar.css .mobile-menu-dropdown instead) */
 .mobile-menu {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #1f2f4f;
-    flex-direction: column;
-    gap: 0;
-    padding: 80px 16px 20px;
-    z-index: 998;
-    animation: slideDown 0.3s ease;
-    overflow-y: auto;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateX(-100%);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+    display: none !important;
 }
 
 .mobile-menu.active {
-    display: flex;
+    display: none !important;
 }
 
 .mobile-menu a,
 .mobile-menu button {
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 1rem;
-    padding: 16px 20px;
-    border-radius: 0;
-    white-space: nowrap;
-    transition: all 0.2s ease;
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    cursor: pointer;
-    text-align: left;
-    width: 100%;
-    box-sizing: border-box;
+    display: none !important;
 }
 
 .mobile-menu a:hover,
 .mobile-menu button:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(58, 111, 248, 0.3);
-    transform: none;
-}
+    display: none !important;
 
 .btn,
 .action-pill,

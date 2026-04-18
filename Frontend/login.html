@@ -225,11 +225,21 @@
             text-align: center;
         }
 
-        .message { padding: 14px 16px; border-radius: 12px; margin-bottom: 16px; font-size: 14px; font-weight: 500; display: none; }
-        .message.show { display: block; }
-        .message.error { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #dc2626; }
-        .message.success { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #059669; }
-        .message.info { background: rgba(79, 110, 247, 0.1); border: 1px solid rgba(79, 110, 247, 0.3); color: var(--accent); }
+        /* ===== FLOATING NOTIFICATION SYSTEM ===== */
+        .notification-container { position: fixed; bottom: 32px; right: 32px; z-index: 10000; display: flex; flex-direction: column; gap: 12px; max-width: 400px; pointer-events: none; }
+        .notification { background: white; border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; font-weight: 500; box-shadow: 0 10px 32px rgba(0,0,0,0.16); animation: slideInNotif 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: auto; max-width: 100%; }
+        .notification.success { border-left: 4px solid #10b981; color: #059669; }
+        .notification.error { border-left: 4px solid #ef4444; color: #dc2626; }
+        .notification.info { border-left: 4px solid var(--accent); color: var(--accent); }
+        @keyframes slideInNotif { from { transform: translateX(400px) translateY(20px); opacity: 0; } to { transform: translateX(0) translateY(0); opacity: 1; } }
+        @keyframes slideOutNotif { from { transform: translateX(0) translateY(0); opacity: 1; } to { transform: translateX(400px) translateY(20px); opacity: 0; } }
+        .notification.removing { animation: slideOutNotif 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+        /* ===== LOADING STATE FOR BUTTONS ===== */
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-primary.loading { position: relative; color: transparent; pointer-events: none; }
+        .btn-primary.loading::after { content: ''; position: absolute; width: 18px; height: 18px; top: 50%; left: 50%; margin: -9px 0 0 -9px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         .toggle-text { text-align: center; margin-top: 20px; font-size: 14px; color: var(--text-muted); }
         .toggle-text a { color: var(--accent); text-decoration: none; font-weight: 600; cursor: pointer; }
@@ -265,6 +275,8 @@
     </style>
 </head>
 <body>
+    <!-- Notification Container for Floating Messages -->
+    <div class="notification-container" id="notificationContainer"></div>
     <!-- Background Orbs -->
     <div class="auth-bg-orbs">
         <div class="auth-orb auth-orb-1"></div>
@@ -323,8 +335,6 @@
                     <button class="auth-tab" data-tab="register">Register</button>
                 </div>
 
-                <div id="message" class="message"></div>
-
                 <!-- LOGIN FORM -->
                 <form id="loginForm" class="auth-form active">
                     <!-- Social Login Buttons -->
@@ -356,7 +366,7 @@
                         <div class="form-group">
                             <label for="mobileNumber">Mobile Number</label>
                             <div class="mobile-input-group">
-                                <input type="tel" id="mobileNumber" placeholder="+94 77 123 4567" required>
+                                <input type="tel" id="mobileNumber" placeholder="+94 77 123 4567">
                                 <button type="button" onclick="sendVotp()">Send VOTP</button>
                             </div>
                         </div>
@@ -400,7 +410,7 @@
                     </div>
                     <div class="form-group">
                         <label for="regPhone">Phone Number <span style="color: #999; font-size: 12px;">(Optional)</span></label>
-                        <input type="tel" id="regPhone" placeholder="+94 77 123 4567" required>
+                        <input type="tel" id="regPhone" placeholder="+94 77 123 4567">
                     </div>
                     <div class="form-group">
                         <label for="regPassword">Password</label>
@@ -635,42 +645,59 @@
             document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
             document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
             document.getElementById(`${tabName}Form`).classList.add('active');
-            hideMessage();
         }
 
         document.querySelectorAll('.auth-tab').forEach(tab => {
             tab.addEventListener('click', () => switchTo(tab.dataset.tab));
         });
 
-        function showMessage(msg, type = 'error') {
-            const messageEl = document.getElementById('message');
-            messageEl.textContent = msg;
-            messageEl.className = `message show ${type}`;
-        }
+        // ===== FLOATING NOTIFICATION SYSTEM =====
+        function showNotification(msg, type = 'info', duration = 4000) {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = msg;
+            container.appendChild(notification);
 
-        function hideMessage() {
-            document.getElementById('message').classList.remove('show');
+            // Auto-remove after duration
+            setTimeout(() => {
+                notification.classList.add('removing');
+                setTimeout(() => notification.remove(), 300);
+            }, duration);
         }
 
         function validateEmail(email) { return email.includes('@'); }
         function validatePhone(phone) { return phone.trim().length >= 10; }
         function validatePassword(password) { return password.length >= 6; }
 
+        // ===== SET BUTTON LOADING STATE =====
+        function setButtonLoading(button, isLoading) {
+            if (isLoading) {
+                button.classList.add('loading');
+                button.disabled = true;
+                button.dataset.originalText = button.innerHTML;
+            } else {
+                button.classList.remove('loading');
+                button.disabled = false;
+                button.innerHTML = button.dataset.originalText || button.innerHTML;
+            }
+        }
+
         // ===== GOOGLE LOGIN =====
         function loginWithGoogle() {
-            showMessage('Opening Google login...', 'info');
+            showNotification('Opening Google login...', 'info');
             // Integration with Google OAuth (implement based on your backend)
             setTimeout(() => {
-                showMessage('Google login not yet configured', 'error');
+                showNotification('❌ Google login not yet configured', 'error');
             }, 1500);
         }
 
         // ===== FACEBOOK LOGIN =====
         function loginWithFacebook() {
-            showMessage('Opening Facebook login...', 'info');
+            showNotification('Opening Facebook login...', 'info');
             // Integration with Facebook OAuth (implement based on your backend)
             setTimeout(() => {
-                showMessage('Facebook login not yet configured', 'error');
+                showNotification('❌ Facebook login not yet configured', 'error');
             }, 1500);
         }
 
@@ -679,11 +706,19 @@
             e.preventDefault();
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
+            const submitBtn = e.target.querySelector('button[type="submit"]');
 
-            if (!validateEmail(email)) { showMessage('Invalid email', 'error'); return; }
-            if (!validatePassword(password)) { showMessage('Password min 6 chars', 'error'); return; }
+            if (!validateEmail(email)) { 
+                showNotification('❌ Invalid email address', 'error');
+                return; 
+            }
+            if (!validatePassword(password)) { 
+                showNotification('❌ Password must be at least 6 characters', 'error');
+                return; 
+            }
 
-            showMessage('Logging in...', 'info');
+            setButtonLoading(submitBtn, true);
+            showNotification('⏳ Logging in...', 'info', 60000);
             try {
                 const url = `${API_BASE_URL}/api/auth/login`;
                 console.log('📡 Sending login request to:', url);
@@ -698,11 +733,13 @@
                     let errorMsg = `HTTP ${response.status}`;
                     
                     if (response.status === 404) {
-                        errorMsg = 'Server not found. Check your internet connection or try again later.';
+                        errorMsg = 'Server not found. Check your internet connection.';
                         console.error('❌ 404: Endpoint not found - API_BASE_URL:', API_BASE_URL);
                     } else if (response.status === 429) {
-                        errorMsg = 'Too many attempts. Please wait 15 minutes before trying again.';
-                        console.error('❌ 429: Rate limited - please wait');
+                        errorMsg = 'Too many login attempts. Please wait 15 minutes.';
+                        console.error('❌ 429: Rate limited');
+                    } else if (response.status === 401) {
+                        errorMsg = 'Invalid email or password.';
                     } else {
                         errorMsg = errorData.message || response.statusText || 'Login failed';
                     }
@@ -744,14 +781,16 @@
                     // Try again before redirect
                     setTimeout(updateNavbar, 400);
                     
-                    showMessage('Login successful!', 'success');
-                    setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+                    showNotification(`✅ Welcome back, ${data.user.name}!`, 'success', 3000);
+                    setTimeout(() => { window.location.href = 'index.html'; }, 1500);
                 } else {
-                    showMessage(data.message || 'Login failed', 'error');
+                    setButtonLoading(submitBtn, false);
+                    showNotification(`❌ ${data.message || 'Login failed'}`, 'error');
                 }
             } catch (error) {
                 console.error('❌ Login error:', error.message);
-                showMessage(`Login failed: ${error.message}`, 'error');
+                setButtonLoading(submitBtn, false);
+                showNotification(`❌ ${error.message}`, 'error');
             }
         });
 
@@ -762,13 +801,15 @@
             const email = document.getElementById('regEmail').value.trim();
             const phone = document.getElementById('regPhone').value.trim();
             const password = document.getElementById('regPassword').value;
+            const submitBtn = e.target.querySelector('button[type="submit"]');
 
             if (!name || !validateEmail(email) || !validatePassword(password)) {
-                showMessage('Please fill: name, email, and password (phone is optional)', 'error');
+                showNotification('❌ Please fill: name, email, and password (phone is optional)', 'error');
                 return;
             }
 
-            showMessage('Creating account...', 'info');
+            setButtonLoading(submitBtn, true);
+            showNotification('⏳ Creating your account...', 'info', 60000);
             try {
                 const url = `${API_BASE_URL}/api/auth/register`;
                 console.log('📡 Sending registration request to:', url);
@@ -783,11 +824,13 @@
                     let errorMsg = `HTTP ${response.status}`;
                     
                     if (response.status === 404) {
-                        errorMsg = 'Server not found. Check your internet connection or try again later.';
+                        errorMsg = 'Server not found. Check your internet connection.';
                         console.error('❌ 404: Endpoint not found - API_BASE_URL:', API_BASE_URL);
                     } else if (response.status === 429) {
-                        errorMsg = 'Too many attempts. Please wait 15 minutes before trying again.';
-                        console.error('❌ 429: Rate limited - please wait');
+                        errorMsg = 'Too many registration attempts. Please wait 15 minutes.';
+                        console.error('❌ 429: Rate limited');
+                    } else if (response.status === 409) {
+                        errorMsg = 'Email already registered. Please login or use another email.';
                     } else {
                         errorMsg = errorData.message || response.statusText || 'Registration failed';
                     }
@@ -823,26 +866,34 @@
                     setTimeout(updateNavbar, 10);
                     setTimeout(updateNavbar, 400);
                     
-                    showMessage('Account created!', 'success');
-                    setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+                    showNotification(`✅ Welcome ${data.user.name}! Account created successfully!`, 'success', 3000);
+                    setTimeout(() => { window.location.href = 'index.html'; }, 1500);
                 } else if (data.success) {
-                    showMessage('Account created! Login now', 'success');
-                    setTimeout(() => { switchTo('login'); }, 1000);
+                    setButtonLoading(submitBtn, false);
+                    showNotification('✅ Account created! Please login now', 'success', 3000);
+                    setTimeout(() => { switchTo('login'); }, 1500);
                 } else {
-                    showMessage(data.message || 'Registration failed', 'error');
+                    setButtonLoading(submitBtn, false);
+                    showNotification(`❌ ${data.message || 'Registration failed'}`, 'error');
                 }
             } catch (error) {
                 console.error('❌ Registration error:', error.message);
-                showMessage(`Registration failed: ${error.message}`, 'error');
+                setButtonLoading(submitBtn, false);
+                showNotification(`❌ ${error.message}`, 'error');
             }
         });
 
         // ===== MOBILE OTP VERIFICATION =====
         async function sendVotp() {
             const mobile = document.getElementById('mobileNumber').value.trim();
-            if (!validatePhone(mobile)) { showMessage('Invalid phone number', 'error'); return; }
+            const sendBtn = event.target;
+            if (!validatePhone(mobile)) { 
+                showNotification('❌ Invalid phone number. Enter 10+ digits', 'error');
+                return; 
+            }
 
-            showMessage('Sending OTP...', 'info');
+            setButtonLoading(sendBtn, true);
+            showNotification('⏳ Sending OTP...', 'info', 30000);
             try {
                 const url = `${API_BASE_URL}/api/auth/send-verification-email`;
                 console.log('📡 Sending OTP request to:', url, { phone: mobile });
@@ -857,11 +908,11 @@
                     let errorMsg = `HTTP ${response.status}`;
                     
                     if (response.status === 404) {
-                        errorMsg = 'Server not found. Check your internet connection or try again later.';
+                        errorMsg = 'Server not found. Check your internet connection.';
                         console.error('❌ 404: Endpoint not found - API_BASE_URL:', API_BASE_URL);
                     } else if (response.status === 429) {
-                        errorMsg = 'Too many attempts. Please wait 15 minutes before trying again.';
-                        console.error('❌ 429: Rate limited - please wait');
+                        errorMsg = 'Too many OTP attempts. Please wait 15 minutes.';
+                        console.error('❌ 429: Rate limited');
                     } else {
                         errorMsg = errorData.message || response.statusText || 'Failed to send OTP';
                     }
@@ -873,27 +924,35 @@
                 console.log('✅ OTP sent successfully:', { message: data.message });
                 
                 if (response.ok) {
-                    showMessage('OTP sent to your mobile!', 'success');
+                    setButtonLoading(sendBtn, false);
+                    showNotification('✅ OTP sent to your phone!', 'success', 3000);
                     document.getElementById('votpSection').style.display = 'block';
-                    document.querySelector('button[onclick="sendVotp()"]').disabled = true;
+                    sendBtn.disabled = true;
                 } else {
-                    showMessage(data.message || 'Failed to send OTP', 'error');
+                    setButtonLoading(sendBtn, false);
+                    showNotification(`❌ ${data.message || 'Failed to send OTP'}`, 'error');
                 }
             } catch (error) {
                 console.error('❌ Send OTP error:', error.message);
-                showMessage(`Failed to send OTP: ${error.message}`, 'error');
+                setButtonLoading(sendBtn, false);
+                showNotification(`❌ ${error.message}`, 'error');
             }
         }
 
         async function verifyVotp() {
             const mobile = document.getElementById('mobileNumber').value.trim();
             const otpInputs = document.querySelectorAll('#votpSection .otp-input');
+            const verifyBtn = event.target;
             let otp = '';
             otpInputs.forEach(input => { otp += input.value; });
 
-            if (otp.length !== 4) { showMessage('Enter all 4 digits of OTP', 'error'); return; }
+            if (otp.length !== 4) { 
+                showNotification('❌ Enter all 4 digits of OTP', 'error');
+                return; 
+            }
 
-            showMessage('Verifying OTP...', 'info');
+            setButtonLoading(verifyBtn, true);
+            showNotification('⏳ Verifying OTP...', 'info', 30000);
             try {
                 const url = `${API_BASE_URL}/api/auth/send-verification-email`;
                 console.log('📡 Sending OTP verification request to:', url, { phone: mobile, otpLength: otp.length });
@@ -908,11 +967,13 @@
                     let errorMsg = `HTTP ${response.status}`;
                     
                     if (response.status === 404) {
-                        errorMsg = 'Server not found. Check your internet connection or try again later.';
-                        console.error('❌ 404: Endpoint not found - API_BASE_URL:', API_BASE_URL);
+                        errorMsg = 'Server not found. Check your internet connection.';
+                        console.error('❌ 404: Endpoint not found');
                     } else if (response.status === 429) {
-                        errorMsg = 'Too many attempts. Please wait 15 minutes before trying again.';
-                        console.error('❌ 429: Rate limited - please wait');
+                        errorMsg = 'Too many verification attempts. Please wait 15 minutes.';
+                        console.error('❌ 429: Rate limited');
+                    } else if (response.status === 401) {
+                        errorMsg = 'Incorrect OTP. Please try again.';
                     } else {
                         errorMsg = errorData.message || response.statusText || 'OTP verification failed';
                     }
@@ -946,20 +1007,24 @@
                     setTimeout(updateNavbar, 10);
                     setTimeout(updateNavbar, 400);
                     
-                    showMessage('OTP verified! Logging in...', 'success');
-                    setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+                    setButtonLoading(verifyBtn, false);
+                    showNotification(`✅ Welcome ${data.user.name}! Logging in...`, 'success', 2000);
+                    setTimeout(() => { window.location.href = 'index.html'; }, 1500);
                 } else if (data.isNewUser || data.needsRegistration) {
                     // New user, redirect to complete profile
-                    showMessage('Welcome! Completing your profile...', 'success');
+                    setButtonLoading(verifyBtn, false);
+                    showNotification('✅ Welcome! Completing your profile...', 'success', 2000);
                     localStorage.setItem('temp_mobile', mobile);
                     localStorage.setItem('temp_otp_verified', 'true');
                     setTimeout(() => { window.location.href = 'complete-profile.html'; }, 1500);
                 } else {
-                    showMessage(data.message || 'OTP verification failed', 'error');
+                    setButtonLoading(verifyBtn, false);
+                    showNotification(`❌ ${data.message || 'OTP verification failed'}`, 'error');
                 }
             } catch (error) {
                 console.error('❌ Verify OTP error:', error.message);
-                showMessage(`OTP verification failed: ${error.message}`, 'error');
+                setButtonLoading(verifyBtn, false);
+                showNotification(`❌ ${error.message}`, 'error');
             }
         }
 

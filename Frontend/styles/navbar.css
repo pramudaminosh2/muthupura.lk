@@ -320,28 +320,45 @@
   margin: 12px 12px;
   border-radius: 10px;
   text-align: center;
-  background: transparent;
-  padding: 12px 24px;
+  background: transparent !important;
+  padding: 12px 24px !important;
+  display: block !important;
+  font-weight: 600;
 }
 
 .mobile-menu-auth:hover {
-  background: var(--accent);
-  color: #ffffff;
+  background: var(--accent) !important;
+  color: #ffffff !important;
+}
+
+.mobile-menu-auth.nav-logout-btn {
+  color: #d12845 !important;
+  border: 2px solid #d12845 !important;
+}
+
+.mobile-menu-auth.nav-logout-btn:hover {
+  background: #d12845 !important;
+  color: #ffffff !important;
 }
 
 .mobile-menu-admin {
   font-size: 0.85rem;
-  color: rgba(255,255,255,0.6);
-  padding: 10px 24px;
-  border: none;
-  margin: 0;
-  background: transparent;
+  color: rgba(255,255,255,0.6) !important;
+  padding: 10px 24px !important;
+  border: none !important;
+  margin: 0 !important;
+  background: transparent !important;
+  display: none;  /* Default hidden - only show if admin */
+}
+
+.mobile-menu-admin.admin-visible {
+  display: block !important;  /* Show only for admins */
 }
 
 .mobile-menu-admin:hover {
-  background: rgba(79, 110, 247, 0.08);
-  color: var(--accent);
-  border: none;
+  background: rgba(79, 110, 247, 0.08) !important;
+  color: var(--accent) !important;
+  border: none !important;
 }
 
 /* ========== ANIMATIONS ========== */
@@ -405,9 +422,10 @@
   }
 
   .nav-link-auth {
-    padding: 6px 12px;
-    font-size: 0.8rem;
-    display: inline-block !important;
+    display: inline-block !important;  /* Show login/logout button on mobile navbar */
+    font-size: 0.85rem;
+    padding: 8px 16px;
+    border: 1.5px solid var(--accent);
   }
 
   .nav-link-auth.hide-on-mobile {
@@ -435,10 +453,5 @@
 
   .navbar-logo-img {
     height: 36px;
-  }
-
-  .nav-link-auth {
-    padding: 7px 14px;
-    font-size: 0.85rem;
   }
 }

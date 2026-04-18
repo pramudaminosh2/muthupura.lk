@@ -1264,29 +1264,10 @@
             }
         }
 
-        function setupHamburgerMenu() {
-            const hamburger = document.getElementById('hamburger-btn');
-            const mobileMenu = document.getElementById('mobile-menu');
-            if (!hamburger || !mobileMenu) return;
-
-            hamburger.addEventListener('click', () => {
-                hamburger.classList.toggle('active');
-                mobileMenu.classList.toggle('active');
-            });
-
-            mobileMenu.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', () => {
-                    hamburger.classList.remove('active');
-                    mobileMenu.classList.remove('active');
-                });
-            });
-        }
-
         fetchVehicle();
 
         document.addEventListener('DOMContentLoaded', () => {
             updateNavigation();
-            setupHamburgerMenu();
         });
     </script>
 

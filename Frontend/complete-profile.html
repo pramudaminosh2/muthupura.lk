@@ -903,7 +903,6 @@
         // ===== INITIALIZE PAGE =====
         window.addEventListener('DOMContentLoaded', () => {
             initializePage();
-            setupNavbar();
         });
 
         function initializePage() {
@@ -924,36 +923,6 @@
 
             // Pre-fill phone (readonly)
             phoneInput.value = phone;
-        }
-
-        // ===== NAVBAR SETUP =====
-        function setupNavbar() {
-            const hamburgerBtn = document.getElementById('hamburger-btn');
-            const mobileMenu = document.getElementById('mobile-menu');
-            const navbarEl = document.getElementById('navbar');
-
-            // Hamburger menu toggle
-            if (hamburgerBtn) {
-                hamburgerBtn.addEventListener('click', () => {
-                    mobileMenu.classList.toggle('active');
-                });
-            }
-
-            // Close menu on link click
-            document.querySelectorAll('.mobile-menu-link').forEach(link => {
-                link.addEventListener('click', () => {
-                    mobileMenu.classList.remove('active');
-                });
-            });
-
-            // Navbar scroll effect
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 10) {
-                    navbarEl.classList.add('scrolled');
-                } else {
-                    navbarEl.classList.remove('scrolled');
-                }
-            });
         }
 
         // ===== ALERT/MESSAGE DISPLAY =====

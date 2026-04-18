@@ -33,9 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const adminLinkMobile = document.getElementById('admin-link-mobile');
     const myListingsLinkMobile = document.getElementById('mylistings-link-mobile');
 
-    // Navbar admin button (from navbar.js)
-    const navAdminBtn = document.getElementById('nav-admin-btn');
-    const mobileAdminLink = document.getElementById('mobile-admin-link');
+    // NOTE: Navbar admin links are now handled by navbar.js directly
 
     // ============================================
     // 3. HELPER FUNCTION: LOGOUT
@@ -144,35 +142,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 100);
             }
 
-            // Show navbar admin button
-            if (navAdminBtn) {
-                navAdminBtn.style.display = 'inline-block';
-                navAdminBtn.style.opacity = '0';
-                navAdminBtn.style.transition = 'opacity 0.3s ease-in-out';
-                
-                setTimeout(() => {
-                    navAdminBtn.style.opacity = '1';
-                }, 100);
-            }
-
-            // Show mobile admin link
-            if (mobileAdminLink) {
-                mobileAdminLink.style.display = 'block';
-                mobileAdminLink.style.opacity = '0';
-                mobileAdminLink.style.transition = 'opacity 0.3s ease-in-out';
-                
-                setTimeout(() => {
-                    mobileAdminLink.style.opacity = '1';
-                }, 100);
-            }
-
             console.log('👑 Admin mode enabled');
         } else {
             // Hide admin links for non-admins
             if (adminLink) adminLink.style.display = 'none';
             if (adminLinkMobile) adminLinkMobile.style.display = 'none';
-            if (navAdminBtn) navAdminBtn.style.display = 'none';
-            if (mobileAdminLink) mobileAdminLink.style.display = 'none';
         }
 
     } else {
@@ -191,11 +165,11 @@ document.addEventListener('DOMContentLoaded', function() {
             authLinkMobile.textContent = 'Login';
             authLinkMobile.href = 'login.html';
             authLinkMobile.classList.remove('mobile-menu-logout');
+            // CRITICAL: Ensure mobile menu auth button is visible in the menu
+            authLinkMobile.style.display = 'block';
         }
 
         // C. Hide admin buttons
-        if (navAdminBtn) navAdminBtn.style.display = 'none';
-        if (mobileAdminLink) mobileAdminLink.style.display = 'none';
         if (adminLink) adminLink.style.display = 'none';
         if (adminLinkMobile) adminLinkMobile.style.display = 'none';
 
@@ -207,10 +181,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // D. Hide My Listings (both desktop and mobile)
         if (myListingsLink) myListingsLink.style.display = 'none';
         if (myListingsLinkMobile) myListingsLinkMobile.style.display = 'none';
-
-        // E. Hide Admin links (both desktop and mobile)
-        if (adminLink) adminLink.style.display = 'none';
-        if (adminLinkMobile) adminLinkMobile.style.display = 'none';
 
         console.log('👤 Anonymous user state');
     }
@@ -247,30 +217,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ============================================
-    // 7. MOBILE MENU TOGGLE
+    // 7. MOBILE MENU TOGGLE - REMOVED (navbar.js handles this)
     // ============================================
-    const hamburgerBtn = document.getElementById('hamburger-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
+    // Hamburger setup is now handled exclusively by navbar.js
+    // to avoid conflicts and duplicate event listeners
 
-    if (hamburgerBtn && mobileMenu) {
-        hamburgerBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('active');
-            hamburgerBtn.classList.toggle('active');
-        });
-
-        // Close mobile menu when link is clicked
-        document.querySelectorAll('.mobile-menu-link, .mobile-menu-auth, .mobile-menu-admin, .mobile-menu-logout').forEach(link => {
-            link.addEventListener('click', () => {
-                // Don't close if it's the logout button
-                if (!link.classList.contains('mobile-menu-logout')) {
-                    mobileMenu.classList.remove('active');
-                    hamburgerBtn.classList.remove('active');
-                } else {
-                    // Logout button - will reload anyway
-                }
-            });
-        });
-    }
 
     // ============================================
     // 8. LOGOUT BUTTON STYLES (Dynamic CSS)

@@ -22,26 +22,49 @@ const getBucket = () => {
 // Wrapper to handle multer errors gracefully
 const handleMulterError = (middleware) => {
   return (req, res, next) => {
+    // Set extended timeout for multipart parsing
+    req.setTimeout = 600000; // 10 minutes
+    
     middleware(req, res, (err) => {
       if (err) {
         console.error("🔴 Multer middleware error:", err.message);
         console.error("   Error name:", err.name);
         console.error("   Error code:", err.code);
+        console.error("   Content-Type:", req.get("content-type"));
+        console.error("   Content-Length:", req.get("content-length"));
 
         // Check for specific errors
         if (err.message && err.message.includes("Unexpected end of form")) {
+          console.error("   🔴 MULTIPART BOUNDARY ERROR DETECTED");
           console.error("   This is a multipart boundary parsing error");
           console.error("   Possible causes:");
           console.error("   - Request stream was interrupted");
           console.error("   - Content-Length mismatch");
           console.error("   - Incomplete file upload");
-          console.error("   - Network timeout");
+          console.error("   - Network timeout or proxy issue");
+          console.error("   - Browser FormData implementation issue");
 
           return res.status(400).json({
             error: "Multipart form incomplete",
-            message: "The form data was incomplete. This often happens with slow " +
-              "connections or large files. Please try again.",
+            message: "The form data was incomplete. This often happens with slow connections or large files. Please try again.",
             code: "INCOMPLETE_MULTIPART",
+            details: {
+              contentType: req.get("content-type"),
+              contentLength: req.get("content-length"),
+              errorMessage: err.message,
+            }
+          });
+        }
+
+        // Stream truncation error
+        if (err.message && (err.message.includes("Unexpected token") || err.message.includes("Failed to parse"))) {
+          console.error("   🔴 STREAM TRUNCATION ERROR DETECTED");
+          console.error("   The request body was incomplete or malformed");
+
+          return res.status(400).json({
+            error: "Request body incomplete",
+            message: "The request was interrupted. Please try uploading again with a stable connection.",
+            code: "TRUNCATED_STREAM",
           });
         }
 
@@ -240,18 +263,22 @@ module.exports = (upload) => {
       // Note: Firestore has limitations with multiple range filters
       // For price range, you might need to filter client-side or use Algolia
 
-      query = query
-        .orderBy("createdAt", "desc")
-        .limit(parseInt(limit));
+      query = query.limit(parseInt(limit) + parseInt(offset));
 
       const snapshot = await query.get();
 
       const vehicles = snapshot.docs
-        .slice(parseInt(offset), parseInt(offset) + parseInt(limit))
         .map((doc) => ({
           id: doc.id,
           ...doc.data(),
-        }));
+        }))
+        // Sort by createdAt descending (newest first)
+        .sort((a, b) => {
+          const dateA = a.createdAt?.toDate?.() || new Date(a.createdAt || 0);
+          const dateB = b.createdAt?.toDate?.() || new Date(b.createdAt || 0);
+          return dateB - dateA;
+        })
+        .slice(parseInt(offset), parseInt(offset) + parseInt(limit));
 
       res.json({
         success: true,
@@ -383,21 +410,29 @@ module.exports = (upload) => {
 
   /**
    * GET /api/vehicles/user/:userId
-   * Get vehicles by user
+   * Get vehicles by user (sorted by createdAt descending)
    */
   router.get("/user/:userId", async (req, res) => {
     try {
       const {userId} = req.params;
 
+      // Query without orderBy to avoid requiring a composite index
+      // Sort in JavaScript instead (more efficient for small datasets)
       const snapshot = await getDb().collection("vehicles")
         .where("userId", "==", userId)
-        .orderBy("createdAt", "desc")
         .get();
 
-      const vehicles = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const vehicles = snapshot.docs
+        .map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+        // Sort by createdAt descending (newest first)
+        .sort((a, b) => {
+          const dateA = a.createdAt?.toDate?.() || new Date(a.createdAt || 0);
+          const dateB = b.createdAt?.toDate?.() || new Date(b.createdAt || 0);
+          return dateB - dateA;
+        });
 
       res.json({success: true, vehicles});
     } catch (error) {

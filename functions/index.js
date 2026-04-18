@@ -6,9 +6,9 @@ const admin = require("firebase-admin");
 const multer = require("multer");
 
 // ✅ Initialize Firebase Admin SDK
-admin.initializeApp({
-  storageBucket: "muthupuralk.appspot.com",
-});
+// Note: Storage bucket is NOT initialized here to avoid deployment timeouts
+// It will be lazily loaded only when needed via admin.storage().bucket()
+admin.initializeApp();
 
 // Set global options for Cloud Functions
 setGlobalOptions({maxInstances: 10});
@@ -37,6 +37,9 @@ app.use((req, res, next) => {
       const boundary = boundaryMatch[1];
       console.log("   Boundary:", boundary);
     }
+
+    // Set longer timeout for multipart uploads
+    res.setTimeout(600000); // 10 minutes
   }
   next();
 });

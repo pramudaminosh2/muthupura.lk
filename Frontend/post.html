@@ -881,6 +881,7 @@
         <div class="mobile-menu-divider"></div>
         <a href="login.html" class="mobile-menu-link mobile-menu-auth" id="auth-link-mobile">Login</a>
     </div>
+
     <section class="page-header">
         <div class="page-header-content">
             <div class="breadcrumb"><i class="fas fa-check-circle"></i> Post Your Vehicle</div>
@@ -1492,6 +1493,39 @@
             }
             console.log(`✅ Files selected: ${selectedFiles.length}`);
 
+            // Validate files before submission
+            let totalFileSize = 0;
+            const fileValidations = [];
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const file = selectedFiles[i];
+                totalFileSize += file.size;
+                fileValidations.push({
+                    index: i,
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    lastModified: file.lastModified,
+                    valid: file.size > 0 && file.type.startsWith('image/')
+                });
+            }
+            
+            console.log('📋 File validation results:');
+            fileValidations.forEach(fv => {
+                if (fv.valid) {
+                    console.log(`  ✅ File ${fv.index}: ${fv.name} (${(fv.size / 1024 / 1024).toFixed(2)} MB)`);
+                } else {
+                    console.error(`  ❌ File ${fv.index}: INVALID - ${fv.name}`);
+                }
+            });
+            
+            console.log(`📊 Total file size: ${(totalFileSize / 1024 / 1024).toFixed(2)} MB`);
+            
+            if (totalFileSize > 100 * 1024 * 1024) {
+                console.error('❌ Total file size exceeds 100MB');
+                alert('Total file size exceeds 100MB. Please reduce the number or size of images.');
+                return;
+            }
+
             const submitBtn = e.target.querySelector('.btn-submit');
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
@@ -1558,18 +1592,72 @@
                     formData.append('images', file);
                 });
 
-                // Send to backend
+                // Send to backend with retry logic
                 console.log(`🚀 Sending POST request to ${API_URL}/api/vehicles/add`);
-                const response = await fetch(`${API_URL}/api/vehicles/add`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: formData
-                });
-
-                console.log(`📡 Response status: ${response.status} ${response.statusText}`);
+                console.log(`📦 FormData details: ${selectedFiles.length} images, ${Object.keys(formValues).length} fields`);
                 
+                // Validate FormData before sending
+                console.log('🔍 FormData contents:');
+                for (let pair of formData.entries()) {
+                    if (pair[0] === 'images') {
+                        console.log(`  - ${pair[0]}: File (${pair[1].name})`);
+                    } else {
+                        console.log(`  - ${pair[0]}: ${String(pair[1]).substring(0, 50)}`);
+                    }
+                }
+
+                // Send with retry logic for multipart errors
+                let response = null;
+                let retryCount = 0;
+                const maxRetries = 2;
+                
+                while (retryCount <= maxRetries) {
+                    try {
+                        if (retryCount > 0) {
+                            console.log(`⏳ Retry attempt ${retryCount} of ${maxRetries}...`);
+                            // Add small delay before retry
+                            await new Promise(r => setTimeout(r, 1000 * retryCount));
+                            
+                            // Rebuild FormData for retry
+                            const retryFormData = new FormData();
+                            Object.keys(formValues).forEach(key => {
+                                retryFormData.append(key, formValues[key]);
+                            });
+                            retryFormData.append('features', features);
+                            selectedFiles.forEach((file) => {
+                                retryFormData.append('images', file);
+                            });
+                            
+                            response = await fetch(`${API_URL}/api/vehicles/add`, {
+                                method: 'POST',
+                                headers: {
+                                    'Authorization': `Bearer ${token}`
+                                },
+                                body: retryFormData
+                            });
+                        } else {
+                            response = await fetch(`${API_URL}/api/vehicles/add`, {
+                                method: 'POST',
+                                headers: {
+                                    'Authorization': `Bearer ${token}`
+                                },
+                                body: formData
+                            });
+                        }
+
+                        console.log(`📡 Response status: ${response.status} ${response.statusText}`);
+                        break; // Success, exit retry loop
+                        
+                    } catch (fetchError) {
+                        console.error(`❌ Fetch attempt ${retryCount} failed:`, fetchError.message);
+                        retryCount++;
+                        
+                        if (retryCount > maxRetries) {
+                            throw fetchError;
+                        }
+                    }
+                }
+
                 // Check if response is JSON
                 const contentType = response.headers.get('content-type');
                 console.log('📋 Response content-type:', contentType);
@@ -1599,6 +1687,24 @@
                 const result = await response.json();
                 console.log('✅ Response received:', result);
 
+                // Handle 400 errors specifically
+                if (response.status === 400) {
+                    console.error('❌ Bad Request (400):', result);
+                    
+                    if (result.code === 'INCOMPLETE_MULTIPART') {
+                        console.error('🔴 Multipart form parsing failed');
+                        console.error('   This usually means: network issue, timeout, or file too large');
+                        alert(`❌ Upload Failed - Multipart Error\n\n` +
+                              `${result.message}\n\n` +
+                              `Try uploading fewer or smaller images.\n` +
+                              `If the problem persists, check your internet connection.`);
+                    } else {
+                        console.error('Error details:', result);
+                        alert(`Error: ${result.message || result.error}`);
+                    }
+                    return;
+                }
+
                 if (result.success) {
                     console.log(`✅ Vehicle posted successfully! ID: ${result.vehicleId}`);
                     getEl('successMessage').style.display = 'flex';
@@ -1616,7 +1722,9 @@
             } catch (error) {
                 console.error('❌ Upload error:', error);
                 console.error('   Stack:', error.stack);
+                console.error('   Message:', error.message);
                 alert('An error occurred while uploading. Check console for details:\n\n' + error.message);
+
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-upload"></i> Post Vehicle';
@@ -1628,7 +1736,6 @@
             checkAuth();
             updateNavigation();
             initializeNavbarScroll();
-            initializeMobileMenu();
         });
 
         // ===== NAVBAR SCROLL EFFECT (Glassmorphism) =====
@@ -1644,37 +1751,8 @@
                 }
             });
         }
-
-        // ===== MOBILE MENU TOGGLE =====
-        function initializeMobileMenu() {
-            const hamburgerBtn = document.getElementById('hamburger-btn');
-            const mobileMenu = document.getElementById('mobile-menu');
-
-            if (hamburgerBtn && mobileMenu) {
-                hamburgerBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    hamburgerBtn.classList.toggle('active');
-                    mobileMenu.classList.toggle('active');
-                });
-
-                // Close mobile menu when a link is clicked
-                mobileMenu.querySelectorAll('a').forEach(link => {
-                    link.addEventListener('click', () => {
-                        hamburgerBtn.classList.remove('active');
-                        mobileMenu.classList.remove('active');
-                    });
-                });
-
-                // Close menu when clicking outside
-                document.addEventListener('click', (e) => {
-                    if (!hamburgerBtn.contains(e.target) && !mobileMenu.contains(e.target)) {
-                        hamburgerBtn.classList.remove('active');
-                        mobileMenu.classList.remove('active');
-                    }
-                });
-            }
-        }
     </script>
     <script src="auth-ui.js"></script>
+    <script src="js/navbar.js" defer></script>
 </body>
 </html>

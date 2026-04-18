@@ -444,7 +444,14 @@
     </style>
 </head>
 <body>
-    <div class="bg-aurora" aria-hidden="true"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+    <div class="bg-aurora" aria-hidden="true">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div id="loader"></div>
+
     <nav class="premium-navbar" id="navbar">
         <div class="navbar-container">
             <div class="navbar-left">
@@ -1002,26 +1009,11 @@
                 else navbar.classList.remove('scrolled');
             });
         }
-        function setupHamburgerMenu() {
-            const hamburger = getEl('hamburger-btn'), mobileMenu = getEl('mobile-menu');
-            if (!hamburger || !mobileMenu) return;
-            hamburger.addEventListener('click', () => {
-                hamburger.classList.toggle('active');
-                mobileMenu.classList.toggle('active');
-            });
-            mobileMenu.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', () => {
-                    hamburger.classList.remove('active');
-                    mobileMenu.classList.remove('active');
-                });
-            });
-        }
         document.addEventListener('DOMContentLoaded', () => {
             updateNavigation();
             checkAdminAccess();
             fetchPendingVehicles();
             setupNavbarScroll();
-            setupHamburgerMenu();
         });
     </script>
     

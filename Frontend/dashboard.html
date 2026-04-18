@@ -1,378 +1,389 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Listings - Muthupura.lk</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="shared.css">
     <link rel="stylesheet" href="styles/navbar.css">
+    <link rel="stylesheet" href="styles.css">
+
     <style>
-        /* ===== PAGE-SPECIFIC STYLES ===== */
-        .page-header {
-            margin-top: 90px;
-            padding: 60px 20px;
-            background: linear-gradient(135deg, rgba(79, 110, 247, 0.1) 0%, rgba(142, 82, 248, 0.08) 100%);
-            text-align: center;
-            border-bottom: 1px solid var(--border-light);
+        body { 
+            margin: 0; 
+            padding: 0; 
+            font-family: "Poppins", sans-serif; 
+            padding-top: 70px; 
+        }
+        
+        .dashboard-header { 
+            margin-top: 0; 
+            padding: 80px 20px 60px; 
+            background: linear-gradient(135deg, rgba(79,110,247,0.12), rgba(142,82,248,0.08)); 
+            border-bottom: 1px solid rgba(200,210,255,0.3); 
+            text-align: center; 
+            position: relative; 
+            overflow: hidden; 
         }
 
-        .page-header h1 {
-            font-size: 3rem;
-            font-weight: 800;
-            color: var(--dark-bg);
-            margin: 0 0 12px;
-            letter-spacing: -0.02em;
+        .dashboard-header::before { 
+            content: ''; 
+            position: absolute; 
+            top: -50%; 
+            right: -20%; 
+            width: 400px; 
+            height: 400px; 
+            background: radial-gradient(circle, rgba(99,130,237,0.08), transparent 70%); 
+            border-radius: 50%; 
+            pointer-events: none; 
         }
 
-        .page-header .breadcrumb {
-            font-size: 0.95rem;
-            color: var(--accent);
-            margin-bottom: 16px;
+        .dashboard-header::after { 
+            content: ''; 
+            position: absolute; 
+            bottom: -30%; 
+            left: -10%; 
+            width: 300px; 
+            height: 300px; 
+            background: radial-gradient(circle, rgba(167,139,250,0.06), transparent 70%); 
+            border-radius: 50%; 
+            pointer-events: none; 
         }
 
-        .page-header .subtitle {
-            font-size: 1.1rem;
-            color: var(--text-dark);
-            opacity: 0.85;
+        .dashboard-header-content { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            position: relative; 
+            z-index: 2; 
         }
 
-        .page-content {
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 247, 255, 0.95) 100%);
-            padding: 60px 20px;
-            min-height: 60vh;
+        .dashboard-header h1 { 
+            font-size: clamp(2rem, 5vw, 3.2rem); 
+            font-weight: 800; 
+            margin: 0 0 16px; 
+            letter-spacing: -0.02em; 
+            background: linear-gradient(135deg, #1f2f4f, var(--accent)); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            background-clip: text; 
         }
 
-        .page-container {
-            max-width: 1200px;
-            margin: 0 auto;
+        .dashboard-breadcrumb { 
+            font-size: 0.95rem; 
+            color: var(--accent); 
+            font-weight: 600; 
+            margin-bottom: 16px; 
+            text-transform: uppercase; 
+            letter-spacing: 0.6px; 
         }
 
-        /* ===== DASHBOARD STATS ===== */
-        .dash-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 24px;
-            margin-bottom: 48px;
+        .dashboard-subtitle { 
+            font-size: 1.1rem; 
+            color: #5b6d8a; 
+            opacity: 0.85; 
+            margin: 0; 
+            line-height: 1.6; 
+            max-width: 600px; 
+            margin-left: auto; 
+            margin-right: auto; 
         }
 
-        .stat-card {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid var(--border-light);
-            border-radius: 20px;
-            padding: 32px;
-            text-align: center;
-            backdrop-filter: blur(8px);
+        .dashboard-content { background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(245,247,255,0.95)); 
+            padding: 80px 20px; 
+            min-height: 60vh; 
+        }
+
+        .dashboard-container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+        }
+
+        .dashboard-stats { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 24px; 
+            margin-bottom: 60px; 
+            animation: slideDown 0.6s ease-out; 
+        }
+
+        @keyframes slideDown { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        @keyframes fadeIn { 
+            from { opacity: 0; } to { opacity: 1; } 
+        }
+
+        @keyframes scaleIn { 
+            from { opacity: 0; transform: scale(0.95); } 
+            to { opacity: 1; transform: scale(1); } 
+        }
+
+        .stat-card { 
+            background: rgba(255,255,255,0.9); 
+            border: 1px solid rgba(200,210,255,0.4); 
+            border-radius: 18px; 
+            padding: 32px 28px; 
+            text-align: center; 
+            backdrop-filter: blur(8px); 
             transition: all 0.3s ease;
+            cursor: pointer; 
+            animation: scaleIn 0.5s ease-out backwards; 
         }
 
-        .stat-card:hover {
-            background: rgba(255, 255, 255, 0.95);
-            border-color: var(--accent);
-            box-shadow: 0 12px 40px rgba(79, 110, 247, 0.1);
-            transform: translateY(-4px);
+        .stat-card:nth-child(1) {
+            animation-delay: 0.1s; 
         }
 
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--accent), #8e52f8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin: 0 0 8px;
+        .stat-card:nth-child(2) { 
+            animation-delay: 0.15s; 
         }
 
-        .stat-label {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--text-dark);
-            opacity: 0.75;
-            letter-spacing: 0.5px;
+        .stat-card:nth-child(3) { 
+            animation-delay: 0.2s; 
         }
 
-        /* ===== ACTION BAR ===== */
-        .dash-action-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 32px;
-            flex-wrap: wrap;
-            gap: 16px;
+        .stat-card:nth-child(4) { 
+            animation-delay: 0.25s; 
         }
 
-        .btn-post-new {
-            padding: 14px 32px;
-            background: linear-gradient(135deg, var(--accent) 0%, #8e52f8 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 24px rgba(79, 110, 247, 0.25);
-            text-decoration: none;
-            display: inline-block;
+        .stat-card:hover { 
+            border-color: rgba(79,110,247,0.5); 
+            box-shadow: 0 12px 40px rgba(79,110,247,0.12); 
+            transform: translateY(-6px); 
         }
 
-        .btn-post-new:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 32px rgba(79, 110, 247, 0.35);
+        .stat-icon { 
+            font-size: 2.8rem; 
+            margin-bottom: 14px; 
+            color: var(--accent); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            width: 80px; 
+            height: 80px; 
+            margin-left: auto;
+            margin-right: auto; 
+            background: linear-gradient(135deg, rgba(79,110,247,0.08), rgba(142,82,248,0.06)); 
+            border-radius: 16px; 
         }
 
-        .refresh-btn {
-            padding: 10px 20px;
-            background: rgba(79, 110, 247, 0.1);
-            color: var(--accent);
-            border: 1px solid var(--border-light);
-            border-radius: 12px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
+        .stat-icon-img { 
+            width: 60px; 
+            height: 60px; 
+            object-fit: contain; 
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); 
         }
 
-        .refresh-btn:hover {
-            background: rgba(79, 110, 247, 0.2);
-            border-color: var(--accent);
+        .stat-icon i { 
+            font-size: 2.8rem; 
+            width: 2.8rem; 
+            height: 2.8rem; 
+            line-height: 2.8rem; 
         }
 
-        .listings-header {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--dark-bg);
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .icon-btn { 
+            margin-right: 4px; 
         }
 
-        /* ===== LISTINGS GRID ===== */
-        .my-listings-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 28px;
-            margin-bottom: 48px;
+        .stat-number { 
+            font-size: 2.5rem; 
+            font-weight: 800; 
+            background: linear-gradient(135deg, var(--accent), #8e52f8); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            background-clip: text; 
+            margin: 0 0 8px; 
         }
 
-        .listing-card {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid var(--border-light);
-            border-radius: 20px;
-            overflow: hidden;
-            backdrop-filter: blur(8px);
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
+        .stat-label { 
+            font-size: 0.95rem; 
+            font-weight: 600; 
+            color: #5b6d8a; 
+            opacity: 0.75; 
+            margin: 0; 
         }
 
-        .listing-card:hover {
-            border-color: var(--accent);
-            box-shadow: 0 12px 40px rgba(79, 110, 247, 0.15);
-            transform: translateY(-4px);
+        .listings-header { 
+            font-size: 1.3rem; 
+            font-weight: 800; 
+            color: #1f2f4f; 
+            margin: 40px 0 32px; 
+            text-align: left; 
+            letter-spacing: -0.5px; 
+            animation: fadeIn 0.6s ease-out 0.3s backwards; 
         }
 
-        .listing-image {
-            width: 100%;
-            height: 200px;
-            background: linear-gradient(135deg, rgba(79, 110, 247, 0.1), rgba(142, 82, 248, 0.1));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--accent);
-            font-size: 3rem;
+        .dashboard-action-bar { 
+            display: flex; 
+            justify-content: flex-start; 
+            align-items: center; 
+            gap: 16px; 
+            margin-bottom: 40px; 
+            flex-wrap: wrap; 
         }
 
-        .listing-content {
-            padding: 24px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
+        .btn-post-new { 
+            padding: 14px 32px; 
+            background: linear-gradient(135deg, var(--accent), #8e52f8); 
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            font-size: 1rem; 
+            font-weight: 700; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            box-shadow: 0 8px 24px rgba(79,110,247,0.25); 
+            text-decoration: none; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
         }
 
-        .listing-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--dark-bg);
-            margin-bottom: 8px;
-            line-height: 1.3;
+        .btn-post-new:hover { 
+            transform: translateY(-4px); 
+            box-shadow: 0 12px 32px rgba(79,110,247,0.35); 
         }
 
-        .listing-price {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--accent);
-            margin-bottom: 12px;
+        .refresh-btn { 
+            padding: 12px 24px; 
+            background: rgba(79,110,247,0.1); 
+            color: var(--accent); 
+            border: 1.5px solid rgba(200,210,255,0.4); 
+            border-radius: 12px; 
+            font-size: 0.95rem; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 6px; 
         }
 
-        .listing-meta {
-            display: flex;
-            gap: 16px;
-            font-size: 0.85rem;
-            color: var(--text-dark);
-            opacity: 0.75;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
+        .refresh-btn:hover { 
+            background: rgba(79,110,247,0.15); 
+            border-color: var(--accent); 
         }
 
-        .listing-status {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-            margin-bottom: 16px;
+        .refresh-btn.loading { 
+            animation: spin 0.8s linear infinite; 
         }
 
-        .status-active {
-            background: rgba(34, 197, 94, 0.15);
-            color: #22c55e;
+        @keyframes spin { 
+            from { transform: rotate(0deg); } 
+            to { transform: rotate(360deg); } 
         }
 
-        .status-pending {
-            background: rgba(245, 158, 11, 0.15);
-            color: #f59e0b;
+        .listings-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+            gap: 28px; 
+            margin-bottom: 80px; 
         }
 
-        .status-expired {
-            background: rgba(239, 68, 68, 0.15);
-            color: #ef4444;
+        .listing-card { 
+            background: rgba(255,255,255,0.9); 
+            border: 1px solid rgba(200,210,255,0.4); 
+            border-radius: 18px; 
+            overflow: hidden; 
+            backdrop-filter: blur(8px); 
+            transition: all 0.3s ease; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            animation: slideDown 0.5s ease-out backwards; 
         }
 
-        .listing-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: auto;
+        .listing-card:nth-child(1) { 
+            animation-delay: 0.05s; 
         }
 
-        .btn-action {
-            flex: 1;
-            padding: 10px 16px;
-            border: none;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
+        .listing-card:nth-child(2) { 
+            animation-delay: 0.1s; 
         }
 
-        .btn-edit {
-            background: linear-gradient(135deg, var(--accent) 0%, #6b8ef0 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(79, 110, 247, 0.2);
+        .listing-card:nth-child(3) { 
+            animation-delay: 0.15s; 
         }
 
-        .btn-edit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(79, 110, 247, 0.3);
+        .listing-card:nth-child(n+4) { 
+            animation-delay: 0.2s; 
         }
 
-        .btn-delete {
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
+        .listing-card:hover { 
+            border-color: rgba(79,110,247,0.5); 
+            box-shadow: 0 16px 48px rgba(79,110,247,0.18); 
+            transform: translateY(-8px); 
         }
 
-        .btn-delete:hover {
-            background: #ef4444;
-            color: white;
-            border-color: #ef4444;
+        .listing-image-container { 
+            position: relative; 
+            width: 100%; 
+            aspect-ratio: 4/3; 
+            overflow: hidden; 
+            background: linear-gradient(135deg, rgba(79,110,247,0.1), rgba(142,82,248,0.1)); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
         }
 
-        /* ===== EMPTY STATE ===== */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .empty-icon {
-            font-size: 4rem;
-            margin-bottom: 16px;
-        }
-
-        .empty-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--dark-bg);
-            margin-bottom: 8px;
-        }
-
-        .empty-text {
-            color: var(--text-dark);
-            opacity: 0.75;
-            margin-bottom: 24px;
-        }
-
-        /* ===== LOADING ===== */
-        .loading {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--accent);
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-
-        @media (max-width: 768px) {
-            .page-header {
-                margin-top: 80px;
-                padding: 40px 16px;
-            }
-
-            .page-header h1 {
-                font-size: 2rem;
-            }
-
-            .page-content {
-                padding: 40px 16px;
-            }
-
-            .dash-stats {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 16px;
-            }
-
-            .stat-card {
-                padding: 20px;
-            }
-
-            .stat-number {
-                font-size: 2rem;
-            }
-
-            .dash-action-bar {
-                flex-direction: column-reverse;
-            }
-
-            .btn-post-new, .refresh-btn {
-                width: 100%;
-            }
-
-            .my-listings-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-        }
+        .listing-image { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+        .listing-card:hover .listing-image { transform: scale(1.12); }
+        .listing-content { padding: 24px; flex-grow: 1; display: flex; flex-direction: column; gap: 12px; }
+        .listing-title { font-size: 1.2rem; font-weight: 700; color: #1f2f4f; margin: 0; }
+        .listing-actions { display: flex; gap: 10px; margin-top: auto; }
+        .btn-action { flex: 1; padding: 11px 14px; border: none; border-radius: 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
+        .btn-view { background: linear-gradient(135deg, rgba(79,110,247,0.15), rgba(142,82,248,0.1)); color: var(--accent); border: 1px solid rgba(79,110,247,0.3); }
+        .btn-view:hover { background: linear-gradient(135deg, rgba(79,110,247,0.25), rgba(142,82,248,0.15)); border-color: var(--accent); transform: translateY(-2px); }
+        .btn-edit { background: linear-gradient(135deg, rgba(79,110,247,0.2), #8e52f8); color: white; border: 1px solid rgba(79,110,247,0.3); box-shadow: 0 4px 12px rgba(79,110,247,0.15); }
+        .btn-edit:hover { background: linear-gradient(135deg, var(--accent), #8e52f8); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(79,110,247,0.25); }
+        .btn-delete { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+        .btn-delete:hover { background: #ef4444; color: white; border-color: #ef4444; transform: translateY(-2px); }
+        .empty-state-wrapper { animation: fadeIn 0.6s ease-out; }
+        .empty-state { text-align: center; padding: 120px 40px; }
+        .empty-state-icon { font-size: 120px; opacity: 0.15; margin-bottom: 32px; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+        .empty-state h2 { font-size: 2.2rem; font-weight: 800; color: #1f2f4f; margin: 0 0 16px; }
+        .empty-state p { font-size: 1.1rem; color: #5b6d8a; opacity: 0.75; margin: 0 0 40px; max-width: 550px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+        .empty-state-cta { padding: 16px 40px; background: linear-gradient(135deg, var(--accent), #8e52f8); color: white; text-decoration: none; border-radius: 12px; display: inline-flex; align-items: center; gap: 10px; font-size: 1.05rem; font-weight: 700; box-shadow: 0 8px 24px rgba(79,110,247,0.3); transition: all 0.3s ease; border: none; cursor: pointer; }
+        .empty-state-cta:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(79,110,247,0.4); }
+        .empty-state-secondary { margin-top: 24px; font-size: 0.95rem; color: #5b6d8a; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; animation: fadeIn 0.3s ease; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 20px; padding: 40px; max-width: 500px; width: 90%; box-shadow: 0 25px 50px rgba(0,0,0,0.35); animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-header { font-size: 1.6rem; font-weight: 800; color: #1f2f4f; margin: 0 0 12px; }
+        .modal-text { color: #5b6d8a; opacity: 0.85; margin-bottom: 32px; line-height: 1.6; }
+        .modal-actions { display: flex; gap: 12px; }
+        .modal-btn { flex: 1; padding: 13px 24px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; font-size: 0.95rem; }
+        .modal-btn-cancel { background: rgba(79,110,247,0.1); color: var(--accent); border: 1.5px solid rgba(79,110,247,0.2); }
+        .modal-btn-cancel:hover { background: rgba(79,110,247,0.2); border-color: var(--accent); }
+        .modal-btn-confirm { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; box-shadow: 0 4px 16px rgba(239,68,68,0.2); }
+        .modal-btn-confirm:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(239,68,68,0.3); }
+        .loading-spinner { width: 50px; height: 50px; border: 4px solid rgba(79,110,247,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 20px; }
+        .loading-text { font-size: 1rem; color: var(--accent); font-weight: 600; }
+        .notification { position: fixed; bottom: 32px; right: 32px; padding: 16px 24px; background: white; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; font-weight: 600; z-index: 1001; animation: slideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .notification.success { border-left: 4px solid #10b981; color: #10b981; }
+        .notification.error { border-left: 4px solid #ef4444; color: #ef4444; }
+        .notification.info { border-left: 4px solid var(--accent); color: var(--accent); }
+        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(400px); opacity: 0; } }
+        @media (max-width: 768px) { body { padding-top: 60px; } .dashboard-header { margin-top: 0; padding: 60px 16px 50px; } .dashboard-header h1 { font-size: 2rem; margin-bottom: 12px; } .dashboard-breadcrumb { font-size: 0.85rem; margin-bottom: 12px; } .dashboard-subtitle { font-size: 1rem; } .dashboard-content { padding: 60px 16px; } .dashboard-stats { grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 40px; } .stat-card { padding: 24px 16px; } .stat-number { font-size: 2rem; } .stat-label { font-size: 0.85rem; } .dashboard-action-bar { flex-direction: column-reverse; width: 100%; } .btn-post-new, .refresh-btn { width: 100%; justify-content: center; } .listings-grid { grid-template-columns: 1fr; gap: 20px; margin-bottom: 60px; } .listing-title { font-size: 1.1rem; } .modal-content { padding: 32px; } .empty-state { padding: 80px 24px; } .empty-state-icon { font-size: 80px; } .empty-state h2 { font-size: 1.8rem; } .empty-state p { font-size: 1rem; } .notification { bottom: 16px; right: 16px; left: 16px; } }
+        @media (max-width: 480px) { body { padding-top: 60px; } .dashboard-header { margin-top: 0; padding: 40px 12px 35px; } .dashboard-header h1 { font-size: 1.5rem; margin-bottom: 8px; } .dashboard-breadcrumb { font-size: 0.75rem; margin-bottom: 10px; } .dashboard-subtitle { font-size: 0.95rem; } .dashboard-content { padding: 40px 12px; } .dashboard-stats { grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 30px; } .stat-card { padding: 20px 12px; } .stat-icon { width: 70px; height: 70px; margin-bottom: 8px; } .stat-icon-img { width: 50px; height: 50px; } .stat-number { font-size: 1.8rem; } .stat-label { font-size: 0.75rem; } .listings-header { font-size: 1rem; margin: 30px 0 20px; } .listing-title { font-size: 1rem; } .btn-action { font-size: 0.75rem; padding: 10px 10px; } .modal-content { padding: 24px; width: 95%; } .modal-header { font-size: 1.3rem; } .modal-btn { font-size: 0.85rem; padding: 11px 16px; } .empty-state { padding: 60px 16px; } .empty-state-icon { font-size: 60px; margin-bottom: 24px; } .empty-state h2 { font-size: 1.5rem; margin-bottom: 12px; } .empty-state p { font-size: 0.95rem; margin-bottom: 32px; } .empty-state-cta { font-size: 1rem; padding: 14px 32px; } .notification { font-size: 0.9rem; padding: 12px 16px; } }
     </style>
 </head>
 <body>
-    <!-- ===== AURORA BACKGROUND ===== -->
     <div class="bg-aurora" aria-hidden="true">
         <div class="orb orb-1"></div>
         <div class="orb orb-2"></div>
         <div class="orb orb-3"></div>
     </div>
 
-    <div id="loader"></div>
-
     <nav class="premium-navbar" id="navbar">
         <div class="navbar-container">
             <div class="navbar-left">
@@ -407,7 +418,7 @@
     <div class="mobile-menu-dropdown" id="mobile-menu">
         <a href="index.html" class="mobile-menu-link" data-page="home">Home</a>
         <a href="post.html" class="mobile-menu-link" data-page="post">Post Ad</a>
-        <a href="dashboard.html" class="mobile-menu-link" id="mylistings-link-mobile" data-page="dashboard" style="display:none;">My Listings</a>
+        <a href="dashboard.html" class="mobile-menu-link" id="mylistings-link-mobile" data-page="dashboard" style="display:block;">My Listings</a>
         <a href="about.html" class="mobile-menu-link" data-page="about">About Us</a>
         <a href="contact.html" class="mobile-menu-link" data-page="contact">Contact Us</a>
         <a href="admin.html" class="mobile-menu-link mobile-menu-admin" id="admin-link-mobile" style="display:none;">Admin</a>
@@ -415,1439 +426,350 @@
         <a href="login.html" class="mobile-menu-link mobile-menu-auth" id="auth-link-mobile">Login</a>
     </div>
 
-    <!-- ===== PAGE HEADER ===== -->
-    <section class="page-header">
-        <div class="page-container">
-            <div class="breadcrumb">Your Dashboard</div>
+    <section class="dashboard-header">
+        <div class="dashboard-header-content">
+            <div class="dashboard-breadcrumb">Dashboard</div>
             <h1>My Listings</h1>
-            <p class="subtitle">Manage all your vehicle listings in one place</p>
+            <p class="dashboard-subtitle">Manage all your vehicle listings in one place</p>
         </div>
     </section>
 
-    <!-- ===== PAGE CONTENT ===== -->
-    <section class="page-content">
-        <div class="page-container">
-            <!-- ===== STATS ROW ===== -->
-            <div class="dash-stats" id="statsContainer">
-                <div class="stat-card">
-                    <div class="stat-number">0</div>
-                    <div class="stat-label">Total Listings</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">0</div>
-                    <div class="stat-label">Total Views</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">0</div>
-                    <div class="stat-label">Featured</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">0</div>
-                    <div class="stat-label">Pending Approval</div>
-                </div>
+    <section class="dashboard-content">
+        <div class="dashboard-container">
+            <div class="dashboard-stats">
+                <div class="stat-card"><div class="stat-icon"><img src="icons/stat.png" alt="Total Listings" class="stat-icon-img"></div><div class="stat-number" id="totalListings">0</div><p class="stat-label">Total Listings</p></div>
+                <div class="stat-card"><div class="stat-icon"><img src="icons/view.png" alt="Total Views" class="stat-icon-img"></div><div class="stat-number" id="totalViews">0</div><p class="stat-label">Total Views</p></div>
+                <div class="stat-card"><div class="stat-icon"><img src="icons/star.png" alt="Featured" class="stat-icon-img"></div><div class="stat-number" id="featuredCount">0</div><p class="stat-label">Featured</p></div>
+                <div class="stat-card"><div class="stat-icon"><img src="icons/active.png" alt="Active" class="stat-icon-img"></div><div class="stat-number" id="activeCount">0</div><p class="stat-label">Active</p></div>
             </div>
-
-            <!-- ===== ACTION BAR ===== -->
-            <div class="dash-action-bar">
-                <a href="post.html" class="btn-post-new">+ Post New Vehicle</a>
-                <button class="refresh-btn" id="refreshBtn">🔄 Refresh</button>
+            <div class="dashboard-action-bar">
+                <a href="post.html" class="btn-post-new"><span>+</span> Post New Vehicle</a>
+                <button class="refresh-btn" onclick="loadDashboardData()">⟲ Refresh</button>
             </div>
-
-            <!-- ===== LISTINGS HEADER ===== -->
-            <div class="listings-header">
-                <span>📋 Your Listings</span>
-            </div>
-
-            <!-- ===== LISTINGS GRID ===== -->
-            <div class="my-listings-grid" id="listingsGrid">
-                <div class="loading">Loading your listings...</div>
+            <h3 class="listings-header">📋 Your Vehicle Listings</h3>
+            <div class="listings-grid" id="listingsGrid">
+                <div style="text-align: center; padding: 60px 20px;"><div class="loading-spinner"></div><p style="color: var(--accent); font-weight: 600;">Loading...</p></div>
             </div>
         </div>
     </section>
 
-    <!-- ===== PREMIUM FOOTER ===== -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <h2 class="modal-header">Delete Listing?</h2>
+            <p style="color: #5b6d8a; margin-bottom: 32px;">This action cannot be undone.</p>
+            <div style="display: flex; gap: 12px;">
+                <button class="modal-btn" onclick="closeDeleteModal()" style="flex: 1; background: rgba(79,110,247,0.1); color: var(--accent);">Cancel</button>
+                <button class="modal-btn" onclick="confirmDelete()" style="flex: 1; background: #ef4444; color: white;">Delete</button>
+            </div>
+        </div>
+    </div>
+
     <footer class="premium-footer">
         <div class="footer-container">
-            <!-- Newsletter Section -->
             <div class="newsletter-section">
                 <h4>✉️ Subscribe to Our Newsletter</h4>
-                <p>Get the latest vehicles, exclusive deals, and marketplace updates delivered to your inbox</p>
+                <p>Get the latest updates delivered to your inbox</p>
                 <form class="newsletter-form" onsubmit="event.preventDefault(); handleNewsletterSubmit(event);">
-                    <input type="email" placeholder="Enter your email address" required>
+                    <input type="email" placeholder="Enter your email" required>
                     <button type="submit">Subscribe</button>
                 </form>
             </div>
-
-            <!-- Main Footer Content -->
             <div class="footer-content">
-                <!-- Brand Section -->
-                <div class="footer-col footer-brand-section" id="footer-brand">
-                    <div class="footer-logo">
-                        <img src="logo.PNG" alt="Muthupura.lk">
-                        <span>Muthupura.lk</span>
-                    </div>
-                    <p class="footer-description">Your trusted marketplace to buy, sell and lease vehicles with complete transparency, speed, and security. Sri Lanka's #1 vehicle marketplace.</p>
-                    <div class="social-links">
-                        <a href="https://facebook.com" title="Facebook" aria-label="Facebook" class="social-icon">f</a>
-                        <a href="https://twitter.com" title="Twitter" aria-label="Twitter" class="social-icon">𝕏</a>
-                        <a href="https://instagram.com" title="Instagram" aria-label="Instagram" class="social-icon">📷</a>
-                        <a href="https://linkedin.com" title="LinkedIn" aria-label="LinkedIn" class="social-icon">in</a>
-                    </div>
+                <div class="footer-col">
+                    <h3>Muthupura.lk</h3>
+                    <p>Your trusted vehicle marketplace</p>
                 </div>
-
-                <!-- Quick Navigation -->
-                <div class="footer-col" id="footer-navigation">
-                    <button class="footer-col-header" data-mobile-toggle="footer-navigation">
-                        <h3>🏠 Quick Navigation</h3>
-                        <span class="toggle-icon">+</span>
-                    </button>
-                    <div class="footer-col-content">
-                        <a href="index.html">Home</a>
-                        <a href="post.html">Post an Ad</a>
-                        <a href="dashboard.html">My Dashboard</a>
-                        <a href="about.html">About Us</a>
-                        <a href="contact.html">Contact Us</a>
-                    </div>
+                <div class="footer-col">
+                    <h3>Navigation</h3>
+                    <a href="index.html">Home</a>
+                    <a href="post.html">Post Ad</a>
+                    <a href="about.html">About Us</a>
                 </div>
-
-                <!-- Services -->
-                <div class="footer-col" id="footer-services">
-                    <button class="footer-col-header" data-mobile-toggle="footer-services">
-                        <h3>🚗 Services</h3>
-                        <span class="toggle-icon">+</span>
-                    </button>
-                    <div class="footer-col-content">
-                        <a href="#">Buy Vehicles</a>
-                        <a href="#">Sell Vehicles</a>
-                        <a href="#">Lease Vehicles</a>
-                        <a href="#">Vehicle Inspection</a>
-                        <a href="#">Financing Options</a>
-                    </div>
-                </div>
-
-                <!-- Support & Info -->
-                <div class="footer-col" id="footer-support">
-                    <button class="footer-col-header" data-mobile-toggle="footer-support">
-                        <h3>📞 Contact & Support</h3>
-                        <span class="toggle-icon">+</span>
-                    </button>
-                    <div class="footer-col-content">
-                        <p><strong>Phone:</strong><br><a href="tel:+94777150660">+94 777 150 660</a></p>
-                        <p><strong>WhatsApp:</strong><br><a href="https://wa.me/94777150660">Message Us</a></p>
-                        <p><strong>Email:</strong><br><a href="mailto:info@muthupura.lk">info@muthupura.lk</a></p>
-                    </div>
+                <div class="footer-col">
+                    <h3>Support</h3>
+                    <p>Email: info@muthupura.lk</p>
+                    <p>Phone: +94 777 150 660</p>
                 </div>
             </div>
-
-            <!-- Divider -->
             <div class="footer-divider"></div>
-
-            <!-- Footer Bottom -->
             <div class="footer-bottom">
-                <span>© 2026 Muthupura.lk – All rights reserved | Developed with ❤️</span>
-                <div class="footer-bottom-links">
-                    <a href="privacy-policy.html">Privacy Policy</a>
-                    <a href="terms-and-conditions.html">Terms of Service</a>
-                    <a href="cookie-policy.html">Cookie Policy</a>
-                </div>
+                <span>© 2026 Muthupura.lk – All rights reserved</span>
             </div>
         </div>
     </footer>
 
+    <script src="auth-ui.js"></script>
+    <script src="js/navbar.js" defer></script>
     <script>
-        // Footer Mobile Collapsible Functionality
-        function initFooterCollapsibles() {
-            const isMobile = window.innerWidth <= 640;
-            const toggles = document.querySelectorAll('[data-mobile-toggle]');
+        let deleteVehicleId = null;
+        const ANIMATION_DELAY = 200; // Milliseconds between card animations
+
+        document.addEventListener("DOMContentLoaded", () => { 
+            loadDashboardData(); 
+        });
+
+        function showNotification(message, type = 'info', duration = 4000) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `${message}`;
+            document.body.appendChild(notification);
             
-            toggles.forEach(btn => {
-                // Remove old listener if it exists by cloning
-                const clone = btn.cloneNode(true);
-                btn.replaceWith(clone);
-                
-                // Add fresh listener
-                clone.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    const targetId = this.dataset.mobileToggle;
-                    const target = document.getElementById(targetId);
-                    if (!target) return;
-                    
-                    const content = target.querySelector('.footer-col-content');
-                    const icon = this.querySelector('.toggle-icon');
-                    if (!content || !icon) return;
-                    
-                    content.classList.toggle('active');
-                    icon.textContent = content.classList.contains('active') ? '−' : '+';
-                });
-            });
-            
-            // Initialize state based on screen size
-            document.querySelectorAll('[data-mobile-toggle]').forEach(btn => {
-                const targetId = btn.dataset.mobileToggle;
-                const target = document.getElementById(targetId);
-                if (!target) return;
-                const content = target.querySelector('.footer-col-content');
-                const icon = btn.querySelector('.toggle-icon');
-                if (!content || !icon) return;
-                
-                if (isMobile) {
-                    // On mobile: close all by default
-                    content.classList.remove('active');
-                    icon.textContent = '+';
-                } else {
-                    // On desktop: open all
-                    content.classList.add('active');
-                    icon.textContent = '−';
-                }
-            });
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+                setTimeout(() => notification.remove(), 400);
+            }, duration);
         }
 
-        // Newsletter Submission Handler
-        function handleNewsletterSubmit(event) {
-            const email = event.target.querySelector('input[type="email"]').value;
-            showFooterNotification('Thank you for subscribing! 📧', 'success');
-            event.target.reset();
-        }
-
-        // Footer Notification Toast
-        function showFooterNotification(message, type = 'info') {
-            let notification = document.getElementById('footer-notification');
-            if (!notification) {
-                notification = document.createElement('div');
-                notification.id = 'footer-notification';
-                notification.style.cssText = `
-                    position: fixed;
-                    bottom: 20px;
-                    right: 20px;
-                    max-width: 300px;
-                    padding: 14px 18px;
-                    border-radius: 10px;
-                    font-weight: 600;
-                    z-index: 9999;
-                    animation: slideInRight 0.4s ease;
-                    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-                    font-family: 'Poppins', sans-serif;
-                    font-size: 0.9rem;
-                `;
-                document.body.appendChild(notification);
-            }
-
-            notification.textContent = message;
-            notification.style.backgroundColor = type === 'success' ? '#22c55e' : (type === 'error' ? '#ef4444' : '#3b82f6');
-            notification.style.color = 'white';
-            notification.style.display = 'block';
-
-            clearTimeout(notification.timeout);
-            notification.timeout = setTimeout(() => {
-                notification.style.animation = 'slideOutRight 0.4s ease';
-                setTimeout(() => {
-                    notification.style.display = 'none';
-                    notification.style.animation = 'slideInRight 0.4s ease';
-                }, 400);
-            }, 3000);
-        }
-
-        // Initialize on DOM ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initFooterCollapsibles);
-        } else {
-            initFooterCollapsibles();
-        }
-
-        // Re-initialize on window resize to handle responsive changes
-        window.addEventListener('resize', initFooterCollapsibles);
-    </script>
-
-    <script src="config.js"></script>
-    <script>
-        // Global logout function
-        window.performLogout = function() {
-            console.log('🚪 Logout initiated');
-            const keysToRemove = ['token', 'jwt_token', 'user_name', 'user_role', 'user', 'userName'];
-            keysToRemove.forEach(key => {
-                if (localStorage.getItem(key)) {
-                    localStorage.removeItem(key);
-                    console.log(`✅ Removed: ${key}`);
-                }
-            });
-            window.location.href = 'index.html';
-        };
-        
-        const API_URL = API_BASE_URL;
-        const getEl = (id) => document.getElementById(id);
-
-        // ===== AUTH CHECK (Redirect if not logged in) =====
-        function checkAuth() {
-            const token = localStorage.getItem('token') || localStorage.getItem('jwt_token');
-            if (!token) {
-                window.location.href = 'login.html';
-                return false;
-            }
-            return true;
-        }
-
-        function getTokenPayload() {
-            const token = localStorage.getItem('token');
-            if (!token) return null;
+        async function loadDashboardData() {
             try {
-                const parts = token.split('.');
-                if (parts.length !== 3) return null;
-                const decoded = JSON.parse(atob(parts[1]));
-                return decoded;
-            } catch (e) {
-                console.error('Token decode error:', e);
-                return null;
-            }
-        }
+                const token = localStorage.getItem("authToken") || localStorage.getItem("token");
+                const userStr = localStorage.getItem("user");
+                
+                if (!token || !userStr) { 
+                    console.log("⚠️ Missing auth data - redirecting to login");
+                    window.location.href = "login.html";
+                    return; 
+                }
 
-        async function updateNavigation() {
-            try {
-                let payload = getTokenPayload();
-                const authLink = getEl('auth-link');
-                const adminLink = getEl('admin-link');
-                const myListings = getEl('mylistings-link');
-                const userGreeting = getEl('user-greeting');
-                const authLinkMobile = getEl('auth-link-mobile');
-                const adminLinkMobile = getEl('admin-link-mobile');
-
-                if (!payload || (payload.exp && Date.now() >= payload.exp * 1000)) {
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('userName');
-                    window.location.href = 'login.html';
+                // Extract userId from stored user object
+                const user = JSON.parse(userStr);
+                const userId = user.uid || user.id;
+                
+                if (!userId) {
+                    console.log("⚠️ User ID not found in auth data");
+                    window.location.href = "login.html";
                     return;
                 }
 
-                if (payload && !payload.name) {
-                    try {
-                        const res = await fetch(`${API_URL}/api/profile/me`, {
-                            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                        });
-                        if (res.ok) {
-                            const profile = await res.json();
-                            if (profile.name) {
-                                payload.name = profile.name;
-                            }
-                        }
-                    } catch (err) {
-                        console.warn('Failed to fetch profile', err);
+                console.log(`🔑 Using User ID: ${userId}`);
+
+                // Show loading state
+                document.getElementById("listingsGrid").innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 80px 20px;">
+                        <div class="loading-spinner"></div>
+                        <p class="loading-text">Loading your listings...</p>
+                    </div>
+                `;
+
+                // Firebase Cloud Functions base URL
+                const API_BASE = 'https://api-soez2bw2ma-uc.a.run.app';
+                const apiUrl = `${API_BASE}/api/vehicles/user/${userId}`;
+                console.log(`📡 Calling API: ${apiUrl}`);
+
+                // Call the correct endpoint: /api/vehicles/user/:userId
+                const res = await fetch(apiUrl, { 
+                    headers: { 
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    } 
+                });
+
+                console.log(`📡 API Response Status: ${res.status}`);
+                console.log(`📄 Content-Type: ${res.headers.get('content-type')}`);
+
+                if (res.status === 401) { 
+                    console.log("🔐 Unauthorized - redirecting to login");
+                    window.location.href = "login.html"; 
+                    return; 
+                }
+
+                if (res.status === 404) {
+                    console.log("📭 No listings found (404)");
+                    renderListings([]);
+                    return;
+                }
+
+                if (!res.ok) {
+                    const contentType = res.headers.get('content-type');
+                    let errorMsg = "Failed to load listings";
+                    
+                    if (contentType && contentType.includes('application/json')) {
+                        const errorData = await res.json();
+                        errorMsg = errorData.error || errorMsg;
+                    } else {
+                        errorMsg = `Server error (${res.status}): ${res.statusText}`;
                     }
+                    throw new Error(errorMsg);
                 }
 
-                // Check both role field and is_admin field
-                const isUserAdmin = payload?.role === 'admin' || payload?.is_admin === true;
-                if (adminLink) adminLink.style.display = isUserAdmin ? 'inline-block' : 'none';
-                if (adminLinkMobile) adminLinkMobile.style.display = isUserAdmin ? 'block' : 'none';
-
-                const displayName = payload.name || localStorage.getItem('userName') || payload.email || '';
-                if (userGreeting) {
-                    // Show only first name to prevent overflow on mobile
-                    const firstName = displayName ? displayName.split(' ')[0] : 'User';
-                    userGreeting.textContent = `Hi, ${firstName}`;
-                    userGreeting.classList.add('show');
+                const data = await res.json();
+                console.log(`✅ Loaded ${data.vehicles?.length || 0} vehicles`);
+                
+                const vehicles = data.vehicles || [];
+                if (Array.isArray(vehicles)) {
+                    updateStats(vehicles);
+                    renderListings(vehicles);
+                } else {
+                    renderListings([]);
                 }
-                // Hide brand text on mobile when logged in
-                const brandText = document.querySelector('.navbar-brand-text');
-                if (brandText) {
-                    brandText.classList.add('hide-on-mobile-logged-in');
-                }
-
-                if (authLink) {
-                    authLink.textContent = 'Logout';
-                    authLink.classList.add('logout-btn');
-                    authLink.classList.add('hide-on-mobile');
-                    authLink.href = '#';
-                    authLink.onclick = (e) => {
-                        e.preventDefault();
-                        window.performLogout();
-                    };
-                }
-                if (authLinkMobile) {
-                    authLinkMobile.textContent = 'Logout';
-                    authLinkMobile.classList.remove('nav-login-btn');
-                    authLinkMobile.classList.add('nav-logout-btn');
-                    authLinkMobile.href = '#';
-                    authLinkMobile.onclick = (e) => {
-                        e.preventDefault();
-                        window.performLogout();
-                    };
-                }
-            } catch (err) {
-                console.error('Navigation update error:', err);
+            } catch (err) { 
+                console.error("❌ Dashboard error:", err);
+                showNotification("Failed to load listings. Please try again.", 'error', 5000);
+                document.getElementById("listingsGrid").innerHTML = `
+                    <div style="grid-column: 1/-1;">
+                        <div class="empty-state-wrapper">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">⚠️</div>
+                                <h2>Error Loading Listings</h2>
+                                <p>${err.message || 'Something went wrong while loading your listings.'}</p>
+                                <button onclick="loadDashboardData()" class="empty-state-cta">
+                                    🔄 Retry
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
             }
         }
 
-        function renderVehicles(vehicles) {
-            const grid = getEl('listingsGrid');
-            if (!vehicles || vehicles.length === 0) {
+        function updateStats(vehicles) {
+            const total = vehicles.length;
+            const views = vehicles.reduce((sum, v) => sum + (v.views || 0), 0);
+            const featured = vehicles.filter(v => v.featured).length;
+            
+            // Animate stat updates
+            animateStatUpdate("totalListings", total);
+            animateStatUpdate("totalViews", views);
+            animateStatUpdate("featuredCount", featured);
+            document.getElementById("activeCount").textContent = total;
+        }
+
+        function animateStatUpdate(elementId, value) {
+            const element = document.getElementById(elementId);
+            const currentValue = parseInt(element.textContent) || 0;
+            
+            if (currentValue !== value) {
+                element.style.opacity = '0.5';
+                setTimeout(() => {
+                    element.textContent = value;
+                    element.style.transition = 'opacity 0.3s ease';
+                    element.style.opacity = '1';
+                }, 100);
+            }
+        }
+
+        function renderListings(vehicles) {
+            const grid = document.getElementById("listingsGrid");
+            
+            if (vehicles.length === 0) {
                 grid.innerHTML = `
                     <div style="grid-column: 1/-1;">
-                        <div class="empty-state">
-                            <div class="empty-icon">🚗</div>
-                            <div class="empty-title">No listings yet</div>
-                            <div class="empty-text">Start selling vehicles by creating your first listing</div>
-                            <a href="post.html" class="btn-post-new">+ Post New Vehicle</a>
+                        <div class="empty-state-wrapper">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📭</div>
+                                <h2>No Listings Yet</h2>
+                                <p>You haven't posted any vehicle ads yet. Start building your portfolio by creating your first listing today!</p>
+                                <a href="post.html" class="empty-state-cta">
+                                    ✨ Post Your First Vehicle
+                                </a>
+                                <div class="empty-state-secondary">
+                                    Get more visibility and reach potential buyers
+                                </div>
+                            </div>
                         </div>
                     </div>
                 `;
                 return;
             }
 
-            grid.innerHTML = vehicles.map((v, i) => `
-                <div class="listing-card">
-                    <div class="listing-image">${i % 3 === 0 ? '🏎️' : i % 3 === 1 ? '🚙' : '🚗'}</div>
+            // Render listings with staggered animation
+            const listingsHTML = vehicles.map((v, index) => `
+                <div class="listing-card" style="animation-delay: ${index * 50}ms;">
+                    <div class="listing-image-container">
+                        ${v.images?.[0] ? `<img src="${v.images[0]}" class="listing-image" alt="${v.title}">` : `<div style="font-size: 3.5rem; color: var(--accent); opacity: 0.3; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">🚗</div>`}
+                    </div>
                     <div class="listing-content">
-                        <div class="listing-title">${v.title || 'Vehicle Listing'}</div>
-                        <div class="listing-price">$${(v.price || 0).toLocaleString()}</div>
-                        <div class="listing-meta">
-                            <span>${v.year || '2024'}</span>
-                            <span>${v.mileage || '0'} km</span>
-                        </div>
-                        <span class="listing-status ${v.status === 'active' ? 'status-active' : v.status === 'pending' ? 'status-pending' : 'status-expired'}">
-                            ${(v.status || 'active').toUpperCase()}
-                        </span>
+                        <h3 class="listing-title">${v.title}</h3>
+                        <p style="margin: 0 0 8px 0; color: #5b6d8a; font-size: 0.9rem;">
+                            ${v.year} • ${(v.mileage || 0).toLocaleString()} km • ${v.transmission || 'N/A'}
+                        </p>
                         <div class="listing-actions">
-                            <button class="btn-action btn-edit">Edit</button>
-                            <button class="btn-action btn-delete">Delete</button>
+                            <a href="vehicle.html?id=${v.id}" class="btn-action btn-view">👁️ View</a>
+                            <button class="btn-action btn-edit" onclick="location.href='post.html?edit=${v.id}'">✏️ Edit</button>
+                            <button class="btn-action btn-delete" onclick="openDeleteModal('${v.id}')">🗑️ Delete</button>
                         </div>
                     </div>
                 </div>
-            `).join('');
-        }
+            `).join("");
 
-        async function fetchMyListings() {
-            const grid = getEl('listingsGrid');
-            grid.innerHTML = '<div class="loading">Loading your listings...</div>';
+            grid.innerHTML = listingsHTML;
             
-            try {
-                const token = localStorage.getItem('token');
-                const url = `${API_URL}/vehicles/my-listings`;
-                console.log('📡 Fetching my listings from:', url);
-                
-                const res = await fetch(url, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-
-                if (!res.ok) {
-                    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-                }
-                
-                const data = await res.json();
-                console.log('✅ My listings fetched:', data.vehicles?.length);
-                renderVehicles(data.vehicles || []);
-            } catch (err) {
-                console.error('❌ Error loading listings:', err.message);
-                grid.innerHTML = `
-                    <div style="grid-column: 1/-1;">
-                        <div class="empty-state">
-                            <div class="empty-icon">⚠️</div>
-                            <div class="empty-title">Error loading listings</div>
-                            <div class="empty-text">Please try refreshing or contact support</div>
-                            <button class="btn-post-new" onclick="location.reload()" style="background: linear-gradient(135deg, #ef4444, #dc2626);">Retry</button>
-                        </div>
-                    </div>
-                `;
+            // Show listing count message
+            if (vehicles.length === 1) {
+                showNotification('✨ You have 1 active listing', 'info', 3000);
+            } else {
+                showNotification(`✨ You have ${vehicles.length} active listings`, 'info', 3000);
             }
         }
 
-        function setupNavbarScroll() {
-            const navbar = getEl('navbar');
-            if (!navbar) return;
-
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 0) {
-                    navbar.classList.add('scrolled');
-                } else {
-                    navbar.classList.remove('scrolled');
-                }
-            });
+        function openDeleteModal(id) { 
+            deleteVehicleId = id; 
+            document.getElementById("deleteModal").classList.add("active"); 
+            document.body.style.overflow = "hidden";
+        }
+        
+        function closeDeleteModal() { 
+            deleteVehicleId = null; 
+            document.getElementById("deleteModal").classList.remove("active"); 
+            document.body.style.overflow = "auto";
         }
 
-        function setupHamburgerMenu() {
-            const hamburger = getEl('hamburger-btn');
-            const mobileMenu = getEl('mobile-menu');
-            if (!hamburger || !mobileMenu) return;
+        async function confirmDelete() {
+            if (!deleteVehicleId) return;
+            
+            const deleteBtn = event.target;
+            deleteBtn.disabled = true;
+            deleteBtn.textContent = "Deleting...";
+            deleteBtn.style.opacity = '0.6';
 
-            hamburger.addEventListener('click', () => {
-                hamburger.classList.toggle('active');
-                mobileMenu.classList.toggle('active');
-            });
-
-            mobileMenu.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', () => {
-                    hamburger.classList.remove('active');
-                    mobileMenu.classList.remove('active');
+            try {
+                const token = localStorage.getItem("authToken") || localStorage.getItem("token");
+                const res = await fetch(`/api/vehicles/${deleteVehicleId}`, { 
+                    method: "DELETE", 
+                    headers: { "Authorization": `Bearer ${token}` } 
                 });
-            });
+                
+                if (!res.ok) throw new Error("Failed to delete");
+                
+                closeDeleteModal();
+                showNotification('✅ Listing deleted successfully', 'success', 3000);
+                
+                // Reload with a small delay for smooth transition
+                setTimeout(() => loadDashboardData(), 400);
+            } catch (err) { 
+                console.error(err);
+                showNotification('❌ Failed to delete listing. Please try again.', 'error', 4000);
+                deleteBtn.disabled = false;
+                deleteBtn.textContent = "Delete";
+                deleteBtn.style.opacity = '1';
+            }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            if (!checkAuth()) return;
-            updateNavigation();
-            setupNavbarScroll();
-            setupHamburgerMenu();
-            fetchMyListings();
+        // Modal close handlers
+        document.getElementById("deleteModal").addEventListener("click", (e) => {
+            if (e.target.id === "deleteModal") closeDeleteModal();
+        });
 
-            const refreshBtn = getEl('refreshBtn');
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") closeDeleteModal();
+        });
+
+        // Refresh button animation
+        document.addEventListener("DOMContentLoaded", () => {
+            const refreshBtn = document.querySelector(".refresh-btn");
             if (refreshBtn) {
-                refreshBtn.addEventListener('click', fetchMyListings);
+                refreshBtn.addEventListener("click", function() {
+                    this.classList.add("loading");
+                    loadDashboardData();
+                    setTimeout(() => this.classList.remove("loading"), 1000);
+                });
             }
         });
+
+        function handleNewsletterSubmit(e) { 
+            e.target.reset(); 
+            showNotification('✉️ Thank you for subscribing!', 'success', 3000);
+        }
     </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Seller Dashboard - Muthupura.lk</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="styles/navbar.css">
-    <style>
-        :root {
-            --bg: #eef2f8;
-            --surface: #ffffff;
-            --text: #1f2f4f;
-            --muted: #5b6d8a;
-            --accent1: #3a6ff8;
-            --accent2: #8e52f8;
-            --shadow-strong: 0 32px 90px rgba(25, 73, 145, 0.14);
-            --radius: 18px;
-        }
-
-        .container {
-            max-width: 1180px;
-            margin: 0 auto;
-            padding: 18px 14px 36px;
-        }
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .stat {
-            background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.96) 100%);
-            border-radius: var(--radius);
-            padding: 20px;
-            border: 1.2px solid rgba(58, 111, 248, 0.14);
-            box-shadow: var(--shadow-strong);
-            animation: fadeInUp 0.45s ease both;
-        }
-
-        .stat h3 {
-            margin: 0 0 10px;
-            font-size: 0.9rem;
-            color: var(--muted);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-        }
-
-        .stat p {
-            margin: 0;
-            font-size: 2rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, #1f2f4f 0%, #3a6ff8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .section-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 28px 0 18px;
-        }
-
-        .section-head h2 {
-            margin: 0;
-            font-size: 1.4rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #1f2f4f 0%, #3a6ff8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .section-head small {
-            color: var(--muted);
-        }
-
-        .vehicle-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 18px;
-        }
-
-        .card {
-            background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.96) 100%);
-            border: 1.2px solid rgba(58, 111, 248, 0.14);
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: var(--shadow-strong);
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-            animation: fadeInUp 0.45s ease both;
-        }
-
-        .card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 20px 60px rgba(58, 111, 248, 0.2);
-        }
-
-        .card-top {
-            position: relative;
-            height: 180px;
-            overflow: hidden;
-        }
-
-        .card-top img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-        }
-
-        .card:hover .card-top img {
-            transform: scale(1.05);
-        }
-
-        .card-top::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.55));
-        }
-
-        .card-badge {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            background: rgba(28, 36, 68, 0.9);
-            color: #fff;
-            border-radius: 999px;
-            padding: 6px 12px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            z-index: 2;
-            backdrop-filter: blur(8px);
-        }
-
-        .card-badge.ev {
-            left: auto;
-            right: 12px;
-            background: linear-gradient(110deg, #3cd06a, #14b4f7);
-            box-shadow: 0 4px 12px rgba(60, 208, 106, 0.3);
-        }
-
-        .card-body {
-            padding: 16px;
-        }
-
-        .card-title {
-            margin: 0 0 10px;
-            font-size: 1.05rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #1f2f4f 0%, #3a6ff8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .card-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            font-size: 0.85rem;
-            color: var(--muted);
-        }
-
-        .card-meta span {
-            background: linear-gradient(135deg, #f9faff, #f5f9ff);
-            border-radius: 8px;
-            padding: 6px 10px;
-            border: 1px solid rgba(58, 111, 248, 0.12);
-        }
-
-        .card-actions {
-            margin-top: 14px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .card-actions .btn {
-            font-size: 0.82rem;
-            padding: 8px 12px;
-            flex: 1;
-            min-width: 80px;
-        }
-
-        .empty {
-            border: 1.2px solid rgba(58, 111, 248, 0.18);
-            background: linear-gradient(135deg, rgba(58, 111, 248, 0.05), rgba(142, 82, 248, 0.03));
-            color: #2f4f82;
-            border-radius: 18px;
-            padding: 32px 20px;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        /* ===== NAVBAR FIXED POSITIONING ===== */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            width: 70%;
-            box-sizing: border-box;
-            background: linear-gradient(135deg, rgba(58,111,248,0.08) 0%, rgba(142,82,248,0.06) 100%);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1.2px solid rgba(58,111,248,0.15);
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(58,111,248,0.08), inset 0 1px 1px rgba(255,255,255,0.9);
-            padding: 0;
-            height: 70px;
-            display: flex;
-            align-items: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .navbar:hover {
-            box-shadow: 0 12px 40px rgba(58,111,248,0.12), inset 0 1px 1px rgba(255,255,255,0.95);
-            border-color: rgba(58,111,248,0.22);
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 0 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 24px;
-        }
-
-        .nav-left {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .nav-center {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            flex-grow: 1;
-        }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-shrink: 0;
-        }
-
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            color: #1f2d52;
-            font-weight: 700;
-            font-size: 1.05rem;
-            transition: all 0.22s ease;
-            flex-shrink: 0;
-        }
-
-        .nav-brand:hover {
-            opacity: 0.85;
-            transform: translateY(-1px);
-        }
-
-        .nav-brand img {
-            height: 46px;
-            width: auto;
-            object-fit: contain;
-        }
-
-        .nav-brand span {
-            display: none;
-        }
-
-        @media (min-width: 640px) {
-            .nav-brand span {
-                display: inline;
-            }
-        }
-
-        .nav-center a {
-            text-decoration: none;
-            color: #1f2d52;
-            font-weight: 600;
-            font-size: 1.05rem;
-            letter-spacing: 0.4px;
-            padding: 10px 18px;
-            border-radius: 14px;
-            transition: all 0.22s ease;
-            position: relative;
-            background: rgba(255, 255, 255, 0.25);
-        }
-
-        .nav-center a:hover {
-            color: #fff;
-            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(58, 111, 248, 0.25);
-        }
-
-        #user-greeting {
-            color: #1f2d52;
-            font-weight: 700;
-            font-size: 0.9rem;
-            padding: 0 12px;
-            white-space: nowrap;
-        }
-
-        #auth-link {
-            padding: 9px 18px;
-            background: rgba(58, 111, 248, 0.08);
-            color: #1f2f4f;
-            border-radius: 12px;
-            border: 1px solid rgba(58, 111, 248, 0.15);
-            transition: all 0.22s ease;
-            text-decoration: none;
-            font-weight: 500;
-            cursor: pointer;
-            font-size: 0.9rem;
-            display: inline-block;
-        }
-
-        #auth-link:hover {
-            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
-            color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(58, 111, 248, 0.25);
-            border-color: #3a6ff8;
-        }
-
-        #auth-link.logout-btn {
-            color: #d12845 !important;
-            border: 2.2px solid #d12845 !important;
-            background: transparent !important;
-            text-decoration: none;
-            padding: 10px 22px;
-            border-radius: 10px;
-            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        #auth-link.logout-btn:hover {
-            background: #d12845 !important;
-            color: #fff !important;
-            border-color: #d12845;
-            box-shadow: 0 8px 20px rgba(209, 40, 69, 0.25);
-            transform: translateY(-3px);
-        }
-
-        #admin-link {
-            padding: 9px 18px;
-            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
-            color: #fff;
-            border-radius: 12px;
-            border: none;
-            font-weight: 600;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            box-shadow: 0 6px 20px rgba(58, 111, 248, 0.2);
-            transition: all 0.22s ease;
-            text-decoration: none;
-            cursor: pointer;
-            display: inline-block;
-        }
-
-        #admin-link:hover {
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 10px 25px rgba(142, 82, 248, 0.35);
-        }
-
-        .hamburger {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            cursor: pointer;
-            background: none;
-            border: none;
-            padding: 8px;
-            transition: all 0.2s ease;
-        }
-
-        @media (min-width: 768px) {
-            .hamburger {
-                display: none;
-            }
-        }
-
-        .hamburger span {
-            width: 24px;
-            height: 2px;
-            background: #1f2d52;
-            border-radius: 2px;
-            transition: all 0.3s ease;
-        }
-
-        .hamburger.active span:nth-child(1) {
-            transform: rotate(45deg) translate(8px, 8px);
-        }
-
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -7px);
-        }
-
-        /* Mobile menu */
-        .mobile-menu {
-            display: none;
-            position: fixed;
-            top: 70px;
-            left: 0;
-            right: 0;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(248, 250, 255, 0.95) 100%);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(200, 210, 230, 0.3);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-            flex-direction: column;
-            padding: 16px;
-            gap: 8px;
-            z-index: 999;
-            max-height: calc(100vh - 70px);
-            overflow-y: auto;
-            animation: slideDown 0.25s ease forwards;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .mobile-menu.active {
-            display: flex;
-        }
-
-        .mobile-menu a {
-            display: block;
-            padding: 12px 16px;
-            text-decoration: none;
-            color: #1f2d52;
-            font-weight: 500;
-            border-radius: 12px;
-            transition: all 0.22s ease;
-            background: rgba(255, 255, 255, 0.4);
-            border: 1px solid rgba(58, 111, 248, 0.1);
-        }
-
-        .mobile-menu a:hover {
-            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
-            color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(58, 111, 248, 0.2);
-            border-color: #3a6ff8;
-        }
-
-        #auth-link-mobile {
-            padding: 12px 16px;
-            background: rgba(58, 111, 248, 0.08);
-            border-radius: 12px;
-            text-decoration: none;
-            color: #1f2d52;
-            font-weight: 500;
-            transition: all 0.22s ease;
-            display: block;
-            border: 1px solid rgba(58, 111, 248, 0.15);
-        }
-
-        #auth-link-mobile:hover {
-            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
-            color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(58, 111, 248, 0.25);
-        }
-
-        #auth-link-mobile.logout-btn {
-            background: rgba(209, 40, 69, 0.08) !important;
-            color: #d12845 !important;
-            border: 1px solid rgba(209, 40, 69, 0.2) !important;
-        }
-
-        #auth-link-mobile.logout-btn:hover {
-            background: #d12845 !important;
-            color: #fff !important;
-            border-color: #d12845 !important;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(209, 40, 69, 0.25);
-        }
-
-        #admin-link-mobile {
-            display: block;
-            padding: 12px 16px;
-            background: linear-gradient(135deg, #3a6ff8, #8e52f8);
-            color: #fff;
-            text-decoration: none;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            box-shadow: 0 6px 20px rgba(58, 111, 248, 0.15);
-            transition: all 0.22s ease;
-        }
-
-        #admin-link-mobile:hover {
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 10px 25px rgba(142, 82, 248, 0.35);
-        }
-
-        @media (max-width: 768px) {
-            .nav-center {
-                display: none;
-            }
-        }
-    </style>
-</head>
-<body data-light-nav="true">
-    <nav class="premium-navbar" id="navbar">
-        <div class="navbar-container">
-            <div class="navbar-left">
-                <a href="index.html" class="navbar-logo">
-                    <img src="logo.PNG" alt="Muthupura.lk" class="navbar-logo-img">
-                    <span class="navbar-brand-text">Muthupura.lk</span>
-                </a>
-            </div>
-
-            <div class="navbar-center" id="navbar-center">
-                <a href="index.html" class="nav-link" data-page="home">Home</a>
-                <a href="post.html" class="nav-link" data-page="post">Post Ad</a>
-                <a href="dashboard.html" class="nav-link" id="mylistings-link" data-page="dashboard" style="display:none;">My Listings</a>
-                <a href="about.html" class="nav-link" data-page="about">About Us</a>
-                <a href="contact.html" class="nav-link" data-page="contact">Contact Us</a>
-            </div>
-
-            <div class="navbar-right">
-                <span id="user-greeting" class="user-greeting"></span>
-                <a href="login.html" class="nav-link-auth" id="auth-link">Login</a>
-                <a href="admin.html" class="nav-link-admin" id="admin-link" style="display:none;">Admin</a>
-            </div>
-
-            <button class="hamburger-menu" id="hamburger-btn" aria-label="Toggle menu">
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-            </button>
-        </div>
-    </nav>
-
-    <div class="mobile-menu-dropdown" id="mobile-menu">
-        <a href="index.html" class="mobile-menu-link" data-page="home">Home</a>
-        <a href="post.html" class="mobile-menu-link" data-page="post">Post Ad</a>
-        <a href="dashboard.html" class="mobile-menu-link" id="mylistings-link-mobile" data-page="dashboard" style="display:none;">My Listings</a>
-        <a href="about.html" class="mobile-menu-link" data-page="about">About Us</a>
-        <a href="contact.html" class="mobile-menu-link" data-page="contact">Contact Us</a>
-        <div class="mobile-menu-divider"></div>
-        <a href="login.html" class="mobile-menu-link mobile-menu-auth" id="auth-link-mobile">Login</a>
-        <a href="admin.html" class="mobile-menu-link mobile-menu-admin" id="admin-link-mobile" style="display:none;">Admin</a>
-    </div>
-
-    <div class="container" style="margin-top: 100px;">
-
-        <section class="section-head">
-            <div>
-                <h2>Seller Dashboard</h2>
-                <small>Manage your listings and update your vehicle inventory quickly.</small>
-            </div>
-            <div>
-                <button id="refreshBtn" class="btn primary">Refresh</button>
-            </div>
-        </section>
-
-        <div class="stats">
-            <div class="stat"><h3>Total Listings</h3><p id="total-listings">0</p></div>
-            <div class="stat"><h3>Total Views</h3><p id="total-views">0</p></div>
-            <div class="stat"><h3>Featured</h3><p id="total-featured">0</p></div>
-        </div>
-
-        <section class="section-head"><h2>Your Vehicles</h2></section>
-        <div id="vehicle-list" class="vehicle-grid"></div>
-        <div id="empty" class="empty" style="display:none;">No vehicles yet. Use Post Ad to add your first listing.</div>
-    </div>
-
-    <script src="config.js"></script>
-    <script>
-        const API_URL = API_BASE_URL;
-        console.log('📡 Using API URL:', API_URL);
-        const FALLBACK_IMAGE = '/logo.PNG';
-        const getEl = (id) => document.getElementById(id);
-
-        function getTokenPayload() {
-            const token = localStorage.getItem('token');
-            if (!token) return null;
-            try { return JSON.parse(atob(token.split('.')[1])); } catch { return null; }
-        }
-
-        async function updateNavigation() {
-            try {
-                let payload = getTokenPayload();
-                const authLink = getEl('auth-link');
-                const adminLink = getEl('admin-link');
-                const myListings = getEl('mylistings-link');
-                const userGreeting = getEl('user-greeting');
-
-                if (!payload || (payload.exp && Date.now() >= payload.exp * 1000)) {
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('userName');
-                    if (userGreeting) userGreeting.classList.remove('show');
-                    payload = null;
-                }
-
-                if (payload && !payload.name) {
-                    try {
-                        const res = await fetch(`${API_URL}/api/profile/me`, {
-                            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                        });
-                        if (res.ok) {
-                            const profile = await res.json();
-                            if (profile.name) {
-                                payload.name = profile.name;
-                            }
-                        }
-                    } catch (err) {
-                        console.warn('Failed to fetch profile', err);
-                    }
-                }
-
-                if (adminLink) {
-                    // Check both role field and is_admin field
-                    const isAdmin = payload?.role === 'admin' || payload?.is_admin === true;
-                    adminLink.style.display = isAdmin ? 'inline-block' : 'none';
-                }
-
-                if (payload) {
-                    if (myListings) myListings.style.display = 'inline-block';
-                    const displayName = payload.name || localStorage.getItem('userName') || payload.email || '';
-                    if (userGreeting) {
-                        // Show only first name to prevent overflow on mobile
-                        const firstName = displayName ? displayName.split(' ')[0] : 'User';
-                        userGreeting.textContent = `Hi, ${firstName}`;
-                        userGreeting.classList.add('show');
-                    }
-                    // Hide brand text on mobile when logged in
-                    const brandText = document.querySelector('.navbar-brand-text');
-                    if (brandText) {
-                        brandText.classList.add('hide-on-mobile-logged-in');
-                    }
-                    if (authLink) {
-                        authLink.textContent = 'Logout';
-                        authLink.classList.add('logout-btn');
-                        authLink.classList.add('hide-on-mobile');
-                        authLink.href = '#';
-                        authLink.onclick = (e) => {
-                            e.preventDefault();
-                            window.performLogout();
-                        };
-                    }
-                } else {
-                    if (myListings) myListings.style.display = 'none';
-                    if (userGreeting) userGreeting.classList.remove('show');
-                    // Show brand text on mobile when not logged in
-                    const brandText = document.querySelector('.navbar-brand-text');
-                    if (brandText) {
-                        brandText.classList.remove('hide-on-mobile-logged-in');
-                    }
-                    if (userGreeting) userGreeting.classList.remove('show');
-                    if (authLink) {
-                        authLink.textContent = 'Login';
-                        authLink.classList.remove('logout-btn');
-                        authLink.href = 'login.html';
-                        authLink.onclick = null;
-                    }
-                }
-                syncMobileAuth();
-            } catch (err) {
-                console.error('Navigation update error:', err);
-            }
-        }
-
-        function syncMobileAuth() {
-            const desktopAuthLink = getEl('auth-link');
-            const mobileAuthLink = getEl('auth-link-mobile');
-            if (desktopAuthLink && mobileAuthLink) {
-                mobileAuthLink.textContent = desktopAuthLink.textContent;
-                mobileAuthLink.href = desktopAuthLink.href;
-                
-                // For logout button, use performLogout function
-                if (desktopAuthLink.classList.contains('logout-btn')) {
-                    mobileAuthLink.onclick = (e) => {
-                        e.preventDefault();
-                        window.performLogout();
-                    };
-                    mobileAuthLink.classList.add('logout-btn');
-                } else {
-                    // For login button, just set href
-                    mobileAuthLink.onclick = null;
-                    mobileAuthLink.classList.remove('logout-btn');
-                }
-            }
-        }
-
-        /**
-         * Get image URL from vehicle data
-         * Images are now stored as Firebase Storage URLs directly
-         */
-        function getImageUrl(images) {
-            try {
-                let imageArray = [];
-                if (typeof images === 'string') {
-                    // Try to parse as JSON array first
-                    try {
-                        imageArray = JSON.parse(images);
-                        // Ensure it's actually an array
-                        if (!Array.isArray(imageArray)) {
-                            imageArray = [images]; // Treat as single image
-                        }
-                    } catch (parseError) {
-                        // If JSON.parse fails, treat as single image URL
-                        imageArray = [images];
-                    }
-                } else if (Array.isArray(images)) {
-                    imageArray = images;
-                }
-                return (imageArray && imageArray[0]) || FALLBACK_IMAGE;
-            } catch (e) {
-                console.warn('⚠️ Failed to parse images:', e.message);
-                return FALLBACK_IMAGE;
-            }
-        }
-
-        function requireLogin() {
-            const payload = getTokenPayload();
-            if (!payload) {
-                window.location.href = 'login.html';
-                return false;
-            }
-            return payload;
-        }
-
-        function isEV(vehicle) {
-            return (vehicle.fuelType || '').toString() === 'Electric';
-        }
-
-        function escapeHtml(text) { return String(text).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c])); }
-
-        function createCard(vehicle) {
-            const card = document.createElement('article');
-            card.className = 'card';
-            const imageUrl = getImageUrl(vehicle.images || vehicle.image);
-            const ev = isEV(vehicle);
-            const featured = Number(vehicle.isFeatured || 0);
-            const location = vehicle.location || 'Unknown';
-
-            card.innerHTML = `
-                <div class="card-top">
-                    <img src="${imageUrl}" alt="${escapeHtml(vehicle.title || 'Vehicle')}" onerror="this.src='/logo.PNG';console.warn('⚠️ Image failed:', this.src);" />
-                    ${featured ? '<span class="card-badge">Featured</span>' : ''}
-                    ${ev ? '<span class="card-badge ev">⚡ EV</span>' : ''}
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title">${escapeHtml(vehicle.title || 'Untitled')}</h3>
-                    <div class="card-meta">
-                        <span>${escapeHtml(vehicle.brand || 'Brand')}</span>
-                        <span>${escapeHtml(vehicle.year || 'Year')}</span>
-                        <span>${escapeHtml(vehicle.fuelType || 'Fuel')}</span>
-                        <span>📍 ${escapeHtml(location)}</span>
-                        <span>${featured ? '⭐ Featured' : 'Normal'}</span>
-                        <span>👁️ ${Number(vehicle.views || 0)}</span>
-                    </div>
-                    <div class="card-actions">
-                        <button class="btn secondary" onclick="handleEdit(${vehicle.id})">Edit</button>
-                        <button class="btn btn-danger" style="background:#e26985;color:#fff;" onclick="handleDelete(${vehicle.id})">Delete</button>
-                    </div>
-                </div>
-            `;
-
-            return card;
-        }
-
-        async function fetchListings() {
-            const payload = requireLogin();
-            if (!payload) return;
-
-            const token = localStorage.getItem('token');
-            const listingContainer = document.getElementById('vehicle-list');
-            listingContainer.innerHTML = '';
-            document.getElementById('empty').style.display = 'none';
-
-            for (let i = 0; i < 6; i++) {
-                const placeholder = document.createElement('div');
-                placeholder.className = 'card';
-                placeholder.style.minHeight = '220px';
-                placeholder.style.opacity = '0.7';
-                placeholder.style.background = 'linear-gradient(90deg, rgba(244,246,252,1) 8%, rgba(233,239,251,1) 18%, rgba(244,246,252,1) 33%)';
-                placeholder.style.backgroundSize = '800px 100px';
-                placeholder.style.animation = 'skeleton-loading 1.2s infinite linear';
-                listingContainer.appendChild(placeholder);
-            }
-
-            try {
-                console.log('Calling API:', API_BASE_URL);
-                const res = await fetch(`${API_URL}/api/vehicles/user/${userId}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                if (!res.ok) throw new Error('Failed to retrieve your vehicles');
-                const vehicles = await res.json();
-
-                listingContainer.innerHTML = '';
-                if (!vehicles.length) {
-                    document.getElementById('empty').style.display = 'block';
-                    document.getElementById('total-listings').textContent = '0';
-                    document.getElementById('total-views').textContent = '0';
-                    document.getElementById('total-featured').textContent = '0';
-                    return;
-                }
-
-                let totalViews = 0;
-                let featuredCount = 0;
-
-                vehicles.forEach(v => {
-                    totalViews += Number(v.views || 0);
-                    featuredCount += Number(v.isFeatured || 0);
-                    listingContainer.appendChild(createCard(v));
-                });
-
-                document.getElementById('total-listings').textContent = String(vehicles.length);
-                document.getElementById('total-views').textContent = String(totalViews);
-                document.getElementById('total-featured').textContent = String(featuredCount);
-            } catch (error) {
-                console.error(error);
-                alert('Unable to load your listings right now. Please try again.');
-            }
-        }
-
-        async function handleDelete(id) {
-            if (!confirm('Delete this vehicle?')) return;
-            const token = localStorage.getItem('token');
-            try {
-                const url = `${API_URL}/api/vehicles/${id}`;
-                console.log('📡 Calling delete API:', url);
-                
-                const res = await fetch(url, { 
-                    method: 'DELETE', 
-                    headers: { Authorization: `Bearer ${token}` } 
-                });
-                
-                if (!res.ok) {
-                    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-                }
-                
-                console.log('✅ Vehicle deleted successfully');
-                await fetchListings();
-            } catch (error) {
-                console.error('❌ Delete error:', error.message);
-                alert(`Could not delete listing: ${error.message}`);
-            }
-        }
-
-        async function handleEdit(id) {
-            const newTitle = prompt('Enter new title (leave blank to keep current):');
-            const newPrice = prompt('Enter new price:');
-            const newBrand = prompt('Enter new brand:');
-            const newYear = prompt('Enter new year:');
-            const newPhone = prompt('Enter contact phone:');
-            const newFuelType = prompt('Enter fuel type (Electric, Petrol, Diesel, Hybrid):');
-
-            const data = {};
-            if (newTitle) data.title = newTitle;
-            if (newPrice) data.price = Number(newPrice);
-            if (newBrand) data.brand = newBrand;
-            if (newYear) data.year = Number(newYear);
-            if (newPhone) data.phone = newPhone;
-            if (newFuelType) data.fuelType = newFuelType;
-
-            if (Object.keys(data).length === 0) return;
-
-            const token = localStorage.getItem('token');
-            try {
-                const url = `${API_URL}/api/vehicles/${id}`;
-                console.log('📡 Calling update API:', url, data);
-                
-                const res = await fetch(url, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                    body: JSON.stringify(data)
-                });
-                
-                if (!res.ok) {
-                    const body = await res.json().catch(() => null);
-                    throw new Error(body?.message || `HTTP ${res.status}: ${res.statusText}`);
-                }
-                
-                console.log('✅ Vehicle updated successfully');
-                alert('Vehicle updated successfully');
-                await fetchListings();
-            } catch (error) {
-                console.error('❌ Update error:', error.message);
-                alert(`Could not update listing: ${error.message}`);
-            }
-        }
-
-        document.getElementById('refreshBtn').onclick = fetchListings;
-
-        function setupHamburgerMenu() {
-            const hamburger = getEl('navbar-hamburger');
-            const mobileMenu = getEl('mobile-menu');
-            if (!hamburger || !mobileMenu) return;
-
-            hamburger.addEventListener('click', () => {
-                hamburger.classList.toggle('active');
-                mobileMenu.classList.toggle('active');
-            });
-
-            mobileMenu.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', () => {
-                    hamburger.classList.remove('active');
-                    mobileMenu.classList.remove('active');
-                });
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            updateNavigation();
-            setupHamburgerMenu();
-            fetchListings();
-        });
-    </script>
-    
-    <!-- Load navbar dynamically -->
-    <script src="js/navbar.js" defer></script>
-    <script src="auth-ui.js"></script>
 </body>
 </html>
