@@ -836,6 +836,485 @@
                 margin: 0;
             }
         }
+
+        /* ===== UPLOAD PROGRESS MODAL ===== */
+        .upload-progress-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 15, 46, 0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+        }
+
+        .upload-progress-modal.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .upload-progress-content {
+            background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.92) 100%);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(79, 110, 247, 0.2);
+            border: 1px solid rgba(79, 110, 247, 0.2);
+            animation: slideInUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header */
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+            gap: 16px;
+        }
+
+        .progress-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-dark);
+            flex: 1;
+            min-width: 0;
+            word-break: break-word;
+        }
+
+        .progress-title i {
+            font-size: 20px;
+            color: var(--accent);
+            animation: float 3s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .progress-percentage {
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(135deg, var(--accent), #8e52f8);
+            padding: 8px 16px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 70px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(79, 110, 247, 0.3);
+        }
+
+        /* Progress Bar */
+        .progress-bar-container {
+            margin-bottom: 28px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(79, 110, 247, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(79, 110, 247, 0.15);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #8e52f8);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 20px rgba(79, 110, 247, 0.5);
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Steps Container */
+        .steps-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            background: rgba(79, 110, 247, 0.05);
+            padding: 16px;
+            border-radius: 12px;
+            overflow-x: auto;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            opacity: 0.5;
+            white-space: nowrap;
+            min-width: max-content;
+        }
+
+        .step-item.active {
+            opacity: 1;
+            background: rgba(79, 110, 247, 0.15);
+        }
+
+        .step-item.completed {
+            opacity: 1;
+            background: rgba(34, 197, 94, 0.15);
+        }
+
+        .step-icon {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(79, 110, 247, 0.2);
+            color: var(--accent);
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .step-item.active .step-icon {
+            background: var(--accent);
+            color: white;
+            animation: pulse 2s ease-in-out infinite;
+            box-shadow: 0 0 16px rgba(79, 110, 247, 0.4);
+        }
+
+        .step-item.completed .step-icon {
+            background: #22c55e;
+            color: white;
+            box-shadow: 0 0 16px rgba(34, 197, 94, 0.3);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .step-details {
+            flex-shrink: 0;
+            min-width: 0;
+        }
+
+        .step-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .step-progress {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+            white-space: nowrap;
+        }
+
+        .step-divider {
+            width: 1px;
+            height: 30px;
+            background: rgba(79, 110, 247, 0.2);
+            flex-shrink: 0;
+        }
+
+        /* Status Message */
+        .progress-status {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 12px;
+            background: rgba(79, 110, 247, 0.08);
+            border-radius: 10px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .progress-status p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin: 0;
+            line-height: 1.5;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        /* Speed Stats */
+        .speed-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(79, 110, 247, 0.1);
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 12px;
+            background: rgba(79, 110, 247, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(79, 110, 247, 0.1);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .stat-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .upload-progress-modal {
+                padding: 12px;
+            }
+
+            .upload-progress-content {
+                padding: 24px;
+                max-width: 100%;
+                width: calc(100% - 24px);
+                border-radius: 16px;
+            }
+
+            .progress-header {
+                flex-direction: row;
+                gap: 12px;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+
+            .progress-title {
+                font-size: 16px;
+                flex: 1;
+                min-width: 0;
+            }
+
+            .progress-title i {
+                font-size: 18px;
+            }
+
+            .progress-percentage {
+                font-size: 14px;
+                padding: 6px 12px;
+                min-width: 60px;
+            }
+
+            .progress-bar-container {
+                margin-bottom: 20px;
+            }
+
+            .progress-bar {
+                height: 8px;
+            }
+
+            .steps-container {
+                gap: 0;
+                padding: 12px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scroll-behavior: smooth;
+            }
+
+            .step-item {
+                flex-shrink: 0;
+                padding: 10px;
+                gap: 8px;
+                font-size: 12px;
+            }
+
+            .step-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 12px;
+            }
+
+            .step-label {
+                font-size: 10px;
+                max-width: 70px;
+            }
+
+            .step-progress {
+                font-size: 10px;
+            }
+
+            .step-divider {
+                display: none;
+            }
+
+            .progress-status {
+                margin-bottom: 16px;
+                padding: 10px;
+            }
+
+            .progress-status p {
+                font-size: 12px;
+            }
+
+            .speed-stats {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+                padding-top: 16px;
+            }
+
+            .stat {
+                padding: 10px;
+                gap: 4px;
+            }
+
+            .stat-label {
+                font-size: 10px;
+            }
+
+            .stat-value {
+                font-size: 13px;
+            }
+        }
+
+        /* Small Mobile */
+        @media (max-width: 480px) {
+            .upload-progress-content {
+                padding: 20px;
+                border-radius: 14px;
+            }
+
+            .progress-header {
+                margin-bottom: 16px;
+            }
+
+            .progress-title {
+                font-size: 14px;
+                gap: 8px;
+            }
+
+            .progress-title i {
+                font-size: 16px;
+            }
+
+            .progress-percentage {
+                font-size: 12px;
+                padding: 4px 10px;
+                min-width: 55px;
+            }
+
+            .progress-bar {
+                height: 6px;
+            }
+
+            .steps-container {
+                gap: 0;
+                padding: 10px;
+                margin-bottom: 18px;
+            }
+
+            .step-item {
+                padding: 8px;
+                gap: 6px;
+            }
+
+            .step-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 11px;
+            }
+
+            .step-label {
+                font-size: 9px;
+                max-width: 60px;
+            }
+
+            .step-progress {
+                font-size: 9px;
+            }
+
+            .progress-status {
+                margin-bottom: 14px;
+                padding: 8px;
+            }
+
+            .progress-status p {
+                font-size: 11px;
+                line-height: 1.3;
+            }
+
+            .speed-stats {
+                gap: 10px;
+                padding-top: 14px;
+            }
+
+            .stat {
+                padding: 8px;
+                gap: 3px;
+            }
+
+            .stat-label {
+                font-size: 9px;
+            }
+
+            .stat-value {
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1499,130 +1978,340 @@
             renderImagePreviews();
         };
 
+        // ===== PROGRESS TRACKING SYSTEM =====
+        const ProgressTracker = {
+            startTime: null,
+            totalBytes: 0,
+            uploadedBytes: 0,
+            
+            getModal() {
+                return document.getElementById('uploadProgressModal');
+            },
+            
+            show() {
+                const modal = this.getModal();
+                if (modal) {
+                    modal.classList.add('show');
+                    this.startTime = Date.now();
+                    this.uploadedBytes = 0;
+                }
+            },
+            
+            hide() {
+                const modal = this.getModal();
+                if (modal) modal.classList.remove('show');
+            },
+            
+            updateTitle(title) {
+                const el = document.getElementById('progressTitle');
+                if (el) el.textContent = title;
+            },
+            
+            updateOverallProgress(percent) {
+                const fill = document.getElementById('overallProgressFill');
+                const percentText = document.getElementById('progressPercent');
+                if (fill) fill.style.width = percent + '%';
+                if (percentText) percentText.textContent = Math.round(percent) + '%';
+            },
+            
+            updateStatus(message) {
+                const el = document.getElementById('progressStatus');
+                if (el) el.textContent = message;
+            },
+            
+            updateStepStatus(stepId, count, total) {
+                const countEl = document.getElementById(`${stepId}-count`);
+                const totalEl = document.getElementById(`${stepId}-total`);
+                if (countEl) countEl.textContent = count;
+                if (totalEl) totalEl.textContent = total;
+            },
+            
+            markStepActive(stepId) {
+                document.querySelectorAll('.step-item').forEach(el => el.classList.remove('active', 'completed'));
+                const step = document.getElementById(`step-${stepId}`);
+                if (step) step.classList.add('active');
+            },
+            
+            markStepCompleted(stepId) {
+                const step = document.getElementById(`step-${stepId}`);
+                if (step) {
+                    step.classList.remove('active');
+                    step.classList.add('completed');
+                }
+            },
+            
+            updateSpeed(totalBytes, elapsedMs) {
+                const seconds = elapsedMs / 1000;
+                const speed = (totalBytes / seconds / 1024 / 1024).toFixed(2);
+                const el = document.getElementById('uploadSpeed');
+                if (el) el.textContent = speed + ' MB/s';
+            },
+            
+            updateTimeRemaining(uploadedBytes, totalBytes, elapsedMs) {
+                if (uploadedBytes === 0) return;
+                const ratio = uploadedBytes / totalBytes;
+                const totalTime = elapsedMs / ratio;
+                const remainingTime = Math.round((totalTime - elapsedMs) / 1000);
+                const el = document.getElementById('timeRemaining');
+                if (el) el.textContent = remainingTime + ' s';
+            }
+        };
+
+        // ===== IMAGE COMPRESSION FUNCTION =====
+        async function compressImage(file) {
+            const MAX_SIZE_MB = 3;
+            const MAX_WIDTH = 1920;
+            const MAX_HEIGHT = 1920;
+            const QUALITY = 0.7;
+
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                const reader = new FileReader();
+
+                reader.readAsDataURL(file);
+
+                reader.onload = (event) => {
+                    img.src = event.target.result;
+                };
+
+                img.onload = () => {
+                    let width = img.width;
+                    let height = img.height;
+
+                    // Resize if too large
+                    if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+                        const scale = Math.min(MAX_WIDTH / width, MAX_HEIGHT / height);
+                        width *= scale;
+                        height *= scale;
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    canvas.toBlob(
+                        (blob) => {
+                            if (!blob) {
+                                reject(new Error("Compression failed"));
+                                return;
+                            }
+
+                            // If still too large, reduce quality again
+                            if (blob.size > MAX_SIZE_MB * 1024 * 1024) {
+                                canvas.toBlob(resolve, 'image/jpeg', 0.5);
+                            } else {
+                                resolve(blob);
+                            }
+                        },
+                        'image/jpeg',
+                        QUALITY
+                    );
+                };
+
+                img.onerror = reject;
+            });
+        }
+
         // ===== FIREBASE STORAGE UPLOAD FUNCTION =====
         async function uploadImagesToFirebaseStorage(files, userId) {
-            console.log(`📸 Starting Firebase Storage upload for ${files.length} images...`);
-            console.log(`🔥 Storage info:`, {
-                storageExists: !!storage,
-                bucket: storage ? storage.app.options.storageBucket : 'N/A',
-                projectId: FIREBASE_CONFIG.projectId
-            });
+            console.log(`📸 Starting optimized Firebase Storage upload for ${files.length} images...`);
             
             if (!storage) {
                 throw new Error('Firebase Storage not initialized. Please refresh the page.');
             }
-            
+
+            // Show progress modal
+            ProgressTracker.show();
+            ProgressTracker.updateStepStatus('compress', 0, files.length);
+            ProgressTracker.updateStepStatus('upload', 0, files.length);
+            ProgressTracker.markStepActive('compress');
+            ProgressTracker.updateStatus('Optimizing images for faster upload...');
+
             const imageUrls = [];
             let uploadedCount = 0;
             let failedCount = 0;
-            const UPLOAD_TIMEOUT = 60000; // 60 seconds timeout per image
+            const UPLOAD_TIMEOUT = 60000;
+            const PARALLEL_UPLOADS = 3; // Upload 3 images simultaneously
+
+            // ===== PHASE 1: COMPRESS ALL IMAGES =====
+            console.log(`\n🔄 PHASE 1: Compressing ${files.length} images...`);
+            const compressedFiles = [];
 
             for (let i = 0; i < files.length; i++) {
                 try {
                     const file = files[i];
-                    const timestamp = Date.now();
-                    // Remove spaces from filename to avoid issues
-                    const safeName = file.name.replace(/\s+/g, '_');
-                    const fileName = `vehicles/${userId}/${timestamp}-${i}-${safeName}`;
+                    console.log(`   [${i + 1}/${files.length}] Compressing ${file.name}...`);
                     
-                    console.log(`\n📤 IMAGE ${i + 1}/${files.length}`);
-                    console.log(`   Name: ${file.name}`);
-                    console.log(`   Size: ${(file.size / 1024 / 1024).toFixed(2)} MB`);
-                    console.log(`   Type: ${file.type}`);
-                    console.log(`   Path: ${fileName}`);
+                    let compressedFile = null;
+                    try {
+                        compressedFile = await compressImage(file);
+                        console.log(`   ✅ Compressed: ${(compressedFile.size / 1024 / 1024).toFixed(2)} MB`);
+                    } catch (err) {
+                        console.warn(`   ⚠️ Compression failed, using original...`);
+                        compressedFile = file;
+                    }
                     
-                    // Create storage reference using pre-initialized storage object
-                    const storageRef = storage.ref().child(fileName);
-                    console.log(`📍 Storage reference created`);
+                    compressedFiles.push(compressedFile);
+                    ProgressTracker.updateStepStatus('compress', i + 1, files.length);
+                    const compressPercent = ((i + 1) / files.length) * 30; // Compress = 0-30%
+                    ProgressTracker.updateOverallProgress(compressPercent);
+                    ProgressTracker.updateStatus(`Optimizing images... ${i + 1}/${files.length}`);
                     
-                    // Upload file with timeout protection
-                    const uploadPromise = new Promise((resolve, reject) => {
-                        const startTime = Date.now();
-                        const uploadTask = storageRef.put(file, {
-                            contentType: file.type,
-                            customMetadata: {
-                                uploadedAt: new Date().toISOString(),
-                                uploadedBy: userId
-                            }
-                        });
-                        
-                        let lastProgressTime = Date.now();
-                        let lastProgress = 0;
-                        
-                        // Track upload progress
-                        uploadTask.on(
-                            'state_changed',
-                            (snapshot) => {
-                                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                                const state = snapshot.state;
-                                lastProgressTime = Date.now();
-                                
-                                // Log every 20% or state change
-                                if (Math.abs(progress - lastProgress) >= 20 || state !== 'running') {
-                                    console.log(`   🔄 State: ${state}, Progress: ${progress.toFixed(1)}%`);
-                                    lastProgress = progress;
-                                }
-                            },
-                            (error) => {
-                                const elapsed = Date.now() - startTime;
-                                console.error(`❌ UPLOAD ERROR after ${elapsed}ms:`);
-                                console.error(`   Code: ${error.code}`);
-                                console.error(`   Message: ${error.message}`);
-                                console.error(`   Full error:`, error);
-                                reject(error);
-                            },
-                            () => {
-                                const elapsed = Date.now() - startTime;
-                                console.log(`✅ Upload completed in ${elapsed}ms`);
-                                resolve();
-                            }
-                        );
-                        
-                        // Timeout protection
-                        setTimeout(() => {
-                            if (uploadTask.snapshot?.state !== 'success') {
-                                console.warn(`⏱️ UPLOAD TIMEOUT - cancelling after ${UPLOAD_TIMEOUT}ms`);
-                                uploadTask.cancel();
-                                reject(new Error(`Upload timeout after ${UPLOAD_TIMEOUT}ms`));
-                            }
-                        }, UPLOAD_TIMEOUT);
-                    });
-                    
-                    await uploadPromise;
-                    
-                    console.log(`🔗 Getting download URL...`);
-                    
-                    // Get download URL
-                    const downloadURL = await storageRef.getDownloadURL();
-                    console.log(`✅ Download URL: ${downloadURL.substring(0, 60)}...`);
-                    imageUrls.push(downloadURL);
-                    uploadedCount++;
-                    
-                    console.log(`✅ Image ${i + 1}/${files.length} completed`);
-                    
-                } catch (uploadErr) {
-                    console.error(`\n❌ IMAGE ${i + 1} FAILED:`);
-                    console.error(`   Error code: ${uploadErr.code}`);
-                    console.error(`   Error message: ${uploadErr.message}`);
-                    console.error(`   Full error:`, uploadErr);
+                } catch (err) {
+                    console.error(`   ❌ Error processing image ${i + 1}:`, err);
                     failedCount++;
+                }
+            }
+
+            console.log(`✅ Compression complete. Starting parallel uploads...`);
+
+            // ===== PHASE 2: PARALLEL UPLOADS =====
+            ProgressTracker.markStepCompleted('compress');
+            ProgressTracker.markStepActive('upload');
+            ProgressTracker.updateStepStatus('upload', 0, files.length);
+            ProgressTracker.updateStatus('Uploading images in parallel...');
+            ProgressTracker.updateOverallProgress(30);
+
+            const uploadStartTime = Date.now();
+            let totalBytesForStats = 0;
+            
+            // Calculate total bytes for stats
+            compressedFiles.forEach(f => {
+                totalBytesForStats += f.size;
+            });
+
+            // Process files in batches of 3 for parallel upload
+            for (let i = 0; i < compressedFiles.length; i += PARALLEL_UPLOADS) {
+                const batch = compressedFiles.slice(i, Math.min(i + PARALLEL_UPLOADS, compressedFiles.length));
+                const batchIndices = [];
+                for (let j = i; j < Math.min(i + PARALLEL_UPLOADS, compressedFiles.length); j++) {
+                    batchIndices.push(j);
+                }
+
+                console.log(`\n📤 Uploading batch: images ${i + 1}-${Math.min(i + PARALLEL_UPLOADS, compressedFiles.length)}...`);
+
+                // Create upload promises for all files in this batch
+                const uploadPromises = batch.map((file, batchIdx) => {
+                    return new Promise(async (resolve, reject) => {
+                        try {
+                            const fileIndex = i + batchIdx;
+                            const originalFile = files[fileIndex];
+                            const timestamp = Date.now();
+                            const safeName = originalFile.name.replace(/\s+/g, '_');
+                            const fileName = `vehicles/${userId}/${timestamp}-${fileIndex}-${safeName}`;
+                            
+                            const storageRef = storage.ref().child(fileName);
+                            
+                            const uploadTask = storageRef.put(file, {
+                                contentType: originalFile.type,
+                                customMetadata: {
+                                    uploadedAt: new Date().toISOString(),
+                                    uploadedBy: userId
+                                }
+                            });
+
+                            // Track progress for UI updates
+                            uploadTask.on(
+                                'state_changed',
+                                (snapshot) => {
+                                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                                    
+                                    // Update overall progress (30% + 70% for uploads)
+                                    const uploadPhaseProgress = (uploadedCount + batchIdx + (progress / 100)) / files.length * 70;
+                                    const totalProgress = 30 + uploadPhaseProgress;
+                                    ProgressTracker.updateOverallProgress(totalProgress);
+                                    
+                                    // Update stats
+                                    const elapsed = Date.now() - uploadStartTime;
+                                    ProgressTracker.updateSpeed(totalBytesForStats * (totalProgress / 100), elapsed);
+                                    ProgressTracker.updateTimeRemaining(totalBytesForStats * (totalProgress / 100), totalBytesForStats, elapsed);
+                                },
+                                (error) => {
+                                    console.error(`   ❌ Upload error for image ${fileIndex + 1}:`, error);
+                                    reject(error);
+                                },
+                                () => {
+                                    console.log(`   ✅ Upload completed for image ${fileIndex + 1}`);
+                                    // Return both fileIndex and fileName for URL retrieval
+                                    resolve({ fileIndex, fileName });
+                                }
+                            );
+
+                            // Timeout protection
+                            setTimeout(() => {
+                                if (uploadTask.snapshot?.state !== 'success') {
+                                    uploadTask.cancel();
+                                    reject(new Error(`Upload timeout for image ${fileIndex + 1}`));
+                                }
+                            }, UPLOAD_TIMEOUT);
+
+                        } catch (err) {
+                            reject(err);
+                        }
+                    });
+                });
+
+                // Wait for all uploads in this batch to complete
+                const results = await Promise.allSettled(uploadPromises);
+
+                // Process results
+                for (let resultIdx = 0; resultIdx < results.length; resultIdx++) {
+                    const result = results[resultIdx];
+                    const fileIndex = i + resultIdx;
+
+                    if (result.status === 'fulfilled') {
+                        try {
+                            // Use the fileName that was actually used during upload
+                            const { fileName } = result.value;
+                            const storageRef = storage.ref().child(fileName);
+                            
+                            const downloadURL = await storageRef.getDownloadURL();
+                            imageUrls[fileIndex] = downloadURL;
+                            uploadedCount++;
+                            
+                            ProgressTracker.updateStepStatus('upload', uploadedCount, files.length);
+                            ProgressTracker.updateStatus(`Uploaded: ${uploadedCount}/${files.length}`);
+                            console.log(`✅ Got download URL for image ${fileIndex + 1}`);
+                            
+                        } catch (err) {
+                            console.error(`   ❌ Failed to get URL for image ${fileIndex + 1}:`, err);
+                            failedCount++;
+                        }
+                    } else {
+                        console.error(`   ❌ Upload failed for image ${fileIndex + 1}:`, result.reason);
+                        failedCount++;
+                    }
                 }
             }
 
             console.log(`\n📊 UPLOAD SUMMARY:`);
             console.log(`   ✅ Succeeded: ${uploadedCount}`);
             console.log(`   ❌ Failed: ${failedCount}`);
-            console.log(`   🔗 URLs ready: ${imageUrls.length}`);
-            
-            if (uploadedCount === 0) {
-                throw new Error(`All image uploads failed.\n\n📌 TROUBLESHOOTING:\n1. Check Firebase Storage Rules in Console\n2. Ensure rules allow public write\n3. Check browser console for error codes\n4. Verify Firebase Storage bucket exists`);
+
+            // Filter out undefined entries
+            const validUrls = imageUrls.filter(url => url !== undefined);
+
+            if (validUrls.length === 0) {
+                ProgressTracker.hide();
+                throw new Error(`All image uploads failed. Please check your connection and try again.`);
             }
-            
+
             if (failedCount > 0) {
                 console.warn(`⚠️ ${failedCount} image(s) failed, but ${uploadedCount} succeeded`);
             }
-            
-            return imageUrls;
+
+            // Mark upload as complete and move to listing creation
+            ProgressTracker.markStepCompleted('upload');
+            ProgressTracker.markStepActive('listing');
+            ProgressTracker.updateOverallProgress(95);
+            ProgressTracker.updateStatus('Creating your listing...');
+            ProgressTracker.updateTitle('Almost Done!');
+
+            return validUrls;
         }
 
         // ===== FORM SUBMISSION =====
@@ -1722,6 +2411,7 @@
                     !formValues.condition || !formValues.make || !formValues.model || !formValues.year || 
                     !formValues.price || !formValues.transmission || !formValues.fuel_type || !formValues.mileage) {
                     console.error('❌ Missing required fields:', formValues);
+                    ProgressTracker.hide();
                     alert('Please fill in all required fields');
                     return;
                 }
@@ -1759,6 +2449,8 @@
                     console.error('   Status:', response.status);
                     console.error('   Content-type:', contentType);
                     console.error('   Response text (first 500 chars):', responseText.substring(0, 500));
+                    
+                    ProgressTracker.hide();
                     
                     if (response.status === 404) {
                         alert(`❌ API Endpoint Not Found (404)\n\n` +
@@ -1799,12 +2491,25 @@
                     }
                     
                     console.error('❌ Error message:', errorMsg);
+                    ProgressTracker.hide();
                     alert(`❌ Cannot post vehicle:\n\n${errorMsg}`);
                     return;
                 }
 
                 if (result.success) {
                     console.log(`✅ Vehicle posted successfully! ID: ${result.vehicleId}`);
+                    
+                    // Show success state in progress modal
+                    ProgressTracker.markStepCompleted('listing');
+                    ProgressTracker.updateOverallProgress(100);
+                    ProgressTracker.updateTitle('✅ Success!');
+                    ProgressTracker.updateStatus('Your vehicle has been posted successfully!');
+                    
+                    // Hide after a brief moment
+                    setTimeout(() => {
+                        ProgressTracker.hide();
+                    }, 1500);
+                    
                     getEl('successMessage').style.display = 'flex';
                     getEl('postVehicleForm').reset();
                     selectedFiles = [];
@@ -1815,12 +2520,14 @@
                     }, 2000);
                 } else {
                     console.error('❌ API returned error:', result.message);
+                    ProgressTracker.hide();
                     alert(`Error: ${result.message}`);
                 }
             } catch (error) {
                 console.error('❌ Error during vehicle posting:', error);
                 console.error('   Stack:', error.stack);
                 console.error('   Message:', error.message);
+                ProgressTracker.hide();
                 alert('An error occurred: ' + error.message);
 
             } finally {
@@ -1850,6 +2557,78 @@
             });
         }
     </script>
+
+    <!-- ===== PROGRESS MODAL ===== -->
+    <div id="uploadProgressModal" class="upload-progress-modal">
+        <div class="upload-progress-content">
+            <!-- Header -->
+            <div class="progress-header">
+                <div class="progress-title">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span id="progressTitle">Uploading Your Vehicle</span>
+                </div>
+                <div class="progress-percentage">
+                    <span id="progressPercent">0%</span>
+                </div>
+            </div>
+
+            <!-- Overall Progress Bar -->
+            <div class="progress-bar-container">
+                <div id="overallProgressBar" class="progress-bar">
+                    <div id="overallProgressFill" class="progress-fill"></div>
+                </div>
+            </div>
+
+            <!-- Step Tracker -->
+            <div class="steps-container">
+                <div class="step-item active" id="step-compress">
+                    <div class="step-icon"><i class="fas fa-image"></i></div>
+                    <div class="step-details">
+                        <div class="step-label">Optimizing Images</div>
+                        <div class="step-progress"><span id="compress-count">0</span>/<span id="compress-total">0</span></div>
+                    </div>
+                </div>
+
+                <div class="step-divider"></div>
+
+                <div class="step-item" id="step-upload">
+                    <div class="step-icon"><i class="fas fa-upload"></i></div>
+                    <div class="step-details">
+                        <div class="step-label">Uploading</div>
+                        <div class="step-progress"><span id="upload-count">0</span>/<span id="upload-total">0</span></div>
+                    </div>
+                </div>
+
+                <div class="step-divider"></div>
+
+                <div class="step-item" id="step-listing">
+                    <div class="step-icon"><i class="fas fa-list"></i></div>
+                    <div class="step-details">
+                        <div class="step-label">Creating Listing</div>
+                        <div class="step-progress"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Message -->
+            <div class="progress-status">
+                <p id="progressStatus">Starting upload...</p>
+            </div>
+
+            <!-- Speed Stats -->
+            <div class="speed-stats">
+                <div class="stat">
+                    <span class="stat-label">Speed:</span>
+                    <span class="stat-value" id="uploadSpeed">-- MB/s</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Time Remaining:</span>
+                    <span class="stat-value" id="timeRemaining">-- s</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="auth-ui.js"></script>
     <script src="js/navbar.js" defer></script>
 </body>

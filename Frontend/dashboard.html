@@ -338,10 +338,10 @@
         .listing-title { font-size: 1.2rem; font-weight: 700; color: #1f2f4f; margin: 0; }
         .listing-actions { display: flex; gap: 10px; margin-top: auto; }
         .btn-action { flex: 1; padding: 11px 14px; border: none; border-radius: 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
-        .btn-view { background: linear-gradient(135deg, rgba(79,110,247,0.15), rgba(142,82,248,0.1)); color: var(--accent); border: 1px solid rgba(79,110,247,0.3); }
-        .btn-view:hover { background: linear-gradient(135deg, rgba(79,110,247,0.25), rgba(142,82,248,0.15)); border-color: var(--accent); transform: translateY(-2px); }
-        .btn-edit { background: linear-gradient(135deg, rgba(79,110,247,0.2), #8e52f8); color: white; border: 1px solid rgba(79,110,247,0.3); box-shadow: 0 4px 12px rgba(79,110,247,0.15); }
-        .btn-edit:hover { background: linear-gradient(135deg, var(--accent), #8e52f8); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(79,110,247,0.25); }
+        .btn-sold { background: rgba(34,197,94,0.12); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+        .btn-sold:hover { background: #22c55e; color: white; border-color: #22c55e; transform: translateY(-2px); }
+        .btn-edit { background: rgba(79,110,247,0.12); color: var(--accent); border: 1px solid rgba(79,110,247,0.3); }
+        .btn-edit:hover { background: var(--accent); color: white; border-color: var(--accent); transform: translateY(-2px); }
         .btn-delete { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
         .btn-delete:hover { background: #ef4444; color: white; border-color: #ef4444; transform: translateY(-2px); }
         .empty-state-wrapper { animation: fadeIn 0.6s ease-out; }
@@ -464,42 +464,203 @@
         </div>
     </div>
 
+    <!-- Footer -->
     <footer class="premium-footer">
         <div class="footer-container">
+            <!-- Newsletter Section -->
             <div class="newsletter-section">
                 <h4>✉️ Subscribe to Our Newsletter</h4>
-                <p>Get the latest updates delivered to your inbox</p>
+                <p>Get the latest vehicles, exclusive deals, and marketplace updates delivered to your inbox</p>
                 <form class="newsletter-form" onsubmit="event.preventDefault(); handleNewsletterSubmit(event);">
-                    <input type="email" placeholder="Enter your email" required>
+                    <input type="email" placeholder="Enter your email address" required>
                     <button type="submit">Subscribe</button>
                 </form>
             </div>
+
+            <!-- Main Footer Content -->
             <div class="footer-content">
-                <div class="footer-col">
-                    <h3>Muthupura.lk</h3>
-                    <p>Your trusted vehicle marketplace</p>
+                <!-- Brand Section -->
+                <div class="footer-col footer-brand-section" id="footer-brand">
+                    <div class="footer-logo">
+                        <img src="logo.PNG" alt="Muthupura.lk">
+                        <span>Muthupura.lk</span>
+                    </div>
+                    <p class="footer-description">Your trusted marketplace to buy, sell and lease vehicles with complete transparency, speed, and security. Sri Lanka's #1 vehicle marketplace.</p>
+                    <div class="social-links">
+                        <a href="https://facebook.com" title="Facebook" aria-label="Facebook" class="social-icon">f</a>
+                        <a href="https://twitter.com" title="Twitter" aria-label="Twitter" class="social-icon">𝕏</a>
+                        <a href="https://instagram.com" title="Instagram" aria-label="Instagram" class="social-icon">📷</a>
+                        <a href="https://linkedin.com" title="LinkedIn" aria-label="LinkedIn" class="social-icon">in</a>
+                    </div>
                 </div>
-                <div class="footer-col">
-                    <h3>Navigation</h3>
-                    <a href="index.html">Home</a>
-                    <a href="post.html">Post Ad</a>
-                    <a href="about.html">About Us</a>
+
+                <!-- Quick Navigation -->
+                <div class="footer-col" id="footer-navigation">
+                    <button class="footer-col-header" data-mobile-toggle="footer-navigation">
+                        <h3>🏠 Quick Navigation</h3>
+                        <span class="toggle-icon">+</span>
+                    </button>
+                    <div class="footer-col-content">
+                        <a href="index.html">Home</a>
+                        <a href="post.html">Post an Ad</a>
+                        <a href="dashboard.html">My Dashboard</a>
+                        <a href="about.html">About Us</a>
+                        <a href="contact.html">Contact Us</a>
+                    </div>
                 </div>
-                <div class="footer-col">
-                    <h3>Support</h3>
-                    <p>Email: info@muthupura.lk</p>
-                    <p>Phone: +94 777 150 660</p>
+
+                <!-- Services -->
+                <div class="footer-col" id="footer-services">
+                    <button class="footer-col-header" data-mobile-toggle="footer-services">
+                        <h3>🚗 Services</h3>
+                        <span class="toggle-icon">+</span>
+                    </button>
+                    <div class="footer-col-content">
+                        <a href="#">Buy Vehicles</a>
+                        <a href="#">Sell Vehicles</a>
+                        <a href="#">Lease Vehicles</a>
+                        <a href="#">Vehicle Inspection</a>
+                        <a href="#">Financing Options</a>
+                    </div>
+                </div>
+
+                <!-- Support & Info -->
+                <div class="footer-col" id="footer-support">
+                    <button class="footer-col-header" data-mobile-toggle="footer-support">
+                        <h3>📞 Contact & Support</h3>
+                        <span class="toggle-icon">+</span>
+                    </button>
+                    <div class="footer-col-content">
+                        <p><strong>Phone:</strong><br><a href="tel:+94777150660">+94 777 150 660</a></p>
+                        <p><strong>WhatsApp:</strong><br><a href="https://wa.me/94777150660">Message Us</a></p>
+                        <p><strong>Email:</strong><br><a href="mailto:info@muthupura.lk">info@muthupura.lk</a></p>
+                    </div>
                 </div>
             </div>
+
+            <!-- Divider -->
             <div class="footer-divider"></div>
+
+            <!-- Footer Bottom -->
             <div class="footer-bottom">
-                <span>© 2026 Muthupura.lk – All rights reserved</span>
+                <span>© 2026 Muthupura.lk – All rights reserved | Developed with ❤️</span>
+                <div class="footer-bottom-links">
+                    <a href="privacy-policy.html">Privacy Policy</a>
+                    <a href="terms-and-conditions.html">Terms of Service</a>
+                    <a href="cookie-policy.html">Cookie Policy</a>
+                </div>
             </div>
         </div>
     </footer>
 
     <script src="auth-ui.js"></script>
     <script src="js/navbar.js" defer></script>
+    <script>
+        // Footer Mobile Collapsible Functionality
+        function initFooterCollapsibles() {
+            const isMobile = window.innerWidth <= 640;
+            const toggles = document.querySelectorAll('[data-mobile-toggle]');
+            
+            toggles.forEach(btn => {
+                // Remove old listener if it exists by cloning
+                const clone = btn.cloneNode(true);
+                btn.replaceWith(clone);
+                
+                // Add fresh listener
+                clone.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const targetId = this.dataset.mobileToggle;
+                    const target = document.getElementById(targetId);
+                    if (!target) return;
+                    
+                    const content = target.querySelector('.footer-col-content');
+                    const icon = this.querySelector('.toggle-icon');
+                    if (!content || !icon) return;
+                    
+                    content.classList.toggle('active');
+                    icon.textContent = content.classList.contains('active') ? '−' : '+';
+                });
+            });
+            
+            // Initialize state based on screen size
+            document.querySelectorAll('[data-mobile-toggle]').forEach(btn => {
+                const targetId = btn.dataset.mobileToggle;
+                const target = document.getElementById(targetId);
+                if (!target) return;
+                const content = target.querySelector('.footer-col-content');
+                const icon = btn.querySelector('.toggle-icon');
+                if (!content || !icon) return;
+                
+                if (isMobile) {
+                    // On mobile: close all by default
+                    content.classList.remove('active');
+                    icon.textContent = '+';
+                } else {
+                    // On desktop: open all
+                    content.classList.add('active');
+                    icon.textContent = '−';
+                }
+            });
+        }
+
+        // Newsletter Submission Handler
+        function handleNewsletterSubmit(event) {
+            const email = event.target.querySelector('input[type="email"]').value;
+            showFooterNotification('Thank you for subscribing! 📧', 'success');
+            event.target.reset();
+        }
+
+        // Footer Notification Toast
+        function showFooterNotification(message, type = 'info') {
+            let notification = document.getElementById('footer-notification');
+            if (!notification) {
+                notification = document.createElement('div');
+                notification.id = 'footer-notification';
+                notification.style.cssText = `
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    max-width: 300px;
+                    padding: 14px 18px;
+                    border-radius: 10px;
+                    font-weight: 600;
+                    z-index: 9999;
+                    animation: slideInRight 0.4s ease;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+                    font-family: 'Poppins', sans-serif;
+                    font-size: 0.9rem;
+                `;
+                document.body.appendChild(notification);
+            }
+
+            notification.textContent = message;
+            notification.style.backgroundColor = type === 'success' ? '#22c55e' : (type === 'error' ? '#ef4444' : '#3b82f6');
+            notification.style.color = 'white';
+            notification.style.display = 'block';
+
+            clearTimeout(notification.timeout);
+            notification.timeout = setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.4s ease';
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                    notification.style.animation = 'slideInRight 0.4s ease';
+                }, 400);
+            }, 3000);
+        }
+
+        // Initialize on DOM ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initFooterCollapsibles);
+        } else {
+            initFooterCollapsibles();
+        }
+
+        // Re-initialize on window resize to handle responsive changes
+        window.addEventListener('resize', initFooterCollapsibles);
+    </script>
+
     <script>
         let deleteVehicleId = null;
         const ANIMATION_DELAY = 200; // Milliseconds between card animations
@@ -673,7 +834,7 @@
 
             // Render listings with staggered animation
             const listingsHTML = vehicles.map((v, index) => `
-                <div class="listing-card" style="animation-delay: ${index * 50}ms;">
+                <div class="listing-card" style="animation-delay: ${index * 50}ms; cursor: pointer;" onclick="viewVehicle('${v.id}')">
                     <div class="listing-image-container">
                         ${v.images?.[0] ? `<img src="${v.images[0]}" class="listing-image" alt="${v.title}">` : `<div style="font-size: 3.5rem; color: var(--accent); opacity: 0.3; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">🚗</div>`}
                     </div>
@@ -683,9 +844,9 @@
                             ${v.year} • ${(v.mileage || 0).toLocaleString()} km • ${v.transmission || 'N/A'}
                         </p>
                         <div class="listing-actions">
-                            <a href="vehicle.html?id=${v.id}" class="btn-action btn-view">👁️ View</a>
-                            <button class="btn-action btn-edit" onclick="location.href='post.html?edit=${v.id}'">✏️ Edit</button>
-                            <button class="btn-action btn-delete" onclick="openDeleteModal('${v.id}')">🗑️ Delete</button>
+                            <button class="btn-action btn-sold" onclick="event.stopPropagation(); markVehicleAsSold('${v.id}')">✅ Sold</button>
+                            <button class="btn-action btn-edit" onclick="event.stopPropagation(); location.href='post.html?edit=${v.id}'">✏️ Edit</button>
+                            <button class="btn-action btn-delete" onclick="event.stopPropagation(); openDeleteModal('${v.id}')">🗑️ Delete</button>
                         </div>
                     </div>
                 </div>
@@ -742,9 +903,16 @@
                 
                 const data = await res.json();
                 console.log(`✅ Delete Response:`, data);
+                console.log(`📸 Images deleted from storage: ${data.imagesDeleted || 0}`);
+                if (data.imageErrorDetails && data.imageErrorDetails.length > 0) {
+                    console.warn(`⚠️ Image deletion errors:`, data.imageErrorDetails);
+                }
                 
                 closeDeleteModal();
-                showNotification('✅ Listing deleted successfully', 'success', 3000);
+                const msg = data.imagesDeleted > 0 
+                    ? `✅ Listing deleted + ${data.imagesDeleted} images removed from storage` 
+                    : `✅ Listing deleted (no images to remove)`;
+                showNotification(msg, 'success', 3000);
                 
                 // Reload with a small delay for smooth transition
                 setTimeout(() => loadDashboardData(), 400);
@@ -754,6 +922,58 @@
                 deleteBtn.disabled = false;
                 deleteBtn.textContent = "Delete";
                 deleteBtn.style.opacity = '1';
+            }
+        }
+
+        // 🎯 Navigate to vehicle details page
+        function viewVehicle(vehicleId) {
+            console.log(`👁️ Viewing vehicle: ${vehicleId}`);
+            window.location.href = `vehicle.html?id=${vehicleId}`;
+        }
+
+        // ✅ Mark vehicle as sold
+        async function markVehicleAsSold(vehicleId) {
+            console.log(`✅ Marking vehicle as sold: ${vehicleId}`);
+            
+            if (!confirm('Are you sure you want to mark this vehicle as sold? This will remove it from your active listings.')) {
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem("authToken") || localStorage.getItem("token");
+                const deleteUrl = `${API_BASE}/api/vehicles/${vehicleId}`;
+                
+                console.log(`📡 Marking as sold: ${deleteUrl}`);
+                
+                const res = await fetch(deleteUrl, { 
+                    method: "DELETE", 
+                    headers: { "Authorization": `Bearer ${token}` } 
+                });
+                
+                console.log(`📡 Response Status: ${res.status}`);
+                
+                if (!res.ok) {
+                    const error = await res.json();
+                    throw new Error(error.error || "Failed to mark as sold");
+                }
+                
+                const data = await res.json();
+                console.log(`✅ Vehicle marked as sold:`, data);
+                console.log(`📸 Images deleted from storage: ${data.imagesDeleted || 0}`);
+                if (data.imageErrorDetails && data.imageErrorDetails.length > 0) {
+                    console.warn(`⚠️ Image deletion errors:`, data.imageErrorDetails);
+                }
+                
+                const msg = data.imagesDeleted > 0 
+                    ? `✅ Sold + ${data.imagesDeleted} images removed from storage` 
+                    : `✅ Marked as sold (no images to remove)`;
+                showNotification(msg, 'success', 3000);
+                
+                // Reload dashboard to update the active count
+                setTimeout(() => loadDashboardData(), 400);
+            } catch (err) { 
+                console.error("❌ Error marking as sold:", err.message);
+                showNotification('❌ Failed to mark as sold. Please try again.', 'error', 4000);
             }
         }
 

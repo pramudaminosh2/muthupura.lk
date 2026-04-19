@@ -1,11 +1,13 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    // Allow users to upload to their own vehicle folder
+    // Allow users to upload, read, and DELETE their own vehicle images
     match /vehicles/{userId}/{allPaths=**} {
-      // Only authenticated users can write to their own folder
+      // Authenticated users can write (upload/delete) to their own folder
       allow write: if request.auth.uid == userId;
-      // Anyone can read (for image CDN delivery)
+      // Allow delete explicitly (write includes delete, but being explicit for clarity)
+      allow delete: if request.auth.uid == userId;
+      // Anyone can read (for image CDN delivery to public listing pages)
       allow read: if true;
     }
 
@@ -13,6 +15,7 @@ service firebase.storage {
     match /{allPaths=**} {
       allow read: if false;
       allow write: if false;
+      allow delete: if false;
     }
   }
 }
