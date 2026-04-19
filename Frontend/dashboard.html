@@ -503,6 +503,7 @@
     <script>
         let deleteVehicleId = null;
         const ANIMATION_DELAY = 200; // Milliseconds between card animations
+        const API_BASE = 'https://api-soez2bw2ma-uc.a.run.app'; // Firebase Cloud Functions base URL
 
         document.addEventListener("DOMContentLoaded", () => { 
             loadDashboardData(); 
@@ -551,8 +552,6 @@
                     </div>
                 `;
 
-                // Firebase Cloud Functions base URL
-                const API_BASE = 'https://api-soez2bw2ma-uc.a.run.app';
                 const apiUrl = `${API_BASE}/api/vehicles/user/${userId}`;
                 console.log(`📡 Calling API: ${apiUrl}`);
 
@@ -724,12 +723,25 @@
 
             try {
                 const token = localStorage.getItem("authToken") || localStorage.getItem("token");
-                const res = await fetch(`/api/vehicles/${deleteVehicleId}`, { 
+                console.log(`🗑️ Deleting vehicle: ${deleteVehicleId}`);
+                
+                const deleteUrl = `${API_BASE}/api/vehicles/${deleteVehicleId}`;
+                console.log(`📡 DELETE URL: ${deleteUrl}`);
+                
+                const res = await fetch(deleteUrl, { 
                     method: "DELETE", 
                     headers: { "Authorization": `Bearer ${token}` } 
                 });
                 
-                if (!res.ok) throw new Error("Failed to delete");
+                console.log(`📡 Delete Response Status: ${res.status}`);
+                
+                if (!res.ok) {
+                    const error = await res.json();
+                    throw new Error(error.error || "Failed to delete");
+                }
+                
+                const data = await res.json();
+                console.log(`✅ Delete Response:`, data);
                 
                 closeDeleteModal();
                 showNotification('✅ Listing deleted successfully', 'success', 3000);
@@ -737,7 +749,7 @@
                 // Reload with a small delay for smooth transition
                 setTimeout(() => loadDashboardData(), 400);
             } catch (err) { 
-                console.error(err);
+                console.error("❌ Delete Error:", err.message);
                 showNotification('❌ Failed to delete listing. Please try again.', 'error', 4000);
                 deleteBtn.disabled = false;
                 deleteBtn.textContent = "Delete";
