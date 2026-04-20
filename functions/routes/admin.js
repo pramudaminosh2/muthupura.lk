@@ -24,6 +24,7 @@ const getDb = () => {
  */
 router.get("/users", authenticate, requireAdmin, async (req, res) => {
   try {
+    console.log("📋 Fetching all users for admin...");
     const snapshot = await getDb().collection("users").limit(100).get();
 
     const users = snapshot.docs.map((doc) => {
@@ -35,10 +36,11 @@ router.get("/users", authenticate, requireAdmin, async (req, res) => {
       };
     });
 
+    console.log(`✅ Retrieved ${users.length} users from database`);
     res.json({success: true, users, total: snapshot.size});
   } catch (error) {
-    console.error("Get users error:", error);
-    res.status(500).json({error: error.message});
+    console.error("❌ Get users error:", error.message);
+    res.status(500).json({error: error.message, details: "Failed to fetch users"});
   }
 });
 
@@ -48,6 +50,7 @@ router.get("/users", authenticate, requireAdmin, async (req, res) => {
  */
 router.get("/vehicles", authenticate, requireAdmin, async (req, res) => {
   try {
+    console.log("📋 Fetching all vehicles for admin...");
     const snapshot = await getDb().collection("vehicles")
       .orderBy("createdAt", "desc")
       .limit(100)
@@ -58,10 +61,11 @@ router.get("/vehicles", authenticate, requireAdmin, async (req, res) => {
       ...doc.data(),
     }));
 
+    console.log(`✅ Retrieved ${vehicles.length} vehicles from database`);
     res.json({success: true, vehicles, total: snapshot.size});
   } catch (error) {
-    console.error("Get admin vehicles error:", error);
-    res.status(500).json({error: error.message});
+    console.error("❌ Get admin vehicles error:", error.message);
+    res.status(500).json({error: error.message, details: "Failed to fetch vehicles"});
   }
 });
 
@@ -92,6 +96,39 @@ router.put("/vehicle/:id/feature", authenticate, requireAdmin, async (req, res) 
   } catch (error) {
     console.error("Toggle feature error:", error);
     res.status(500).json({error: error.message});
+  }
+});
+
+/**
+ * PUT /api/admin/user/:uid/verify
+ * Verify a seller (set verified flag)
+ */
+router.put("/user/:uid/verify", authenticate, requireAdmin, async (req, res) => {
+  try {
+    const {uid} = req.params;
+    console.log(`✅ Verifying seller: ${uid}`);
+
+    const userDoc = await getDb().collection("users").doc(uid).get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({error: "User not found"});
+    }
+
+    await userDoc.ref.update({
+      verified: true,
+      verifiedAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    console.log(`✅ Seller verified: ${userDoc.data().email}`);
+    res.json({
+      success: true,
+      message: "Seller verified successfully",
+      email: userDoc.data().email,
+    });
+  } catch (error) {
+    console.error("❌ Verify seller error:", error);
+    res.status(500).json({error: error.message, details: "Failed to verify seller"});
   }
 });
 
@@ -142,6 +179,8 @@ router.put("/user/:uid/role", authenticate, requireAdmin, async (req, res) => {
     const {uid} = req.params;
     const {role} = req.body;
 
+    console.log(`🔄 Updating user role for ${uid} to ${role}`);
+
     if (!["user", "admin"].includes(role)) {
       return res.status(400).json({error: "Invalid role"});
     }
@@ -157,13 +196,14 @@ router.put("/user/:uid/role", authenticate, requireAdmin, async (req, res) => {
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
+    console.log(`✅ User role updated: ${userDoc.data().email} to ${role}`);
     res.json({
       success: true,
       message: `User role updated to ${role}`,
     });
   } catch (error) {
-    console.error("Update user role error:", error);
-    res.status(500).json({error: error.message});
+    console.error("❌ Update user role error:", error.message);
+    res.status(500).json({error: error.message, details: "Failed to update user role"});
   }
 });
 
@@ -174,6 +214,7 @@ router.put("/user/:uid/role", authenticate, requireAdmin, async (req, res) => {
 router.delete("/user/:uid", authenticate, requireAdmin, async (req, res) => {
   try {
     const {uid} = req.params;
+    console.log(`🗑️  Starting user deletion process for: ${uid}`);
 
     // Step 1: Get user document
     const userDoc = await getDb().collection("users").doc(uid).get();

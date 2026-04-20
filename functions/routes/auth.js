@@ -267,4 +267,221 @@ router.post("/refresh-token", async (req, res) => {
   }
 });
 
+/**
+ * POST /api/auth/phone-verify
+ * Verify Firebase phone authentication and exchange for JWT
+ */
+router.post("/phone-verify", async (req, res) => {
+  try {
+    const {idToken, uid} = req.body;
+
+    if (!idToken || !uid) {
+      return res.status(400).json({
+        success: false,
+        message: "ID token and UID required"
+      });
+    }
+
+    console.log("🔐 Phone verify request:", {uid});
+
+    // Verify Firebase ID token
+    let decodedToken;
+    try {
+      decodedToken = await admin.auth().verifyIdToken(idToken);
+      console.log("✅ ID token verified:", {uid: decodedToken.uid});
+    } catch (error) {
+      console.error("❌ ID token verification failed:", error.message);
+      return res.status(401).json({
+        success: false,
+        message: "Invalid ID token"
+      });
+    }
+
+    // Ensure UID matches
+    if (decodedToken.uid !== uid) {
+      console.error("❌ UID mismatch:", {expected: decodedToken.uid, provided: uid});
+      return res.status(401).json({
+        success: false,
+        message: "UID mismatch"
+      });
+    }
+
+    // Get user from Firestore
+    const db = getDb();
+    const userRef = db.collection("users").doc(uid);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      // New user
+      console.log("📱 New phone user detected:", {uid});
+      return res.status(200).json({
+        success: true,
+        isNewUser: true,
+        uid,
+        phoneNumber: decodedToken.phone_number
+      });
+    }
+
+    // Existing user - generate JWT
+    const userData = userDoc.data();
+    console.log("👤 Existing phone user:", {uid, name: userData.name});
+
+    const token = jwt.sign(
+      {
+        uid: userData.uid || uid,
+        email: userData.email || "",
+        name: userData.name || "User",
+        role: userData.role || "user"
+      },
+      JWT_SECRET,
+      {expiresIn: "7d"}
+    );
+
+    const refreshToken = jwt.sign(
+      {uid: userData.uid || uid},
+      JWT_REFRESH,
+      {expiresIn: "30d"}
+    );
+
+    res.json({
+      success: true,
+      isNewUser: false,
+      token,
+      refreshToken,
+      user: {
+        uid: userData.uid || uid,
+        email: userData.email || "",
+        name: userData.name || "User",
+        role: userData.role || "user",
+        phoneNumber: userData.phone || decodedToken.phone_number
+      }
+    });
+  } catch (error) {
+    console.error("❌ Phone verify error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Phone verification failed"
+    });
+  }
+});
+
+/**
+ * POST /api/auth/social-login
+ * Exchange Firebase ID token from Google/Facebook for JWT
+ */
+router.post("/social-login", async (req, res) => {
+  try {
+    const {idToken, provider, email, displayName, photoURL} = req.body;
+
+    if (!idToken || !provider) {
+      return res.status(400).json({
+        error: "ID token and provider required"
+      });
+    }
+
+    console.log(`🔐 Social login request: ${provider}`, {email});
+
+    // Verify Firebase ID token
+    let decodedToken;
+    try {
+      decodedToken = await admin.auth().verifyIdToken(idToken);
+      console.log(`✅ ID token verified from ${provider}:`, {uid: decodedToken.uid, email: decodedToken.email});
+    } catch (error) {
+      console.error(`❌ ID token verification failed for ${provider}:`, error.message);
+      return res.status(401).json({
+        error: "Invalid ID token"
+      });
+    }
+
+    const db = getDb();
+    const firebaseUid = decodedToken.uid;
+    const userEmail = decodedToken.email || email;
+    const userName = decodedToken.name || displayName || userEmail.split("@")[0];
+
+    // Find existing user by Firebase UID or email
+    let userDoc;
+    let isNewUser = false;
+
+    // Try to find by Firebase UID first
+    const userByUidQuery = await db.collection("users")
+      .where("firebaseUid", "==", firebaseUid)
+      .get();
+
+    if (!userByUidQuery.empty) {
+      userDoc = userByUidQuery.docs[0];
+      console.log(`👤 Found existing user by Firebase UID:`, {uid: userDoc.id, email: userEmail});
+    } else {
+      // Try to find by email
+      const userByEmailQuery = await db.collection("users")
+        .where("email", "==", userEmail)
+        .get();
+
+      if (!userByEmailQuery.empty) {
+        userDoc = userByEmailQuery.docs[0];
+        console.log(`👤 Found existing user by email:`, {uid: userDoc.id, email: userEmail});
+
+        // Update Firebase UID if not set
+        if (!userDoc.data().firebaseUid) {
+          await userDoc.ref.update({firebaseUid});
+        }
+      } else {
+        // Create new user
+        isNewUser = true;
+        const newUserRef = db.collection("users").doc(firebaseUid);
+
+        await newUserRef.set({
+          email: userEmail,
+          name: userName,
+          firebaseUid: firebaseUid,
+          socialProvider: provider,
+          profileImageUrl: photoURL || "",
+          phone: "",
+          password: "", // No password for social login
+          role: "user",
+          verified: false,
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+
+        userDoc = await newUserRef.get();
+        console.log(`✨ New user created via ${provider}:`, {uid: userDoc.id, email: userEmail});
+      }
+    }
+
+    const userData = userDoc.data();
+
+    // Create JWT
+    const token = jwt.sign(
+      {
+        uid: userDoc.id,
+        email: userData.email,
+        name: userData.name,
+        role: userData.role || "user",
+        provider: provider
+      },
+      JWT_SECRET,
+      {expiresIn: "7d"}
+    );
+
+    res.json({
+      success: true,
+      isNewUser,
+      token,
+      user: {
+        uid: userDoc.id,
+        email: userData.email,
+        name: userData.name,
+        role: userData.role || "user",
+        profileImageUrl: userData.profileImageUrl || "",
+        phone: userData.phone || "",
+      },
+    });
+  } catch (error) {
+    console.error("❌ Social login error:", error.message);
+    res.status(500).json({
+      error: error.message || "Social login failed"
+    });
+  }
+});
+
 module.exports = router;

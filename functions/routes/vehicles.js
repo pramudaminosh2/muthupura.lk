@@ -122,6 +122,90 @@ const deleteImagesFromStorage = async (imageUrls) => {
 const router = express.Router();
 
 /**
+ * GET /api/vehicles
+ * Get all vehicles (default route) - with optional filters and search
+ */
+router.get("/", async (req, res) => {
+  try {
+    const {limit = 100, offset = 0, brand = "", search = "", type = "",
+      fuel = "", transmission = "", minPrice, maxPrice} = req.query;
+
+    let query = getDb().collection("vehicles");
+
+    // Apply filters if provided
+    if (brand) {
+      query = query.where("brand", "==", brand);
+    }
+
+    if (type) {
+      query = query.where("vehicleType", "==", type);
+    }
+
+    if (fuel) {
+      query = query.where("fuelType", "==", fuel);
+    }
+
+    if (transmission) {
+      query = query.where("transmission", "==", transmission);
+    }
+
+    query = query.limit(parseInt(limit) + parseInt(offset));
+
+    const snapshot = await query.get();
+
+    let vehicles = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        location: data.city || data.location || "N/A",
+        featured: data.featured || data.isFeatured || false,
+        isFeatured: data.isFeatured || data.featured || false,
+      };
+    });
+
+    // Client-side filtering for search (since Firestore doesn't support full-text search easily)
+    if (search) {
+      const searchLower = search.toLowerCase();
+      vehicles = vehicles.filter((v) =>
+        (v.title && v.title.toLowerCase().includes(searchLower)) ||
+        (v.brand && v.brand.toLowerCase().includes(searchLower)) ||
+        (v.model && v.model.toLowerCase().includes(searchLower)) ||
+        (v.description && v.description.toLowerCase().includes(searchLower))
+      );
+    }
+
+    // Client-side price filtering
+    if (minPrice) {
+      vehicles = vehicles.filter((v) => v.price >= parseInt(minPrice));
+    }
+    if (maxPrice) {
+      vehicles = vehicles.filter((v) => v.price <= parseInt(maxPrice));
+    }
+
+    // Sort by createdAt descending (newest first)
+    vehicles = vehicles
+      .sort((a, b) => {
+        const dateA = a.createdAt?.toDate?.() || new Date(a.createdAt || 0);
+        const dateB = b.createdAt?.toDate?.() || new Date(b.createdAt || 0);
+        return dateB - dateA;
+      })
+      .slice(parseInt(offset), parseInt(offset) + parseInt(limit));
+
+    console.log(`✅ GET /api/vehicles - Returned ${vehicles.length} vehicles`);
+
+    res.json({
+      success: true,
+      vehicles,
+      total: vehicles.length,
+    });
+  } catch (error) {
+    console.error("❌ Get vehicles error:", error);
+    res.status(500).json({error: error.message});
+  }
+});
+
+/**
  * POST /api/vehicles/add
  * Add new vehicle with image URLs from Firebase Storage
  *

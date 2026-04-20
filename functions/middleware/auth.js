@@ -1,5 +1,6 @@
 const admin = require("firebase-admin");
 const jwt = require("jsonwebtoken");
+const {getFirestore} = require("firebase-admin/firestore");
 
 /**
  * Verify authentication middleware
@@ -67,21 +68,28 @@ async function requireAdmin(req, res, next) {
       return res.status(401).json({error: "Not authenticated"});
     }
 
-    const db = admin.firestore();
+    // ✅ FIX: Use modular SDK to access muthupuralk database
+    const db = getFirestore("muthupuralk");
     const userDoc = await db.collection("users").doc(req.user.uid).get();
 
     if (!userDoc.exists) {
+      console.log("❌ User not found in muthupuralk database:", req.user.uid);
       return res.status(404).json({error: "User not found"});
     }
 
     const userData = userDoc.data();
+    console.log("👤 User role:", userData.role, "for uid:", req.user.uid);
+
     if (userData.role !== "admin") {
+      console.log("❌ User is not admin. Role:", userData.role);
       return res.status(403).json({error: "Admin access required"});
     }
 
+    console.log("✅ Admin access granted for uid:", req.user.uid);
     next();
   } catch (error) {
-    res.status(403).json({error: "Authorization check failed"});
+    console.error("❌ Authorization check failed:", error.message);
+    res.status(403).json({error: "Authorization check failed: " + error.message});
   }
 }
 

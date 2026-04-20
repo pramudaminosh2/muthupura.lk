@@ -17,6 +17,9 @@ const FIREBASE_CONFIG = {
     measurementId: "G-NJVKKR7BXY"
 };
 
+// reCAPTCHA Configuration
+const RECAPTCHA_SITE_KEY = '6Lcg7sAsAAAAAIvdT8Ufa47LdvKzWDZCl5fuAHqh';
+
 // Validation check
 if (!API_BASE_URL || typeof API_BASE_URL !== 'string') {
     console.error('❌ CRITICAL: API_BASE_URL is not properly defined');

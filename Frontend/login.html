@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="shared.css">
     <link rel="stylesheet" href="styles/navbar.css">
     <style>
@@ -97,6 +98,155 @@
         .form-group input:focus { outline: none; background: #ffffff; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.15); }
         .form-group input::placeholder { color: #cbd5e1; }
 
+        /* ===== PASSWORD FIELD WITH TOGGLE ===== */
+        .password-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-input-wrapper input {
+            width: 100%;
+            padding-right: 45px;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 14px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 18px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+        }
+
+        .password-toggle-btn:hover {
+            color: var(--accent);
+            transform: scale(1.1);
+        }
+
+        .password-toggle-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* ===== FORGOT PASSWORD LINK ===== */
+        .forgot-password-link {
+            display: block;
+            text-align: right;
+            margin-top: 8px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--accent);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .forgot-password-link:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+
+        /* ===== FORGOT PASSWORD MODAL ===== */
+        .forgot-password-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .forgot-password-modal.show {
+            display: flex;
+        }
+
+        .forgot-password-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-align: center;
+        }
+
+        .forgot-password-icon {
+            font-size: 48px;
+            color: var(--accent);
+            margin-bottom: 16px;
+        }
+
+        .forgot-password-content h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .forgot-password-content p {
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .contact-info {
+            background: rgba(79, 110, 247, 0.1);
+            border: 1.5px solid rgba(79, 110, 247, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .contact-info p {
+            margin: 8px 0;
+        }
+
+        .contact-phone {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .forgot-password-close {
+            display: block;
+            width: 100%;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--accent), #6366f1);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 16px;
+        }
+
+        .forgot-password-close:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(79, 110, 247, 0.35);
+        }
+
         .btn-primary {
             width: 100%;
             padding: 14px 24px;
@@ -111,6 +261,10 @@
             transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
             box-shadow: 0 4px 20px rgba(79, 110, 247, 0.35);
             margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(79, 110, 247, 0.45); }
@@ -118,12 +272,16 @@
 
         /* Social Login Buttons */
         .social-login {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display: flex;
+            justify-content: center;
             gap: 12px;
             margin-bottom: 24px;
             padding-bottom: 24px;
             border-bottom: 1px solid var(--border-light);
+        }
+        
+        .social-login .social-btn {
+            flex: 0 1 auto;
         }
 
         .social-btn {
@@ -273,6 +431,11 @@
             .newsletter-form { flex-direction: column; }
         }
     </style>
+    <!-- Load Config First -->
+    <script src="config.js"></script>
+    <!-- Firebase Authentication SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 </head>
 <body>
     <!-- Notification Container for Floating Messages -->
@@ -340,10 +503,7 @@
                     <!-- Social Login Buttons -->
                     <div class="social-login">
                         <button type="button" class="social-btn" onclick="loginWithGoogle()">
-                            <span>🔵</span> Google
-                        </button>
-                        <button type="button" class="social-btn" onclick="loginWithFacebook()">
-                            <span>📘</span> Facebook
+                            <i class="fab fa-google"></i> Google
                         </button>
                     </div>
 
@@ -355,35 +515,16 @@
                     </div>
                     <div class="form-group">
                         <label for="loginPassword">Password</label>
-                        <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('loginPassword')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
-                    <button type="submit" class="btn-primary">🔓 Login</button>
+                    <a class="forgot-password-link" onclick="showForgotPasswordModal()">Forgot password?</a>
+                    <button type="submit" class="btn-primary"><i class="fas fa-sign-in-alt"></i> Login</button>
                     <div class="toggle-text">Don't have an account? <a onclick="switchTo('register')">Register here</a></div>
-
-                    <!-- Mobile + VOTP Verification Section -->
-                    <div class="divider"><span>Or Login with Mobile</span></div>
-                    <div class="mobile-login-section">
-                        <div class="form-group">
-                            <label for="mobileNumber">Mobile Number</label>
-                            <div class="mobile-input-group">
-                                <input type="tel" id="mobileNumber" placeholder="+94 77 123 4567">
-                                <button type="button" onclick="sendVotp()">Send VOTP</button>
-                            </div>
-                        </div>
-                        <div id="votpSection" style="display: none;">
-                            <div class="votp-status" id="votpStatus">✅ OTP sent to your mobile</div>
-                            <div class="form-group">
-                                <label>Enter OTP (4 digits)</label>
-                                <div class="otp-group">
-                                    <input type="text" class="otp-input" maxlength="1" placeholder="0" inputmode="numeric">
-                                    <input type="text" class="otp-input" maxlength="1" placeholder="0" inputmode="numeric">
-                                    <input type="text" class="otp-input" maxlength="1" placeholder="0" inputmode="numeric">
-                                    <input type="text" class="otp-input" maxlength="1" placeholder="0" inputmode="numeric">
-                                </div>
-                            </div>
-                            <button type="button" class="btn-primary" onclick="verifyVotp()">✅ Verify VOTP</button>
-                        </div>
-                    </div>
                 </form>
 
                 <!-- REGISTER FORM -->
@@ -391,10 +532,7 @@
                     <!-- Social Login Buttons -->
                     <div class="social-login">
                         <button type="button" class="social-btn" onclick="loginWithGoogle()">
-                            <span>🔵</span> Google
-                        </button>
-                        <button type="button" class="social-btn" onclick="loginWithFacebook()">
-                            <span>📘</span> Facebook
+                            <i class="fab fa-google"></i> Google
                         </button>
                     </div>
 
@@ -414,9 +552,14 @@
                     </div>
                     <div class="form-group">
                         <label for="regPassword">Password</label>
-                        <input type="password" id="regPassword" placeholder="Min 6 characters" required>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="regPassword" placeholder="Min 6 characters" required>
+                            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('regPassword')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
-                    <button type="submit" class="btn-primary">✨ Create Account</button>
+                    <button type="submit" class="btn-primary"><i class="fas fa-wand-magic-sparkles"></i> Create Account</button>
                     <div class="toggle-text">Already have an account? <a onclick="switchTo('login')">Login here</a></div>
                 </form>
 
@@ -429,7 +572,7 @@
         <div class="footer-container">
             <!-- Newsletter Section -->
             <div class="newsletter-section">
-                <h4>✉️ Subscribe to Our Newsletter</h4>
+                <h4><i class="fas fa-envelope"></i> Subscribe to Our Newsletter</h4>
                 <p>Get the latest vehicles, exclusive deals, and marketplace updates delivered to your inbox</p>
                 <form class="newsletter-form" onsubmit="event.preventDefault(); handleNewsletterSubmit(event);">
                     <input type="email" placeholder="Enter your email address" required>
@@ -619,7 +762,6 @@
         window.addEventListener('resize', initFooterCollapsibles);
     </script>
 
-    <script src="config.js"></script>
     <script>
         // Verify API configuration is loaded
         if (!API_BASE_URL || typeof API_BASE_URL !== 'string') {
@@ -667,7 +809,6 @@
         }
 
         function validateEmail(email) { return email.includes('@'); }
-        function validatePhone(phone) { return phone.trim().length >= 10; }
         function validatePassword(password) { return password.length >= 6; }
 
         // ===== SET BUTTON LOADING STATE =====
@@ -683,22 +824,70 @@
             }
         }
 
-        // ===== GOOGLE LOGIN =====
-        function loginWithGoogle() {
-            showNotification('Opening Google login...', 'info');
-            // Integration with Google OAuth (implement based on your backend)
-            setTimeout(() => {
-                showNotification('❌ Google login not yet configured', 'error');
-            }, 1500);
-        }
+        // ===== INITIALIZE FIREBASE =====
+        firebase.initializeApp(FIREBASE_CONFIG);
+        const auth = firebase.auth();
 
-        // ===== FACEBOOK LOGIN =====
-        function loginWithFacebook() {
-            showNotification('Opening Facebook login...', 'info');
-            // Integration with Facebook OAuth (implement based on your backend)
-            setTimeout(() => {
-                showNotification('❌ Facebook login not yet configured', 'error');
-            }, 1500);
+        // ===== GOOGLE LOGIN =====
+        async function loginWithGoogle() {
+            showNotification('🔄 Opening Google login...', 'info', 60000);
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                // Force account selection even if logged in
+                provider.setCustomParameters({ prompt: 'select_account' });
+                
+                const result = await auth.signInWithPopup(provider);
+                console.log('✅ Google sign-in successful:', { user: result.user.email });
+                
+                // Get ID token from Firebase
+                const idToken = await result.user.getIdToken();
+                console.log('✅ ID token obtained from Firebase');
+                
+                // Exchange Firebase ID token for JWT with backend
+                const response = await fetch(`${API_BASE_URL}/api/auth/social-login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        idToken: idToken,
+                        provider: 'google',
+                        email: result.user.email,
+                        displayName: result.user.displayName,
+                        photoURL: result.user.photoURL
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || 'Social login exchange failed');
+                }
+                
+                const data = await response.json();
+                console.log('✅ Backend authentication successful:', { token: !!data.token, user: data.user?.name });
+                
+                if (data.token && data.user) {
+                    // Store auth data
+                    localStorage.setItem('jwt_token', data.token);
+                    localStorage.setItem('user_role', data.user?.role || 'user');
+                    localStorage.setItem('user_name', data.user?.name || result.user.displayName);
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    console.log('✅ Auth data stored successfully');
+                    
+                    // Update navbar
+                    if (typeof window.updateNavbarAuthUI === 'function') {
+                        window.updateNavbarAuthUI();
+                    }
+                    
+                    showNotification(`✅ Welcome, ${data.user.name}!`, 'success', 3000);
+                    setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+                } else {
+                    throw new Error('Invalid response from backend');
+                }
+            } catch (error) {
+                console.error('❌ Google login error:', error.message);
+                showNotification(`❌ Google login failed: ${error.message}`, 'error');
+            }
         }
 
         // ===== EMAIL LOGIN =====
@@ -882,150 +1071,273 @@
                 showNotification(`❌ ${error.message}`, 'error');
             }
         });
+        
+        // Initialize Firebase Auth (Safe initialization with config check)
+        function initializeFirebaseAuth() {
+            try {
+                if (firebaseInitialized) return firebaseAuth;
+                
+                if (typeof FIREBASE_CONFIG === 'undefined') {
+                    throw new Error('FIREBASE_CONFIG not loaded');
+                }
+                
+                console.log('🔐 Initializing Firebase...');
+                firebase.initializeApp(FIREBASE_CONFIG);
+                firebaseAuth = firebase.auth();
+                firebaseInitialized = true;
+                console.log('✅ Firebase Auth initialized');
+                return firebaseAuth;
+            } catch (error) {
+                console.error('❌ Firebase init error:', error.message);
+                throw error;
+            }
+        }
+        
+        // Get auth instance (with initialization)
+        function getAuth() {
+            if (!firebaseInitialized) {
+                return initializeFirebaseAuth();
+            }
+            return firebaseAuth;
+        }
+        
+        // Initialize RecaptchaVerifier
+        function initializeRecaptcha() {
+            try {
+                const auth = getAuth();
+                
+                if (!recaptchaVerifier) {
+                    console.log('� Initializing Firebase RecaptchaVerifier...');
+                    
+                    // Verify container exists
+                    const container = document.getElementById('recaptcha-container');
+                    if (!container) {
+                        throw new Error('reCAPTCHA container element not found');
+                    }
+                    console.log('✅ reCAPTCHA container found in DOM');
+                    
+                    // Create RecaptchaVerifier without explicit site key
+                    // Firebase will automatically configure based on project settings
+                    recaptchaVerifier = new firebase.auth.RecaptchaVerifier(auth, 'recaptcha-container', {
+                        'size': 'invisible',
+                        'callback': (response) => {
+                            console.log('✅ reCAPTCHA verified successfully');
+                        },
+                        'expired-callback': () => {
+                            console.warn('⚠️ reCAPTCHA token expired');
+                            recaptchaVerifier = null;
+                        },
+                        'error-callback': (error) => {
+                            console.error('❌ reCAPTCHA error:', error);
+                            recaptchaVerifier = null;
+                        }
+                    });
+                    
+                    console.log('✅ RecaptchaVerifier initialized successfully');
+                }
+            } catch (error) {
+                console.error('❌ Failed to initialize reCAPTCHA:', error.message);
+                console.error('📍 Error code:', error.code);
+                recaptchaVerifier = null;
+                throw error;
+            }
+        }
+        
 
-        // ===== MOBILE OTP VERIFICATION =====
+        // Send OTP via Firebase Phone Auth
         async function sendVotp() {
             const mobile = document.getElementById('mobileNumber').value.trim();
             const sendBtn = event.target;
+            
             if (!validatePhone(mobile)) { 
                 showNotification('❌ Invalid phone number. Enter 10+ digits', 'error');
                 return; 
             }
 
             setButtonLoading(sendBtn, true);
-            showNotification('⏳ Sending OTP...', 'info', 30000);
+            showNotification('⏳ Sending OTP to your phone...', 'info', 30000);
+            
             try {
-                const url = `${API_BASE_URL}/api/auth/send-verification-email`;
-                console.log('📡 Sending OTP request to:', url, { phone: mobile });
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone: mobile })
-                });
+                const auth = getAuth();
                 
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    let errorMsg = `HTTP ${response.status}`;
-                    
-                    if (response.status === 404) {
-                        errorMsg = 'Server not found. Check your internet connection.';
-                        console.error('❌ 404: Endpoint not found - API_BASE_URL:', API_BASE_URL);
-                    } else if (response.status === 429) {
-                        errorMsg = 'Too many OTP attempts. Please wait 15 minutes.';
-                        console.error('❌ 429: Rate limited');
-                    } else {
-                        errorMsg = errorData.message || response.statusText || 'Failed to send OTP';
-                    }
-                    
-                    throw new Error(errorMsg);
-                }
+                // Convert phone to international format
+                const phoneWithCountry = mobile.startsWith('+') ? mobile : `+94${mobile.replace(/^0/, '')}`;
+                console.log('📱 Sending OTP to:', phoneWithCountry);
                 
-                const data = await response.json();
-                console.log('✅ OTP sent successfully:', { message: data.message });
+                // Create RecaptchaVerifier with hidden container
+                const recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                    'size': 'invisible'
+                }, auth);
                 
-                if (response.ok) {
-                    setButtonLoading(sendBtn, false);
-                    showNotification('✅ OTP sent to your phone!', 'success', 3000);
-                    document.getElementById('votpSection').style.display = 'block';
-                    sendBtn.disabled = true;
-                } else {
-                    setButtonLoading(sendBtn, false);
-                    showNotification(`❌ ${data.message || 'Failed to send OTP'}`, 'error');
-                }
-            } catch (error) {
-                console.error('❌ Send OTP error:', error.message);
+                console.log('🔐 RecaptchaVerifier created, sending OTP...');
+                
+                // Send OTP using correct Firebase compat SDK method
+                const confirmationResult = await auth.signInWithPhoneNumber(phoneWithCountry, recaptchaVerifier);
+                
+                // Store confirmation result for later verification
+                window.confirmationResult = confirmationResult;
+                
+                console.log('✅ OTP sent successfully!');
                 setButtonLoading(sendBtn, false);
-                showNotification(`❌ ${error.message}`, 'error');
+                showNotification('✅ OTP sent to your phone!', 'success', 3000);
+                
+                // Show OTP verification section
+                document.getElementById('votpSection').style.display = 'block';
+                sendBtn.disabled = true;
+                
+                // Store phone for reference
+                sessionStorage.setItem('phoneForAuth', phoneWithCountry);
+                
+            } catch (error) {
+                console.error('❌ Send OTP error:', error);
+                setButtonLoading(sendBtn, false);
+                
+                let errorMsg = 'Failed to send OTP: ' + error.message;
+                if (error.message.includes('too-many-requests')) {
+                    errorMsg = 'Too many OTP requests. Try again later.';
+                } else if (error.message.includes('invalid-phone-number')) {
+                    errorMsg = 'Invalid phone number format.';
+                }
+                
+                showNotification(`❌ ${errorMsg}`, 'error');
+                window.confirmationResult = null; // Reset for retry
             }
         }
 
+        // Verify OTP and Sign In
         async function verifyVotp() {
-            const mobile = document.getElementById('mobileNumber').value.trim();
             const otpInputs = document.querySelectorAll('#votpSection .otp-input');
             const verifyBtn = event.target;
             let otp = '';
             otpInputs.forEach(input => { otp += input.value; });
 
-            if (otp.length !== 4) { 
-                showNotification('❌ Enter all 4 digits of OTP', 'error');
+            if (otp.length !== 6) { 
+                showNotification('❌ Enter all 6 digits of OTP', 'error');
                 return; 
+            }
+
+            if (!window.confirmationResult) {
+                showNotification('❌ OTP verification session expired. Please try again.', 'error');
+                return;
             }
 
             setButtonLoading(verifyBtn, true);
             showNotification('⏳ Verifying OTP...', 'info', 30000);
+            
             try {
-                const url = `${API_BASE_URL}/api/auth/send-verification-email`;
-                console.log('📡 Sending OTP verification request to:', url, { phone: mobile, otpLength: otp.length });
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone: mobile, otp })
+                console.log('🔐 Verifying OTP with Firebase...');
+                
+                // Confirm OTP using the confirmation result from sendVotp
+                const result = await window.confirmationResult.confirm(otp);
+                console.log('✅ Phone authentication successful!', result.user.uid);
+                
+                // Get ID token for backend
+                const idToken = await result.user.getIdToken(true);
+                const isNewUser = result.additionalUserInfo.isNewUser;
+                
+                console.log('📊 Auth result:', { 
+                    uid: result.user.uid, 
+                    isNewUser, 
+                    phoneNumber: result.user.phoneNumber 
                 });
                 
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    let errorMsg = `HTTP ${response.status}`;
-                    
-                    if (response.status === 404) {
-                        errorMsg = 'Server not found. Check your internet connection.';
-                        console.error('❌ 404: Endpoint not found');
-                    } else if (response.status === 429) {
-                        errorMsg = 'Too many verification attempts. Please wait 15 minutes.';
-                        console.error('❌ 429: Rate limited');
-                    } else if (response.status === 401) {
-                        errorMsg = 'Incorrect OTP. Please try again.';
-                    } else {
-                        errorMsg = errorData.message || response.statusText || 'OTP verification failed';
-                    }
-                    
-                    throw new Error(errorMsg);
-                }
+                // Store in sessionStorage
+                sessionStorage.setItem('firebase_uid', result.user.uid);
+                sessionStorage.setItem('firebase_id_token', idToken);
+                sessionStorage.setItem('is_new_user', isNewUser);
                 
-                const data = await response.json();
-                console.log('✅ OTP verified:', { isNewUser: data.isNewUser, hasToken: !!data.token, userName: data.user?.name });
-                
-                if (data.token && data.user) {
-                    // User is registered, log them in
-                    console.log('📊 Storing auth data from OTP:', { userName: data.user.name, role: data.user.role });
-                    
-                    // Store all keys for compatibility
-                    localStorage.setItem('jwt_token', data.token);
-                    localStorage.setItem('user_role', data.user?.role || 'user');
-                    localStorage.setItem('user_name', data.user?.name || 'User');
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    
-                    // Update navbar multiple times
-                    const updateNavbar = () => {
-                        if (typeof window.updateNavbarAuthUI === 'function') {
-                            console.log('🔄 Calling updateNavbarAuthUI (VOTP)...');
-                            window.updateNavbarAuthUI();
-                        }
-                    };
-                    
-                    updateNavbar();
-                    setTimeout(updateNavbar, 10);
-                    setTimeout(updateNavbar, 400);
-                    
-                    setButtonLoading(verifyBtn, false);
-                    showNotification(`✅ Welcome ${data.user.name}! Logging in...`, 'success', 2000);
-                    setTimeout(() => { window.location.href = 'index.html'; }, 1500);
-                } else if (data.isNewUser || data.needsRegistration) {
-                    // New user, redirect to complete profile
-                    setButtonLoading(verifyBtn, false);
-                    showNotification('✅ Welcome! Completing your profile...', 'success', 2000);
-                    localStorage.setItem('temp_mobile', mobile);
-                    localStorage.setItem('temp_otp_verified', 'true');
-                    setTimeout(() => { window.location.href = 'complete-profile.html'; }, 1500);
-                } else {
-                    setButtonLoading(verifyBtn, false);
-                    showNotification(`❌ ${data.message || 'OTP verification failed'}`, 'error');
-                }
-            } catch (error) {
-                console.error('❌ Verify OTP error:', error.message);
                 setButtonLoading(verifyBtn, false);
-                showNotification(`❌ ${error.message}`, 'error');
+                
+                if (isNewUser) {
+                    // New user - redirect to complete profile
+                    showNotification('✅ Welcome! Completing your profile...', 'success', 2000);
+                    setTimeout(() => { 
+                        window.location.href = 'complete-profile.html'; 
+                    }, 1500);
+                } else {
+                    // Existing user - exchange token for JWT and login
+                    try {
+                        console.log('🔄 Exchanging Firebase token for JWT...');
+                        const response = await fetch(`${API_BASE_URL}/api/auth/phone-verify`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ idToken, uid: result.user.uid })
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}`);
+                        }
+                        
+                        const data = await response.json();
+                        console.log('✅ JWT obtained:', { userName: data.user?.name, role: data.user?.role });
+                        
+                        // Store auth data
+                        localStorage.setItem('jwt_token', data.token);
+                        localStorage.setItem('user_role', data.user?.role || 'user');
+                        localStorage.setItem('user_name', data.user?.name || 'User');
+                        localStorage.setItem('token', data.token);
+                        localStorage.setItem('user', JSON.stringify(data.user));
+                        
+                        // Update navbar
+                        const updateNavbar = () => {
+                            if (typeof window.updateNavbarAuthUI === 'function') {
+                                console.log('🔄 Updating navbar (phone auth)...');
+                                window.updateNavbarAuthUI();
+                            }
+                        };
+                        updateNavbar();
+                        setTimeout(updateNavbar, 10);
+                        setTimeout(updateNavbar, 400);
+                        
+                        showNotification(`✅ Welcome back ${data.user?.name}!`, 'success', 2000);
+                        setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+                        
+                    } catch (error) {
+                        console.error('❌ JWT exchange failed:', error);
+                        // Still sign in to local auth
+                        localStorage.setItem('firebase_uid', result.user.uid);
+                        localStorage.setItem('firebase_id_token', idToken);
+                        showNotification('✅ Logged in successfully!', 'success', 2000);
+                        setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+                    }
+                }
+                
+            } catch (error) {
+                console.error('❌ OTP verification failed:', error);
+                setButtonLoading(verifyBtn, false);
+                
+                let errorMsg = 'OTP verification failed';
+                if (error.message.includes('invalid-verification-code')) {
+                    errorMsg = 'Incorrect OTP. Please try again.';
+                } else if (error.message.includes('invalid-verification-id')) {
+                    errorMsg = 'OTP expired. Please request a new one.';
+                } else if (error.message.includes('too-many-requests')) {
+                    errorMsg = 'Too many verification attempts. Please try again later.';
+                } else {
+                    errorMsg = error.message;
+                }
+                
+                showNotification(`❌ ${errorMsg}`, 'error');
             }
+        }
+        
+        // Resend OTP functionality
+        function startResendCountdown() {
+            resendCountdown = 60;
+            const resendBtn = document.querySelector('#votpSection button[onclick*="sendVotp"]');
+            if (!resendBtn) return;
+            
+            const countdown = setInterval(() => {
+                resendCountdown--;
+                if (resendCountdown <= 0) {
+                    clearInterval(countdown);
+                    resendBtn.textContent = '📱 Resend OTP';
+                    resendBtn.disabled = false;
+                } else {
+                    resendBtn.textContent = `Resend OTP (${resendCountdown}s)`;
+                    resendBtn.disabled = true;
+                }
+            }, 1000);
         }
 
         // ===== OTP INPUT AUTO-FOCUS =====
@@ -1035,6 +1347,65 @@
             const index = Array.from(inputs).indexOf(e.target);
             if (e.target.value.length > 1) e.target.value = e.target.value.slice(-1);
             if (e.target.value && index < inputs.length - 1) inputs[index + 1].focus();
+        });
+    </script>
+
+    <!-- ===== FORGOT PASSWORD MODAL ===== -->
+    <div id="forgotPasswordModal" class="forgot-password-modal">
+        <div class="forgot-password-content">
+            <div class="forgot-password-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h2>Password Reset</h2>
+            <p>Unfortunately, password reset is not yet available through our self-service system.</p>
+            <div class="contact-info">
+                <p style="color: var(--text-dark); font-weight: 600;">Please contact our admin:</p>
+                <p class="contact-phone">+94 777 150 660</p>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">Call or WhatsApp to reset your password</p>
+            </div>
+            <button class="forgot-password-close" onclick="closeForgotPasswordModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // ===== PASSWORD VISIBILITY TOGGLE =====
+        function togglePasswordVisibility(fieldId) {
+            const input = document.getElementById(fieldId);
+            const button = input.parentElement.querySelector('.password-toggle-btn');
+            const icon = button.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // ===== FORGOT PASSWORD MODAL =====
+        function showForgotPasswordModal() {
+            document.getElementById('forgotPasswordModal').classList.add('show');
+        }
+
+        function closeForgotPasswordModal() {
+            document.getElementById('forgotPasswordModal').classList.remove('show');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('forgotPasswordModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeForgotPasswordModal();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeForgotPasswordModal();
+            }
         });
     </script>
 </body>
