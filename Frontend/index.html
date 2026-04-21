@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="preload" as="image" href="hero-bg.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="shared.css">
     <link rel="stylesheet" href="styles/navbar.css">
@@ -2242,6 +2243,7 @@
             margin-bottom: 60px;
             position: relative;
             z-index: 10;
+            padding-top: 40px;
         }
 
         .section-header {
@@ -2249,7 +2251,7 @@
             align-items: center;
             justify-content: space-between;
             margin-bottom: 32px;
-            padding: 0 4px;
+            padding: 0 20px;
         }
 
         .section-title-wrap {
@@ -2486,6 +2488,192 @@
             .vehicles-grid {
                 grid-template-columns: 1fr;
                 gap: 16px;
+            }
+        }
+
+        /* ===== PREMIUM PAGINATION ===== */
+        .pagination-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-top: 50px;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(79, 110, 247, 0.05), rgba(139, 92, 246, 0.05));
+            border-radius: 20px;
+            border: 1px solid rgba(79, 110, 247, 0.1);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .pagination-container.hidden {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pagination-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .pagination-btn {
+            background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.95) 100%);
+            border: 1.5px solid rgba(79, 110, 247, 0.25);
+            color: #4f6ef7;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.34, 1.4, 0.64, 1);
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(79, 110, 247, 0.08);
+        }
+
+        .pagination-btn:hover {
+            background: linear-gradient(135deg, #4f6ef7 0%, #6366f1 100%);
+            color: #ffffff;
+            border-color: #4f6ef7;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 110, 247, 0.25);
+        }
+
+        .pagination-btn:active {
+            transform: translateY(0);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: rgba(255, 255, 255, 0.5);
+            color: #cbd5e1;
+            border-color: rgba(79, 110, 247, 0.1);
+        }
+
+        .pagination-btn:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .pagination-buttons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .pagination-number {
+            min-width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            border: 1.5px solid rgba(79, 110, 247, 0.25);
+            background: #ffffff;
+            color: #4f6ef7;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.34, 1.4, 0.64, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(79, 110, 247, 0.08);
+        }
+
+        .pagination-number:hover {
+            background: rgba(79, 110, 247, 0.1);
+            border-color: #4f6ef7;
+            transform: translateY(-2px);
+        }
+
+        .pagination-number.active {
+            background: linear-gradient(135deg, #4f6ef7 0%, #6366f1 100%);
+            color: #ffffff;
+            border-color: #4f6ef7;
+            box-shadow: 0 6px 20px rgba(79, 110, 247, 0.25);
+        }
+
+        .pagination-ellipsis {
+            color: #cbd5e1;
+            font-weight: 600;
+            cursor: default;
+            padding: 0 4px;
+        }
+
+        .pagination-info {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .page-info {
+            background: rgba(79, 110, 247, 0.1);
+            color: #4f6ef7;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: 1px solid rgba(79, 110, 247, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .pagination-wrapper {
+                gap: 8px;
+            }
+
+            .pagination-btn {
+                width: 38px;
+                height: 38px;
+                font-size: 14px;
+            }
+
+            .pagination-number {
+                min-width: 38px;
+                height: 38px;
+                font-size: 12px;
+            }
+
+            .pagination-container {
+                padding: 30px 16px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .pagination-wrapper {
+                gap: 6px;
+            }
+
+            .pagination-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 12px;
+            }
+
+            .pagination-number {
+                min-width: 36px;
+                height: 36px;
+                font-size: 11px;
+            }
+
+            .page-info {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .pagination-info {
+                font-size: 12px;
+                gap: 12px;
             }
         }
 
@@ -3245,6 +3433,22 @@
                     <h3>No Featured Vehicles</h3>
                     <p>Check back soon for premium listings</p>
                 </div>
+
+                <!-- Featured Pagination -->
+                <div id="featured-pagination" class="pagination-container hidden">
+                    <div class="pagination-wrapper">
+                        <button class="pagination-btn pagination-prev" onclick="goToFeaturedPage(-1)" aria-label="Previous page">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <div id="featured-pagination-buttons" class="pagination-buttons"></div>
+                        <button class="pagination-btn pagination-next" onclick="goToFeaturedPage(1)" aria-label="Next page">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="pagination-info">
+                        <span id="featured-page-info" class="page-info">Page 1</span>
+                    </div>
+                </div>
             </section>
 
             <!-- LATEST VEHICLES SECTION -->
@@ -3273,6 +3477,22 @@
                     </svg>
                     <h3>No Vehicles Found</h3>
                     <p>Try adjusting your search filters or check back later</p>
+                </div>
+
+                <!-- Latest Pagination -->
+                <div id="latest-pagination" class="pagination-container hidden">
+                    <div class="pagination-wrapper">
+                        <button class="pagination-btn pagination-prev" onclick="goToLatestPage(-1)" aria-label="Previous page">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <div id="latest-pagination-buttons" class="pagination-buttons"></div>
+                        <button class="pagination-btn pagination-next" onclick="goToLatestPage(1)" aria-label="Next page">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="pagination-info">
+                        <span id="latest-page-info" class="page-info">Page 1</span>
+                    </div>
                 </div>
 
                 <div id="api-error" class="error-state hidden">
@@ -3720,16 +3940,24 @@
             }
         }
 
+        // ===== PAGINATION STATE =====
+        let paginationState = {
+            featured: { items: [], currentPage: 1, itemsPerPage: 15 },
+            latest: { items: [], currentPage: 1, itemsPerPage: 30 }
+        };
+
         function renderVehicles(vehicles) {
             const listEl = getEl('vehicle-list');
             const latestLoadEl = getEl('latest-loading');
             const latestEmptyEl = getEl('latest-empty');
+            const paginationEl = getEl('latest-pagination');
             
             if (!listEl) return;
             
             if (vehicles.length === 0) {
                 if (latestLoadEl) latestLoadEl.classList.add('hidden');
                 if (latestEmptyEl) latestEmptyEl.classList.remove('hidden');
+                if (paginationEl) paginationEl.classList.add('hidden');
                 listEl.style.display = 'none';
                 return;
             }
@@ -3737,8 +3965,183 @@
             if (latestLoadEl) latestLoadEl.classList.add('hidden');
             if (latestEmptyEl) latestEmptyEl.classList.add('hidden');
             
-            listEl.innerHTML = vehicles.map(createCard).join('');
+            // Store vehicles and reset to page 1
+            paginationState.latest.items = vehicles;
+            paginationState.latest.currentPage = 1;
+            
+            // Render pagination
+            displayLatestPage(1);
+        }
+
+        function displayLatestPage(pageNum) {
+            const listEl = getEl('vehicle-list');
+            const paginationEl = getEl('latest-pagination');
+            const { items, itemsPerPage } = paginationState.latest;
+            
+            if (!listEl || items.length === 0) return;
+            
+            const totalPages = Math.ceil(items.length / itemsPerPage);
+            pageNum = Math.max(1, Math.min(pageNum, totalPages));
+            paginationState.latest.currentPage = pageNum;
+            
+            // Get items for this page
+            const startIdx = (pageNum - 1) * itemsPerPage;
+            const endIdx = startIdx + itemsPerPage;
+            const pageItems = items.slice(startIdx, endIdx);
+            
+            // Render items
+            listEl.innerHTML = pageItems.map(createCard).join('');
             listEl.style.display = 'grid';
+            
+            // Update pagination UI
+            updatePaginationButtons('latest', pageNum, totalPages);
+            
+            // Show/hide pagination
+            if (totalPages > 1 && paginationEl) {
+                paginationEl.classList.remove('hidden');
+            } else if (paginationEl) {
+                paginationEl.classList.add('hidden');
+            }
+            
+            // Scroll to top of section
+            const vehicleSection = listEl.closest('.vehicles-section');
+            if (vehicleSection) {
+                vehicleSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function renderFeatured(vehicles) {
+            const scrollEl = getEl('featured-list');
+            const featuredLoadEl = getEl('featured-loading');
+            const featuredEmptyEl = getEl('featured-empty');
+            const paginationEl = getEl('featured-pagination');
+            
+            if (!scrollEl) return;
+            
+            if (vehicles.length === 0) {
+                if (featuredLoadEl) featuredLoadEl.classList.add('hidden');
+                if (featuredEmptyEl) featuredEmptyEl.classList.remove('hidden');
+                if (paginationEl) paginationEl.classList.add('hidden');
+                scrollEl.style.display = 'none';
+                return;
+            }
+            
+            if (featuredLoadEl) featuredLoadEl.classList.add('hidden');
+            if (featuredEmptyEl) featuredEmptyEl.classList.add('hidden');
+            
+            // Store vehicles and reset to page 1
+            paginationState.featured.items = vehicles;
+            paginationState.featured.currentPage = 1;
+            
+            // Render pagination
+            displayFeaturedPage(1);
+        }
+
+        function displayFeaturedPage(pageNum) {
+            const scrollEl = getEl('featured-list');
+            const paginationEl = getEl('featured-pagination');
+            const { items, itemsPerPage } = paginationState.featured;
+            
+            if (!scrollEl || items.length === 0) return;
+            
+            const totalPages = Math.ceil(items.length / itemsPerPage);
+            pageNum = Math.max(1, Math.min(pageNum, totalPages));
+            paginationState.featured.currentPage = pageNum;
+            
+            // Get items for this page
+            const startIdx = (pageNum - 1) * itemsPerPage;
+            const endIdx = startIdx + itemsPerPage;
+            const pageItems = items.slice(startIdx, endIdx);
+            
+            // Render items
+            scrollEl.innerHTML = pageItems.map(createCard).join('');
+            scrollEl.style.display = 'flex';
+            
+            // Update pagination UI
+            updatePaginationButtons('featured', pageNum, totalPages);
+            
+            // Show/hide pagination
+            if (totalPages > 1 && paginationEl) {
+                paginationEl.classList.remove('hidden');
+            } else if (paginationEl) {
+                paginationEl.classList.add('hidden');
+            }
+            
+            // Scroll to top of section
+            const vehicleSection = scrollEl.closest('.vehicles-section');
+            if (vehicleSection) {
+                vehicleSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function updatePaginationButtons(section, currentPage, totalPages) {
+            const buttonsContainer = getEl(`${section}-pagination-buttons`);
+            const pageInfo = getEl(`${section}-page-info`);
+            const prevBtn = document.querySelector(`#${section}-pagination .pagination-prev`);
+            const nextBtn = document.querySelector(`#${section}-pagination .pagination-next`);
+            
+            if (!buttonsContainer) return;
+            
+            // Update page info
+            if (pageInfo) {
+                pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+            }
+            
+            // Update prev/next buttons
+            if (prevBtn) prevBtn.disabled = currentPage === 1;
+            if (nextBtn) nextBtn.disabled = currentPage === totalPages;
+            
+            // Generate page buttons
+            let buttons = '';
+            const maxVisible = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+            
+            if (endPage - startPage < maxVisible - 1) {
+                startPage = Math.max(1, endPage - maxVisible + 1);
+            }
+            
+            // First page
+            if (startPage > 1) {
+                buttons += `<button class="pagination-number" onclick="goToPage('${section}', 1)">1</button>`;
+                if (startPage > 2) {
+                    buttons += `<span class="pagination-ellipsis">...</span>`;
+                }
+            }
+            
+            // Middle pages
+            for (let i = startPage; i <= endPage; i++) {
+                const activeClass = i === currentPage ? 'active' : '';
+                buttons += `<button class="pagination-number ${activeClass}" onclick="goToPage('${section}', ${i})">${i}</button>`;
+            }
+            
+            // Last page
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    buttons += `<span class="pagination-ellipsis">...</span>`;
+                }
+                buttons += `<button class="pagination-number" onclick="goToPage('${section}', ${totalPages})">${totalPages}</button>`;
+            }
+            
+            buttonsContainer.innerHTML = buttons;
+        }
+
+        function goToPage(section, pageNum) {
+            if (section === 'latest') {
+                displayLatestPage(pageNum);
+            } else if (section === 'featured') {
+                displayFeaturedPage(pageNum);
+            }
+        }
+
+        function goToLatestPage(direction) {
+            const newPage = paginationState.latest.currentPage + direction;
+            displayLatestPage(newPage);
+        }
+
+        function goToFeaturedPage(direction) {
+            const newPage = paginationState.featured.currentPage + direction;
+            displayFeaturedPage(newPage);
         }
 
         function contactSeller(vehicleId) {
@@ -4008,27 +4411,6 @@
             if (cond.includes('recond')) return 'badge-recon';
             if (cond.includes('antique')) return 'badge-antique';
             return 'badge-used';
-        }
-
-        function renderFeatured(vehicles) {
-            const scrollEl = getEl('featured-list');
-            const featuredLoadEl = getEl('featured-loading');
-            const featuredEmptyEl = getEl('featured-empty');
-            
-            if (!scrollEl) return;
-            
-            if (vehicles.length === 0) {
-                if (featuredLoadEl) featuredLoadEl.classList.add('hidden');
-                if (featuredEmptyEl) featuredEmptyEl.classList.remove('hidden');
-                scrollEl.style.display = 'none';
-                return;
-            }
-            
-            if (featuredLoadEl) featuredLoadEl.classList.add('hidden');
-            if (featuredEmptyEl) featuredEmptyEl.classList.add('hidden');
-            
-            scrollEl.innerHTML = vehicles.map(createCard).join('');
-            scrollEl.style.display = 'flex';
         }
 
         function applyFilters() {

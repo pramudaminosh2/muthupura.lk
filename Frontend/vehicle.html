@@ -1299,6 +1299,24 @@
             return fuel ? fuel.charAt(0).toUpperCase() + fuel.slice(1) : '-';
         }
 
+        // Format phone number for WhatsApp (handles multiple formats)
+        function formatPhoneForWhatsApp(phone) {
+            if (!phone) return '';
+            
+            // Remove all non-digit characters
+            let digits = phone.replace(/\D/g, '');
+            
+            // Remove leading zeros (local format like 0777150660 → 777150660)
+            digits = digits.replace(/^0+/, '');
+            
+            // If doesn't start with 94, add it (country code for Sri Lanka)
+            if (!digits.startsWith('94')) {
+                digits = '94' + digits;
+            }
+            
+            return digits;
+        }
+
         // ===== RENDER VEHICLE DATA =====
         function renderVehicleData(data) {
             hideError();
@@ -1357,7 +1375,7 @@
 
             // Update contact buttons
             if (data.phone) {
-                const phoneLink = data.phone.replace(/\D/g, '');
+                const phoneLink = formatPhoneForWhatsApp(data.phone);
                 getEl('callButton').href = `tel:+${phoneLink}`;
                 getEl('whatsappButton').href = `https://wa.me/${phoneLink}?text=Hi,%20I%20am%20interested%20in%20your%20${data.year}%20${data.make}%20${data.model}`;
             }

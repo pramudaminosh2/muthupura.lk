@@ -8,7 +8,7 @@ const API_BASE_URL = 'https://api-soez2bw2ma-uc.a.run.app';
 
 // Firebase Configuration for Storage
 const FIREBASE_CONFIG = {
-    apiKey: "AIzaSyDGR24p3h94s8KfCwqxEDgJfC9sxJPB6zs",
+    apiKey: "AIzaSyD6APHZMfX39NE3D0QmqhM9CYcJLEYAq7A",
     authDomain: "muthupuralk.firebaseapp.com",
     projectId: "muthupuralk",
     storageBucket: "muthupuralk.firebasestorage.app",
