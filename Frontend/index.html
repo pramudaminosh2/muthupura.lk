@@ -2129,7 +2129,15 @@
         }
 
         .search-card-wrapper.hidden {
-            display: none;
+            display: none !important;
+            visibility: hidden;
+            height: 0;
+            overflow: hidden;
+        }
+        
+        .search-card-wrapper {
+            display: block;
+            animation: fadeInDown 0.3s ease-out;
         }
 
         @keyframes fadeInDown {
@@ -3253,7 +3261,7 @@
             </div>
 
             <!-- Simple Search Card -->
-            <div class="search-card-wrapper" id="simple-search-wrapper">
+            <div class="search-card-wrapper hidden" id="simple-search-wrapper">
                 <div class="simple-search-card">
                     <div class="search-input-row">
                         <div class="search-field">
@@ -3493,7 +3501,7 @@
                     <p>Loading vehicles...</p>
                 </div>
 
-                <div id="vehicle-list" class="vehicles-grid"></div>
+                <div id="vehicle-list" class="featured-scroll"></div>
 
                 <div id="latest-empty" class="empty-state hidden">
                     <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -3538,7 +3546,7 @@
                     <div class="section-title-wrap">
                         <div class="section-accent-bar"></div>
                         <div>
-                            <h2 class="section-title"><i class="fas fa-sparkles"></i> Brand New Vehicles</h2>
+                            <h2 class="section-title"><i class="fas fa-gem"></i> Brand New Vehicles</h2>
                             <p class="section-subtitle">Unregistered and pristine condition vehicles</p>
                         </div>
                     </div>
@@ -4077,7 +4085,7 @@
             
             // Render items
             listEl.innerHTML = pageItems.map(createCard).join('');
-            listEl.style.display = 'grid';
+            listEl.style.display = 'flex';
             
             // Update pagination UI
             updatePaginationButtons('latest', pageNum, totalPages);
@@ -4665,14 +4673,26 @@
                 // Show simple search, hide advanced search
                 tabSimple.classList.add('active');
                 tabAdvanced.classList.remove('active');
-                if (simpleWrapper) simpleWrapper.classList.remove('hidden');
-                if (advancedWrapper) advancedWrapper.classList.add('hidden');
+                if (simpleWrapper) {
+                    simpleWrapper.classList.remove('hidden');
+                    simpleWrapper.style.display = 'block';
+                }
+                if (advancedWrapper) {
+                    advancedWrapper.classList.add('hidden');
+                    advancedWrapper.style.display = 'none';
+                }
             } else if (mode === 'advanced') {
                 // Show advanced search, hide simple search
                 tabAdvanced.classList.add('active');
                 tabSimple.classList.remove('active');
-                if (simpleWrapper) simpleWrapper.classList.add('hidden');
-                if (advancedWrapper) advancedWrapper.classList.remove('hidden');
+                if (simpleWrapper) {
+                    simpleWrapper.classList.add('hidden');
+                    simpleWrapper.style.display = 'none';
+                }
+                if (advancedWrapper) {
+                    advancedWrapper.classList.remove('hidden');
+                    advancedWrapper.style.display = 'block';
+                }
             }
         }
 
@@ -4714,6 +4734,17 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             updateNavigation();
+            
+            // Initialize search mode - hide all search fields by default (only show buttons)
+            const simpleWrapper = getEl('simple-search-wrapper');
+            const advancedWrapper = getEl('advanced-search-wrapper');
+            const tabSimple = getEl('tab-simple');
+            const tabAdvanced = getEl('tab-advanced');
+            
+            if (simpleWrapper) simpleWrapper.classList.add('hidden');
+            if (advancedWrapper) advancedWrapper.classList.add('hidden');
+            if (tabSimple) tabSimple.classList.remove('active');
+            if (tabAdvanced) tabAdvanced.classList.remove('active');
             
             // 🌐 Wake-up ping for Render cold start (silent)
             console.log('💤 Pinging backend to wake up from cold start...');

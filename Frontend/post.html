@@ -2542,6 +2542,48 @@
             checkAuth();
             updateNavigation();
             initializeNavbarScroll();
+            
+            // ===== HANDLE BRAND NEW VEHICLE POSTING (ADMIN ONLY) =====
+            const urlParams = new URLSearchParams(window.location.search);
+            const vehicleType = urlParams.get('type');
+            
+            if (vehicleType === 'brand_new') {
+                // Check if user is logged in - use correct localStorage key
+                const token = localStorage.getItem('jwt_token');
+                const role = localStorage.getItem('user_role');
+                
+                if (!token || role !== 'admin') {
+                    alert('Only admins can add brand new vehicles');
+                    window.location.href = 'admin.html';
+                    return;
+                }
+                
+                // Set condition to brand_new automatically
+                const conditionField = document.getElementById('condition');
+                if (conditionField) {
+                    conditionField.value = 'brand_new';
+                    conditionField.disabled = true;
+                    conditionField.style.opacity = '0.7';
+                    conditionField.style.cursor = 'not-allowed';
+                    
+                    // Add a note to the label
+                    const conditionLabel = document.querySelector('label[for="condition"]');
+                    if (conditionLabel) {
+                        conditionLabel.innerHTML = 'Condition <span class="required">*</span> <span style="color: #22c55e; font-weight: 600; font-size: 0.85rem;">(Auto: Brand New)</span>';
+                    }
+                }
+                
+                // Update page header
+                const pageTitle = document.querySelector('.page-header h1');
+                if (pageTitle) {
+                    pageTitle.textContent = 'Add Brand New Vehicle';
+                }
+                
+                const pageSubtitle = document.querySelector('.page-header .subtitle');
+                if (pageSubtitle) {
+                    pageSubtitle.textContent = 'Add unregistered and pristine condition vehicles to the Brand New section.';
+                }
+            }
         });
 
         // ===== NAVBAR SCROLL EFFECT (Glassmorphism) =====
