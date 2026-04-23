@@ -817,8 +817,33 @@
 
         @media (max-width: 520px) {
             .vehicle-grid {
-                grid-template-columns: 1fr;
+                display: flex;
+                flex-direction: row;
                 gap: 16px;
+                overflow-x: auto;
+                overflow-y: hidden;
+                scroll-behavior: smooth;
+                padding: 8px 0 12px 0;
+                width: 100vw;
+                margin-left: calc(-50vw + 50%);
+                grid-template-columns: unset;
+            }
+
+            .vehicle-grid .card {
+                flex: 0 0 calc(75% - 8px);
+                min-width: 200px;
+            }
+
+            /* Horizontal scrollbar styling for mobile */
+            .vehicle-grid::-webkit-scrollbar {
+                height: 6px;
+                display: none;
+            }
+
+            .vehicle-grid::-webkit-scrollbar-thumb {
+                background: rgba(79, 110, 247, 0.3);
+                border-radius: 3px;
+                display: none;
             }
         }
 
@@ -3220,10 +3245,10 @@
             <!-- Search Mode Tabs -->
             <div class="search-tabs">
                 <button class="search-tab active" onclick="switchSearchMode('simple')" id="tab-simple">
-                    🔍 Simple Search
+                    <i class="fas fa-search"></i> Simple Search
                 </button>
                 <button class="search-tab" onclick="switchSearchMode('advanced')" id="tab-advanced">
-                    ⚙️ Advanced Search
+                    <i class="fas fa-sliders"></i> Advanced Search
                 </button>
             </div>
 
@@ -3412,7 +3437,7 @@
                     <div class="section-title-wrap">
                         <div class="section-accent-bar"></div>
                         <div>
-                            <h2 class="section-title">⭐ Featured Vehicles</h2>
+                            <h2 class="section-title"><i class="fas fa-star"></i> Featured Vehicles</h2>
                             <p class="section-subtitle">Premium listings handpicked for you</p>
                         </div>
                     </div>
@@ -3457,7 +3482,7 @@
                     <div class="section-title-wrap">
                         <div class="section-accent-bar"></div>
                         <div>
-                            <h2 class="section-title">🚗 Latest Vehicles</h2>
+                            <h2 class="section-title"><i class="fas fa-car"></i> Latest Vehicles</h2>
                             <p class="section-subtitle">Browse all available vehicles</p>
                         </div>
                     </div>
@@ -3506,6 +3531,51 @@
                     <button class="btn-retry" onclick="retryLoadVehicles()">Retry</button>
                 </div>
             </section>
+
+            <!-- BRAND NEW VEHICLES SECTION -->
+            <section class="vehicles-section">
+                <div class="section-header">
+                    <div class="section-title-wrap">
+                        <div class="section-accent-bar"></div>
+                        <div>
+                            <h2 class="section-title"><i class="fas fa-sparkles"></i> Brand New Vehicles</h2>
+                            <p class="section-subtitle">Unregistered and pristine condition vehicles</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="brandnew-loading" class="loader-container hidden">
+                    <div class="spinner"></div>
+                    <p>Loading brand new vehicles...</p>
+                </div>
+
+                <div id="brandnew-list" class="featured-scroll"></div>
+
+                <div id="brandnew-empty" class="empty-state hidden">
+                    <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"></path>
+                        <circle cx="12" cy="12" r="4"></circle>
+                    </svg>
+                    <h3>No Brand New Vehicles</h3>
+                    <p>Check back soon for new listings</p>
+                </div>
+
+                <!-- Brand New Pagination -->
+                <div id="brandnew-pagination" class="pagination-container hidden">
+                    <div class="pagination-wrapper">
+                        <button class="pagination-btn pagination-prev" onclick="goToBrandNewPage(-1)" aria-label="Previous page">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <div id="brandnew-pagination-buttons" class="pagination-buttons"></div>
+                        <button class="pagination-btn pagination-next" onclick="goToBrandNewPage(1)" aria-label="Next page">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="pagination-info">
+                        <span id="brandnew-page-info" class="page-info">Page 1</span>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
 
@@ -3542,7 +3612,7 @@
         <!-- Quick Navigation -->
         <div class="footer-col" id="footer-navigation">
           <button class="footer-col-header" data-mobile-toggle="footer-navigation">
-            <h3>🏠 Quick Navigation</h3>
+            <h3><i class="fas fa-home"></i> Quick Navigation</h3>
             <span class="toggle-icon">+</span>
           </button>
           <div class="footer-col-content">
@@ -3557,7 +3627,7 @@
         <!-- Services -->
         <div class="footer-col" id="footer-services">
           <button class="footer-col-header" data-mobile-toggle="footer-services">
-            <h3>🚗 Services</h3>
+            <h3><i class="fas fa-car"></i> Services</h3>
             <span class="toggle-icon">+</span>
           </button>
           <div class="footer-col-content">
@@ -3713,7 +3783,7 @@
         try {
             const app = firebase.initializeApp(FIREBASE_CONFIG);
             firebaseDb = firebase.firestore();
-            console.log('✅ Firebase initialized');
+            console.log('✓ Firebase initialized');
         } catch (err) {
             console.warn('⚠️ Firebase initialization warning (non-critical):', err.message);
         }
@@ -3781,7 +3851,7 @@
                         }
                         
                         const profile = await res.json();
-                        console.log('✅ Profile fetched:', profile);
+                        console.log('✓ Profile fetched:', profile);
                         
                         if (profile.name) {
                             payload.name = profile.name;
@@ -3866,7 +3936,7 @@
         function syncMobileAuth() {
             // Mobile auth button is now separate from navbar button
             // This function can be used for other syncs if needed
-            console.log('✅ Mobile auth sync completed');
+            console.log('✓ Mobile auth sync completed');
         }
 
         async function fetchVehicles() {
@@ -3915,7 +3985,7 @@
                     ? `${API_URL}/api/vehicles?${queryString}`
                     : `${API_URL}/api/vehicles`;
 
-                console.log('🚗 Fetching vehicles from:', url);
+                console.log('> Fetching vehicles from:', url);
                 const res = await fetch(url);
                 
                 if (!res.ok) {
@@ -3923,7 +3993,7 @@
                 }
                 
                 vehiclesData = await res.json();
-                console.log('✅ Vehicles fetched:', vehiclesData.vehicles?.length || vehiclesData.length || vehiclesData?.data?.length || 0);
+                console.log('✓ Vehicles fetched:', vehiclesData.vehicles?.length || vehiclesData.length || vehiclesData?.data?.length || 0);
                 
                 // Check if response is wrapped or raw array - handle {vehicles: [...]} format
                 const vehicles = vehiclesData?.vehicles || vehiclesData?.data || (Array.isArray(vehiclesData) ? vehiclesData : []);
@@ -3940,6 +4010,7 @@
                 // Render vehicles and featured
                 renderVehicles(vehicles);
                 renderFeatured(vehicles.filter(v => v.isFeatured || v.featured));
+                renderBrandNew(vehicles.filter(v => v.condition && (v.condition.toLowerCase() === 'brand_new' || v.condition.toLowerCase() === 'brand new')));
             } catch (err) {
                 console.error('❌ Fetch error:', err);
                 // Show error state
@@ -3957,7 +4028,8 @@
         // ===== PAGINATION STATE =====
         let paginationState = {
             featured: { items: [], currentPage: 1, itemsPerPage: 15 },
-            latest: { items: [], currentPage: 1, itemsPerPage: 30 }
+            latest: { items: [], currentPage: 1, itemsPerPage: 30 },
+            brandnew: { items: [], currentPage: 1, itemsPerPage: 15 }
         };
 
         function renderVehicles(vehicles) {
@@ -4133,6 +4205,8 @@
                 displayLatestPage(pageNum);
             } else if (section === 'featured') {
                 displayFeaturedPage(pageNum);
+            } else if (section === 'brandnew') {
+                displayBrandNewPage(pageNum);
             }
         }
 
@@ -4144,6 +4218,69 @@
         function goToFeaturedPage(direction) {
             const newPage = paginationState.featured.currentPage + direction;
             displayFeaturedPage(newPage);
+        }
+
+        function renderBrandNew(vehicles) {
+            const scrollEl = getEl('brandnew-list');
+            const brandnewLoadEl = getEl('brandnew-loading');
+            const brandnewEmptyEl = getEl('brandnew-empty');
+            const paginationEl = getEl('brandnew-pagination');
+            
+            if (!scrollEl) return;
+            
+            if (vehicles.length === 0) {
+                if (brandnewLoadEl) brandnewLoadEl.classList.add('hidden');
+                if (brandnewEmptyEl) brandnewEmptyEl.classList.remove('hidden');
+                if (paginationEl) paginationEl.classList.add('hidden');
+                scrollEl.style.display = 'none';
+                return;
+            }
+            
+            if (brandnewLoadEl) brandnewLoadEl.classList.add('hidden');
+            if (brandnewEmptyEl) brandnewEmptyEl.classList.add('hidden');
+            
+            // Store vehicles and reset to page 1
+            paginationState.brandnew.items = vehicles;
+            paginationState.brandnew.currentPage = 1;
+            
+            // Render pagination
+            displayBrandNewPage(1);
+        }
+
+        function displayBrandNewPage(pageNum) {
+            const scrollEl = getEl('brandnew-list');
+            const paginationEl = getEl('brandnew-pagination');
+            const { items, itemsPerPage } = paginationState.brandnew;
+            
+            if (!scrollEl || items.length === 0) return;
+            
+            const totalPages = Math.ceil(items.length / itemsPerPage);
+            pageNum = Math.max(1, Math.min(pageNum, totalPages));
+            paginationState.brandnew.currentPage = pageNum;
+            
+            // Get items for this page
+            const startIdx = (pageNum - 1) * itemsPerPage;
+            const endIdx = startIdx + itemsPerPage;
+            const pageItems = items.slice(startIdx, endIdx);
+            
+            // Render items
+            scrollEl.innerHTML = pageItems.map(createCard).join('');
+            scrollEl.style.display = 'flex';
+            
+            // Update pagination UI
+            updatePaginationButtons('brandnew', pageNum, totalPages);
+            
+            // Show/hide pagination
+            if (totalPages > 1 && paginationEl) {
+                paginationEl.classList.remove('hidden');
+            } else if (paginationEl) {
+                paginationEl.classList.add('hidden');
+            }
+        }
+
+        function goToBrandNewPage(direction) {
+            const newPage = paginationState.brandnew.currentPage + direction;
+            displayBrandNewPage(newPage);
         }
 
         function contactSeller(vehicleId) {
@@ -4458,7 +4595,7 @@
                     ? `${API_URL}/api/vehicles?${queryString}`
                     : `${API_URL}/api/vehicles`;
                 
-                console.log('🔍 Filtering vehicles:', url);
+                console.log('> Filtering vehicles:', url);
                 const res = await fetch(url);
                 
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -4474,6 +4611,7 @@
                 vehiclesData = vehicleArray;
                 renderVehicles(vehicleArray);
                 renderFeatured(vehicleArray.filter(v => v.isFeatured === true || v.featured === true));
+                renderBrandNew(vehicleArray.filter(v => v.condition && (v.condition.toLowerCase() === 'brand_new' || v.condition.toLowerCase() === 'brand new')));
                 
             } catch (err) {
                 console.error('❌ Filter error:', err);
@@ -4581,17 +4719,17 @@
             console.log('💤 Pinging backend to wake up from cold start...');
             fetch(`${API_URL}/api/health`, { method: 'GET' })
                 .then(r => r.json())
-                .then(data => console.log('✅ Backend healthy:', data))
+                .then(data => console.log('✓ Backend healthy:', data))
                 .catch(() => console.log('⚠️ Backend not responding yet, proceeding anyway...'));
             
-            // 📊 Track home page views in Firestore (non-blocking)
+            // [LOG] Track home page views in Firestore (non-blocking)
             try {
                 if (firebaseDb) {
                     const pageViewRef = firebaseDb.collection('pageViews').doc('homepage');
                     await pageViewRef.update({
                         count: firebase.firestore.FieldValue.increment(1)
                     });
-                    console.log('✅ Home page view tracked in Firestore');
+                    console.log('✓ Home page view tracked in Firestore');
                 } else {
                     console.warn('⚠️ Firebase not available, skipping view tracking');
                 }
