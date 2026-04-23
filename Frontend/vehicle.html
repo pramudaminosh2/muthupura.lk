@@ -1376,7 +1376,7 @@
             // Update contact buttons
             if (data.phone) {
                 const phoneLink = formatPhoneForWhatsApp(data.phone);
-                getEl('callButton').href = `tel:+${phoneLink}`;
+                getEl('callButton').href = `tel:${phoneLink}`;
                 getEl('whatsappButton').href = `https://wa.me/${phoneLink}?text=Hi,%20I%20am%20interested%20in%20your%20${data.year}%20${data.make}%20${data.model}`;
             }
 

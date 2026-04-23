@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="shared.css">
     <link rel="stylesheet" href="styles/navbar.css">
     <style>
@@ -1142,22 +1143,22 @@
             <!-- Stats Section -->
             <div class="admin-stats-row">
                 <div class="stat-card stat-loading" id="totalVehiclesCard">
-                    <span class="stat-icon">📊</span>
+                    <span class="stat-icon"><i class="fas fa-chart-bar"></i></span>
                     <div class="stat-label">Total Vehicle Ads</div>
                     <div class="stat-value" id="totalVehicles">-</div>
                 </div>
                 <div class="stat-card stat-loading" id="activeVehiclesCard">
-                    <span class="stat-icon">✅</span>
+                    <span class="stat-icon"><i class="fas fa-check-circle"></i></span>
                     <div class="stat-label">Active Listings</div>
                     <div class="stat-value" id="activeVehicles">-</div>
                 </div>
                 <div class="stat-card stat-loading" id="totalUsersCard">
-                    <span class="stat-icon">👥</span>
+                    <span class="stat-icon"><i class="fas fa-users"></i></span>
                     <div class="stat-label">Registered Users</div>
                     <div class="stat-value" id="totalUsers">-</div>
                 </div>
                 <div class="stat-card stat-loading" id="homeViewsCard">
-                    <span class="stat-icon">👁️</span>
+                    <span class="stat-icon"><i class="fas fa-eye"></i></span>
                     <div class="stat-label">Home Page Views</div>
                     <div class="stat-value" id="homeViews">-</div>
                 </div>
@@ -1165,7 +1166,7 @@
 
             <!-- Search & Filter Section -->
             <div class="search-section">
-                <h3>🔍 Search Vehicles & Sellers</h3>
+                <h3><i class="fas fa-search"></i> Search Vehicles & Sellers</h3>
                 <div class="search-controls">
                     <div class="search-input-group">
                         <label for="searchVehicleName">Vehicle Name</label>
@@ -1196,14 +1197,14 @@
                             <option value="inactive">Inactive</option>
                         </select>
                     </div>
-                    <button id="searchBtn" class="btn-search" title="Search">🔍 Search</button>
+                    <button id="searchBtn" class="btn-search" title="Search"><i class="fas fa-search"></i> Search</button>
                     <button id="resetBtn" class="btn-reset" title="Reset filters">Reset</button>
                 </div>
             </div>
 
             <!-- Vehicles Section -->
             <div class="vehicles-section">
-                <h2>📋 All Vehicles</h2>
+                <h2><i class="fas fa-list"></i> All Vehicles</h2>
                 <div class="vehicles-table-wrapper">
                     <table class="vehicles-table" id="vehiclesTable">
                         <thead>
@@ -1269,7 +1270,7 @@
                 <!-- Quick Navigation -->
                 <div class="footer-col" id="footer-navigation">
                     <button class="footer-col-header" data-mobile-toggle="footer-navigation">
-                        <h3>🏠 Quick Navigation</h3>
+                        <h3><i class="fas fa-home"></i> Quick Navigation</h3>
                         <span class="toggle-icon">+</span>
                     </button>
                     <div class="footer-col-content">
@@ -1284,7 +1285,7 @@
                 <!-- Services -->
                 <div class="footer-col" id="footer-services">
                     <button class="footer-col-header" data-mobile-toggle="footer-services">
-                        <h3>🚗 Services</h3>
+                        <h3><i class="fas fa-car"></i> Services</h3>
                         <span class="toggle-icon">+</span>
                     </button>
                     <div class="footer-col-content">
@@ -1341,6 +1342,20 @@
 
     <!-- Scripts -->
     <script src="config.js"></script>
+    <!-- Firebase SDK - Load without blocking -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+    <script>
+        // Initialize Firebase after SDK loads
+        let firebaseDb = null;
+        try {
+            const app = firebase.initializeApp(FIREBASE_CONFIG);
+            firebaseDb = firebase.firestore();
+            console.log('✅ Firebase initialized for Admin');
+        } catch (err) {
+            console.warn('⚠️ Firebase initialization warning (non-critical):', err.message);
+        }
+    </script>
     <script src="auth-ui.js"></script>
     <script>
         // ============================================
@@ -1429,9 +1444,28 @@
                 allVehicles = vehiclesData.vehicles || [];
                 allUsers = usersData.users || [];
 
-                // Load local stats
-                const stats = JSON.parse(localStorage.getItem('stats') || '{"homeViews": 0}');
+                // Load home page views from Firestore (non-blocking)
+                let homeViews = 0;
+                try {
+                    if (firebaseDb) {
+                        const docSnap = await firebaseDb.collection('pageViews').doc('homepage').get();
+                        if (docSnap.exists) {
+                            homeViews = docSnap.data().count || 0;
+                            console.log('✅ Home page views from Firestore:', homeViews);
+                        } else {
+                            console.log('⚠️ Homepage document not found in Firestore');
+                            homeViews = 0;
+                        }
+                    } else {
+                        console.warn('⚠️ Firebase not available');
+                        homeViews = 0;
+                    }
+                } catch (firebaseErr) {
+                    console.warn('⚠️ Error fetching home page views (non-critical):', firebaseErr.message);
+                    homeViews = 0;
+                }
 
+                const stats = { homeViews };
                 updateStats(stats);
                 displayVehicles(allVehicles);
 
