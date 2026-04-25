@@ -21,8 +21,14 @@ window.performLogout = function() {
         }
     });
     console.log('🚪 All auth data cleared');
-    console.log('⏭️  Redirecting to contact.html...');
-    window.location.href = 'contact.html';
+    console.log('⏭️  Redirecting to index.html...');
+    
+    // Force hard reload to clear caches and get fresh index.html
+    window.location.href = 'index.html?logout=' + Date.now();
+    setTimeout(() => {
+        // Fallback: hard refresh after 500ms
+        window.location.reload(true);
+    }, 500);
 };
 
 /**

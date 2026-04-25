@@ -44,8 +44,13 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.removeItem('user_role');
         localStorage.removeItem('user_name');
         
-        // Optional: Redirect to home if on restricted page
-        window.location.reload();
+        // Force redirect with cache bust query param
+        window.location.href = 'index.html?logout=' + Date.now();
+        
+        // Fallback: hard refresh
+        setTimeout(() => {
+            window.location.reload(true);
+        }, 500);
     }
 
     // ============================================

@@ -436,6 +436,14 @@
     <!-- Firebase Authentication SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#0d6efd" />
+    <meta name="description" content="Find Your Perfect Vehicle - Buy, Sell, and Trade Vehicles with Confidence" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Muthupura.lk" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
 </head>
 <body>
     <!-- Notification Container for Floating Messages -->
@@ -1408,6 +1416,8 @@
             }
         });
     </script>
+    <!-- PWA Installation & Service Worker -->
+    <script src="pwa-install.js"></script>
 </body>
 </html>
 
